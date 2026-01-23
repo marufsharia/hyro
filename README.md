@@ -65,12 +65,15 @@ Or modify config/hyro.php directly after publishing:
 
 ```bash
 php artisan vendor:publish --tag=hyro-config
+```
 🔧 Available Commands (Phase 1)
-bash
+
+```bash
 php artisan hyro:install          # Install Hyro
 php artisan hyro:create-user      # Create a new user
 php artisan hyro:status   
-```        # Check Hyro status (coming soon)
+```        
+### Check Hyro status (coming soon)
 🧪 Testing Phase 1
 Manual Test Script
 Create a test route in your Laravel application:
@@ -93,9 +96,11 @@ Route::get('/test-hyro', function() {
 ```
 Or use Tinker:
 
-bash
+```bash
 php artisan tinker
->>> \MarufSharia\Hyro\Facades\Hyro::status()
+```
+> \MarufSharia\Hyro\Facades\Hyro::status()
+
 🏗️ Project Structure
 ```
 marufsharia/hyro/
