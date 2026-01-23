@@ -97,7 +97,7 @@ bash
 php artisan tinker
 >>> \MarufSharia\Hyro\Facades\Hyro::status()
 🏗️ Project Structure
-text
+```
 marufsharia/hyro/
 ├── src/
 │   ├── HyroServiceProvider.php
@@ -112,26 +112,27 @@ marufsharia/hyro/
 ├── routes/
 └── README.md
 📚 Documentation
+```
 Complete documentation will be available in Phase 11. For now:
 
-Service Provider: MarufSharia\Hyro\HyroServiceProvider
+> Service Provider: MarufSharia\Hyro\HyroServiceProvider
 
-Facade: MarufSharia\Hyro\Facades\Hyro
+> Facade: MarufSharia\Hyro\Facades\Hyro
 
-Config: config('hyro')
+> Config: config('hyro')
 
 🛡️ Security Notes
-Feature Toggles: All features can be disabled via environment variables
+> Feature Toggles: All features can be disabled via environment variables
 
-Configurable Tables: Avoid table name collisions
+> Configurable Tables: Avoid table name collisions
 
-Protected Roles: Super-admin and admin roles are protected by default
+> Protected Roles: Super-admin and admin roles are protected by default
 
-Audit Logging: Built-in audit trail (enable in config)
+> Audit Logging: Built-in audit trail (enable in config)
 
 🤝 Contributing
 This package is under active development. Phase 1 establishes the foundation. Next phases will add:
-
+```
 Database migrations
 
 Core models with traits
@@ -147,14 +148,15 @@ REST API
 Admin UI
 
 Security hardening
-
+```
 📄 License
 MIT License. See LICENSE file.
 
-👤 Author
+```👤 Author
 Maruf Sharia
 
 Email: marufsharia@gmail.com
 
 GitHub: @marufsharia
+```
 
