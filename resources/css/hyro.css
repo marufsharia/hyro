@@ -1,0 +1,557 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+ | Tailwind Component Extensions
+ |============================================================ */
+@layer components {
+    .btn {
+        @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium
+        focus:outline-none focus:ring-2 focus:ring-offset-2 transition;
+    }
+
+    .btn-primary {
+        @apply bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500;
+    }
+
+    .btn-secondary {
+        @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500;
+    }
+
+    .btn-danger {
+        @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    }
+
+    .form-label {
+        @apply block text-sm font-medium text-gray-700;
+    }
+
+    .form-input {
+        @apply block w-full rounded-md border-gray-300 shadow-sm
+        focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
+    }
+
+    .card {
+        @apply bg-white rounded-lg shadow-sm overflow-hidden;
+    }
+}
+
+/* Hyro Package Styles - Vite Compiled */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --hyro-primary: #7c3aed;
+    --hyro-primary-dark: #6d28d9;
+    --hyro-primary-light: #ede9fe;
+    --hyro-secondary: #10b981;
+    --hyro-danger: #ef4444;
+    --hyro-warning: #f59e0b;
+    --hyro-success: #10b981;
+    --hyro-info: #3b82f6;
+    --hyro-dark: #1f2937;
+    --hyro-light: #f9fafb;
+    --hyro-border: #e5e7eb;
+    --hyro-radius: 0.5rem;
+    --hyro-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --hyro-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body.hyro-body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--hyro-light);
+    color: var(--hyro-dark);
+    line-height: 1.5;
+    font-size: 0.875rem;
+}
+
+.hyro-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Buttons */
+.hyro-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: var(--hyro-radius);
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    text-decoration: none;
+    user-select: none;
+}
+
+.hyro-btn:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.5);
+}
+
+.hyro-btn-primary {
+    background-color: var(--hyro-primary);
+    color: white;
+}
+
+.hyro-btn-primary:hover {
+    background-color: var(--hyro-primary-dark);
+}
+
+.hyro-btn-secondary {
+    background-color: white;
+    color: var(--hyro-dark);
+    border-color: var(--hyro-border);
+}
+
+.hyro-btn-secondary:hover {
+    background-color: var(--hyro-light);
+}
+
+.hyro-btn-danger {
+    background-color: var(--hyro-danger);
+    color: white;
+}
+
+.hyro-btn-danger:hover {
+    background-color: #dc2626;
+}
+
+/* Cards */
+.hyro-card {
+    background: white;
+    border-radius: var(--hyro-radius);
+    box-shadow: var(--hyro-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.hyro-card-header {
+    border-bottom: 1px solid var(--hyro-border);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hyro-card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--hyro-dark);
+}
+
+/* Forms */
+.hyro-form-group {
+    margin-bottom: 1rem;
+}
+
+.hyro-form-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--hyro-dark);
+    font-size: 0.875rem;
+}
+
+.hyro-form-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--hyro-border);
+    border-radius: var(--hyro-radius);
+    background-color: white;
+    font-size: 0.875rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.hyro-form-input:focus {
+    outline: none;
+    border-color: var(--hyro-primary);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.hyro-form-error {
+    color: var(--hyro-danger);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* Tables */
+.hyro-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 0.875rem;
+}
+
+.hyro-table th {
+    background-color: var(--hyro-light);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--hyro-dark);
+    border-bottom: 1px solid var(--hyro-border);
+    white-space: nowrap;
+}
+
+.hyro-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--hyro-border);
+    vertical-align: middle;
+}
+
+.hyro-table tr:hover {
+    background-color: var(--hyro-light);
+}
+
+.hyro-table .hyro-table-actions {
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Alerts */
+.hyro-alert {
+    padding: 1rem;
+    border-radius: var(--hyro-radius);
+    margin-bottom: 1rem;
+    border-left: 4px solid transparent;
+    font-size: 0.875rem;
+}
+
+.hyro-alert-success {
+    background-color: #d1fae5;
+    border-color: var(--hyro-success);
+    color: #065f46;
+}
+
+.hyro-alert-danger {
+    background-color: #fee2e2;
+    border-color: var(--hyro-danger);
+    color: #991b1b;
+}
+
+.hyro-alert-warning {
+    background-color: #fef3c7;
+    border-color: var(--hyro-warning);
+    color: #92400e;
+}
+
+.hyro-alert-info {
+    background-color: #dbeafe;
+    border-color: var(--hyro-info);
+    color: #1e40af;
+}
+
+/* Navigation */
+.hyro-nav {
+    background: white;
+    border-bottom: 1px solid var(--hyro-border);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.hyro-nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.hyro-nav-brand {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--hyro-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hyro-nav-menu {
+    display: flex;
+    gap: 0.5rem;
+    list-style: none;
+}
+
+.hyro-nav-item a {
+    color: #6b7280;
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--hyro-radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.15s ease-in-out;
+}
+
+.hyro-nav-item a:hover {
+    background-color: var(--hyro-light);
+    color: var(--hyro-dark);
+}
+
+.hyro-nav-item.active a {
+    background-color: var(--hyro-primary);
+    color: white;
+}
+
+/* Loading States */
+.hyro-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+}
+
+.hyro-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid var(--hyro-border);
+    border-top-color: var(--hyro-primary);
+    border-radius: 50%;
+    animation: hyro-spin 1s linear infinite;
+}
+
+@keyframes hyro-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hyro-nav-container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .hyro-nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hyro-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+/* Toast Notifications */
+.hyro-toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+}
+
+.hyro-toast {
+    background: white;
+    border-radius: var(--hyro-radius);
+    padding: 1rem;
+    box-shadow: var(--hyro-shadow-lg);
+    margin-bottom: 0.5rem;
+    min-width: 300px;
+    max-width: 400px;
+    animation: hyro-toast-slide 0.3s ease-out;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+@keyframes hyro-toast-slide {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.hyro-toast-content {
+    flex: 1;
+}
+
+.hyro-toast-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.hyro-toast-message {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.hyro-toast-close {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0;
+}
+
+.hyro-toast-success {
+    border-left: 4px solid var(--hyro-success);
+}
+
+.hyro-toast-danger {
+    border-left: 4px solid var(--hyro-danger);
+}
+
+.hyro-toast-warning {
+    border-left: 4px solid var(--hyro-warning);
+}
+
+.hyro-toast-info {
+    border-left: 4px solid var(--hyro-info);
+}
+
+/* Modal */
+.hyro-modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.hyro-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.hyro-modal-content {
+    background: white;
+    border-radius: var(--hyro-radius);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--hyro-shadow-lg);
+    animation: hyro-modal-slide 0.3s ease-out;
+}
+
+@keyframes hyro-modal-slide {
+    from {
+        transform: translateY(-1rem);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.hyro-modal-header {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--hyro-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hyro-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--hyro-dark);
+}
+
+.hyro-modal-close {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+    padding: 0;
+}
+
+.hyro-modal-body {
+    padding: 1.5rem;
+}
+
+.hyro-modal-footer {
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid var(--hyro-border);
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+/* Dashboard Widgets */
+.hyro-widget-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.hyro-widget {
+    background: white;
+    border-radius: var(--hyro-radius);
+    padding: 1.5rem;
+    box-shadow: var(--hyro-shadow);
+}
+
+.hyro-widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.hyro-widget-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.hyro-widget-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--hyro-primary);
+    margin-bottom: 0.5rem;
+}
+
+.hyro-widget-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.hyro-widget-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--hyro-radius);
+    background-color: var(--hyro-primary-light);
+    color: var(--hyro-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
