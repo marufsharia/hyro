@@ -1,0 +1,18 @@
+# Vite
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+public/build/
+public/hot
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Development
+*.log
+*.tmp

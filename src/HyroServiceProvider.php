@@ -220,6 +220,8 @@ class HyroServiceProvider extends ServiceProvider
             \Marufsharia\Hyro\Console\Commands\Publis\PublishHyroAssets::class,
             \Marufsharia\Hyro\Console\Commands\Publis\HyroCompileCommand::class,
             \Marufsharia\Hyro\Console\Commands\Publis\HyroPublishCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Publis\ViteCompileCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Publis\ViteDevCommand::class,
         ]);
     }
 
