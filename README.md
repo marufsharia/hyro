@@ -9,7 +9,7 @@
 Hyro is an enterprise-grade Authentication, Authorization, Role & Privilege Management System for Laravel 12+. Built with security, extensibility, and developer experience in mind.
 
 ## ✨ Features (Planned)
-
+```
 | Phase | Status | Features |
 |-------|--------|----------|
 | 1 | ✅ Complete | Package Foundation, Service Provider, Configuration |
@@ -21,9 +21,9 @@ Hyro is an enterprise-grade Authentication, Authorization, Role & Privilege Mana
 | 7 | ⏳ Pending | REST API |
 | 8 | ⏳ Pending | Blade Directives |
 | 9 | ⏳ Pending | Admin UI |
-| 10 | ⏳ Pending | Security Hardening |
-| 11 | ⏳ Pending | Documentation |
-
+| 10 |⏳ Pending | Security Hardening |
+| 11 |⏳ Pending | Documentation |
+```
 ## 📦 Installation
 
 ```bash
