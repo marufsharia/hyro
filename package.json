@@ -1,4 +1,19 @@
 {
+    "name": "hyro",
+    "version": "1.0.0",
+    "description": "> **Namespace:** `MarufSharia\\Hyro` > **Author:** Maruf Sharia > **Status:** Phase 1 Complete - Foundation Ready",
+    "main": "tailwind.config.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/marufsharia/hyro.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/marufsharia/hyro/issues"
+    },
+    "homepage": "https://github.com/marufsharia/hyro#readme",
     "private": true,
     "type": "module",
     "scripts": {
@@ -6,14 +21,16 @@
         "build": "vite build"
     },
     "devDependencies": {
-        "@tailwindcss/forms": "^0.5",
-        "autoprefixer": "^10.4.23",
+        "@tailwindcss/forms": "^0.5.10",
+        "@tailwindcss/vite": "^4.1.18",
+        "autoprefixer": "^10.4.19",
         "laravel-vite-plugin": "^1.3.0",
         "postcss": "^8.5.6",
-        "tailwindcss": "^3.4.19",
-        "vite": "^5.0"
+        "vite": "^5.4.21"
     },
     "dependencies": {
-        "@tailwindcss/vite": "^4.1.18"
+        "@tailwindcss/postcss": "^4.1.18",
+        "alpinejs": "^3.15.4",
+        "tailwindcss": "^4.1.18"
     }
 }

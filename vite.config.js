@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import laravel from 'laravel-vite-plugin'
+import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -13,8 +14,9 @@ export default defineConfig({
                 'resources/js/hyro.js',
                 'resources/css/hyro.css',
             ],
-            refresh: false,
+            refresh: true,
         }),
+
     ],
 
     build: {
@@ -24,6 +26,6 @@ export default defineConfig({
     },
 
     css: {
-        postcss: path.resolve(__dirname, 'postcss.config.js'),
+        postcss: path.resolve(__dirname, 'postcss.config.mjs'),
     },
 })

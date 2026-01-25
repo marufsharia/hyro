@@ -1,6 +1,6 @@
 <?php
 
-namespace MarufSharia\Hyro\Console\Commands\UserManagement;
+namespace Marufsharia\Hyro\Console\Commands\UserManagement;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;

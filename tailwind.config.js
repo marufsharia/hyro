@@ -6,6 +6,7 @@ export default {
         './resources/**/*.vue',
         './src/**/*.php',
     ],
+    darkMode: 'class', // Add this for dark mode support
     theme: {
         extend: {},
     },

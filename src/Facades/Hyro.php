@@ -1,15 +1,15 @@
 <?php
 
-namespace MarufSharia\Hyro\Facades;
+namespace Marufsharia\Hyro\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \MarufSharia\Hyro\HyroManager driver(string $driver = null)
- * @method static \MarufSharia\Hyro\Contracts\UserContract user()
- * @method static \MarufSharia\Hyro\Models\Role role()
- * @method static \MarufSharia\Hyro\Models\Privilege privilege()
- * @method static \MarufSharia\Hyro\Contracts\AuditLogger audit()
+ * @method static \Marufsharia\Hyro\HyroManager driver(string $driver = null)
+ * @method static \Marufsharia\Hyro\Contracts\UserContract user()
+ * @method static \Marufsharia\Hyro\Models\Role role()
+ * @method static \Marufsharia\Hyro\Models\Privilege privilege()
+ * @method static \Marufsharia\Hyro\Contracts\AuditLogger audit()
  * @method static bool install()
  * @method static bool uninstall(bool $force = false)
  * @method static array status()
@@ -24,8 +24,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static void clearCache()
  * @method static void emergencyLockdown()
  * @method static void emergencyUnlock()
- * 
- * @see \MarufSharia\Hyro\HyroManager
+ *
+ * @see \Marufsharia\Hyro\HyroManager
  */
 class Hyro extends Facade
 {

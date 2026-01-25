@@ -1,40 +1,15 @@
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* ============================================================
- | Tailwind Component Extensions
- |============================================================ */
+/* Custom components - these work fine */
 @layer components {
     .btn {
         @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium
         focus:outline-none focus:ring-2 focus:ring-offset-2 transition;
     }
-
-    .btn-primary {
-        @apply bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500;
-    }
-
-    .btn-secondary {
-        @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500;
-    }
-
-    .btn-danger {
-        @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
-    }
-
-    .form-label {
-        @apply block text-sm font-medium text-gray-700;
-    }
-
-    .form-input {
-        @apply block w-full rounded-md border-gray-300 shadow-sm
-        focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
-    }
-
-    .card {
-        @apply bg-white rounded-lg shadow-sm overflow-hidden;
-    }
+    .btn-primary { @apply bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500; }
+    .btn-secondary { @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500; }
+    .btn-danger { @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500; }
+    .form-label { @apply block text-sm font-medium text-gray-700; }
+    .form-input { @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm; }
+    .card { @apply bg-white rounded-lg shadow-sm overflow-hidden; }
 }
-

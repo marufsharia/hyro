@@ -1,9 +1,9 @@
 <?php
 
-namespace MarufSharia\Hyro\Http\Controllers\Admin;
+namespace Marufsharia\Hyro\Http\Controllers\Admin;
 
 use App\Models\User;
-use MarufSharia\Hyro\Models\Role;
+use Marufsharia\Hyro\Models\Role;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;

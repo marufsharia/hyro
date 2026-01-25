@@ -1,5 +1,5 @@
 <?php
-namespace MarufSharia\Hyro\Traits;
+namespace Marufsharia\Hyro\Traits;
 
 trait ValidatesInputWithRetry
 {

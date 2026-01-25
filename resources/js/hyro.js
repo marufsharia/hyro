@@ -1,5 +1,8 @@
 // Hyro Package JavaScript - ES Module Version
+import Alpine from 'alpinejs';
 
+window.Alpine = Alpine;
+Alpine.start();
 export class Hyro {
     constructor() {
         this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');

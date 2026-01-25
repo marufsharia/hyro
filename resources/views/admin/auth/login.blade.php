@@ -51,7 +51,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('hyro.login') }}">
+        <form method="POST" action="{{ route('hyro.login.submit') }}">
             @csrf
 
             <!-- Email Address -->

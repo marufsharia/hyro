@@ -1,9 +1,9 @@
 <?php
 
-namespace MarufSharia\Hyro\Database\Seeders;
+namespace Marufsharia\Hyro\Database\Seeders;
 
-use MarufSharia\Hyro\Models\Privilege;
-use MarufSharia\Hyro\Models\Role;
+use Marufsharia\Hyro\Models\Privilege;
+use Marufsharia\Hyro\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 

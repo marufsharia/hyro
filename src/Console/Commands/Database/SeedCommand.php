@@ -1,9 +1,9 @@
 <?php
 
-namespace MarufSharia\Hyro\Console\Commands\Database;
+namespace Marufsharia\Hyro\Console\Commands\Database;
 
 use Illuminate\Console\Command;
-use MarufSharia\Hyro\Database\Seeders\HyroSeeder;
+use Marufsharia\Hyro\Database\Seeders\HyroSeeder;
 
 class SeedCommand extends Command
 {

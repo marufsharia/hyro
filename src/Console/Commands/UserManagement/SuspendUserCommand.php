@@ -1,11 +1,11 @@
 <?php
 
-namespace MarufSharia\Hyro\Console\Commands\UserManagement;
+namespace Marufsharia\Hyro\Console\Commands\UserManagement;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use MarufSharia\Hyro\Facades\Hyro;
+use Marufsharia\Hyro\Facades\Hyro;
 
 class SuspendUserCommand extends Command
 {

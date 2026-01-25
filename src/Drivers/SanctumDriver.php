@@ -1,6 +1,6 @@
 <?php
 
-namespace MarufSharia\Hyro\Drivers;
+namespace Marufsharia\Hyro\Drivers;
 
 class SanctumDriver
 {

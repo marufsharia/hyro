@@ -1,6 +1,6 @@
 <?php
 
-namespace MarufSharia\Hyro\Database\Seeders;
+namespace Marufsharia\Hyro\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

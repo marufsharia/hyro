@@ -1,8 +1,8 @@
 <?php
 
-namespace MarufSharia\Hyro\Http\Controllers\Admin;
+namespace Marufsharia\Hyro\Http\Controllers\Admin;
 
-use MarufSharia\Hyro\Models\Privilege;
+use Marufsharia\Hyro\Models\Privilege;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -60,7 +60,7 @@ class PrivilegeController extends Controller
     /**
      * Show the form for editing the specified privilege.
      *
-     * @param  \MarufSharia\Hyro\Models\Privilege  $privilege
+     * @param  \Marufsharia\Hyro\Models\Privilege  $privilege
      * @return \Illuminate\View\View
      */
     public function edit(Privilege $privilege): View
@@ -72,7 +72,7 @@ class PrivilegeController extends Controller
      * Update the specified privilege.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \MarufSharia\Hyro\Models\Privilege  $privilege
+     * @param  \Marufsharia\Hyro\Models\Privilege  $privilege
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Privilege $privilege): RedirectResponse
@@ -93,7 +93,7 @@ class PrivilegeController extends Controller
     /**
      * Remove the specified privilege.
      *
-     * @param  \MarufSharia\Hyro\Models\Privilege  $privilege
+     * @param  \Marufsharia\Hyro\Models\Privilege  $privilege
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Privilege $privilege): RedirectResponse

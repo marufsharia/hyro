@@ -79,10 +79,10 @@ Manual Test Script
 Create a test route in your Laravel application:
 
 ```php
-// routes/web.php
+// routes/admin.php
 Route::get('/test-hyro', function() {
     // Test 1: Check if Hyro is loaded
-    $status = \MarufSharia\Hyro\Facades\Hyro::status();
+    $status = \Marufsharia\Hyro\Facades\Hyro::status();
     
     // Test 2: Check configuration
     $config = config('hyro');

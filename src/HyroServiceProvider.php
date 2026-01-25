@@ -5,6 +5,7 @@ namespace Marufsharia\Hyro;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Marufsharia\Hyro\Contracts\AuthorizationResolverContract;
 use Marufsharia\Hyro\Contracts\CacheInvalidatorContract;
@@ -15,6 +16,7 @@ use Marufsharia\Hyro\Events\RoleAssigned;
 use Marufsharia\Hyro\Events\RoleRevoked;
 use Marufsharia\Hyro\Events\UserSuspended;
 use Marufsharia\Hyro\Events\UserUnsuspended;
+use Marufsharia\Hyro\Facades\Hyro;
 use Marufsharia\Hyro\Listeners\TokenSynchronizationListener;
 use Marufsharia\Hyro\Providers\ApiServiceProvider;
 use Marufsharia\Hyro\Providers\BladeDirectivesServiceProvider;
@@ -61,7 +63,6 @@ class HyroServiceProvider extends ServiceProvider
             $this->publishResources();
             $this->registerCommands();
         }
-
 
         $this->loadConditionalResources();
         $this->registerBladeDirectives();
@@ -173,13 +174,14 @@ class HyroServiceProvider extends ServiceProvider
             $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
         }
 
-        if (config('hyro.ui.enabled', false)) {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        if (config('hyro.admin.enabled', false)) {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/admin.php');
             $this->loadRoutesFrom(__DIR__ . '/../routes/auth.php');
             $this->loadViewsFrom(__DIR__ . '/../resources/views', 'hyro');
 
         }
     }
+
 
     /**
      * Register console commands.

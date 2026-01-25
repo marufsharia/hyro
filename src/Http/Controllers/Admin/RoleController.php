@@ -1,9 +1,9 @@
 <?php
 
-namespace MarufSharia\Hyro\Http\Controllers\Admin;
+namespace Marufsharia\Hyro\Http\Controllers\Admin;
 
-use MarufSharia\Hyro\Models\Role;
-use MarufSharia\Hyro\Models\Privilege;
+use Marufsharia\Hyro\Models\Role;
+use Marufsharia\Hyro\Models\Privilege;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -73,7 +73,7 @@ class RoleController extends Controller
     /**
      * Show the form for editing the specified role.
      *
-     * @param  \MarufSharia\Hyro\Models\Role  $role
+     * @param  \Marufsharia\Hyro\Models\Role  $role
      * @return \Illuminate\View\View
      */
     public function edit(Role $role): View
@@ -88,7 +88,7 @@ class RoleController extends Controller
      * Update the specified role.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \MarufSharia\Hyro\Models\Role  $role
+     * @param  \Marufsharia\Hyro\Models\Role  $role
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Role $role): RedirectResponse
@@ -118,7 +118,7 @@ class RoleController extends Controller
     /**
      * Remove the specified role.
      *
-     * @param  \MarufSharia\Hyro\Models\Role  $role
+     * @param  \Marufsharia\Hyro\Models\Role  $role
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Role $role): RedirectResponse
@@ -139,7 +139,7 @@ class RoleController extends Controller
     /**
      * Show form for editing role privileges.
      *
-     * @param  \MarufSharia\Hyro\Models\Role  $role
+     * @param  \Marufsharia\Hyro\Models\Role  $role
      * @return \Illuminate\View\View
      */
     public function editPrivileges(Role $role): View
@@ -154,7 +154,7 @@ class RoleController extends Controller
      * Update role privileges.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \MarufSharia\Hyro\Models\Role  $role
+     * @param  \Marufsharia\Hyro\Models\Role  $role
      * @return \Illuminate\Http\RedirectResponse
      */
     public function updatePrivileges(Request $request, Role $role): RedirectResponse

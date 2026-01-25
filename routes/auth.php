@@ -2,43 +2,69 @@
 
 use Illuminate\Support\Facades\Route;
 use Marufsharia\Hyro\Http\Controllers\Admin\Auth\AuthController;
-use Marufsharia\Hyro\Http\Controllers\Admin\Auth\ForgotPasswordController;
 use Marufsharia\Hyro\Http\Controllers\Admin\Auth\RegisterController;
+use Marufsharia\Hyro\Http\Controllers\Admin\Auth\ForgotPasswordController;
 use Marufsharia\Hyro\Http\Controllers\Admin\Auth\ResetPasswordController;
 
-Route::prefix(config('hyro.ui.route_prefix', 'admin/hyro'))
+Route::prefix(config('hyro.admin.route.prefix'))
     ->middleware('web')
     ->name('hyro.')
     ->group(function () {
 
         /*
         |--------------------------------------------------------------------------
-        | Authentication
+        | Guest Routes (login, register, password reset)
         |--------------------------------------------------------------------------
         */
-        Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-        Route::post('login', [AuthController::class, 'login']);
-        Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+        Route::middleware('guest')->group(function () {
+
+            // Login page or redirect to dashboard if already logged in
+            Route::get('/', function () {
+                if (auth()->check()) {
+                    return redirect()->route('hyro.admin.dashboard');
+                }
+                return app(AuthController::class)->showLoginForm();
+            })->name('login');
+
+            // Login submission
+            Route::post('login', [AuthController::class, 'login'])
+                ->name('login.submit');
+
+            // Registration page
+            Route::get('register', [RegisterController::class, 'showRegistrationForm'])
+                ->name('register');
+
+            // Registration submission
+            Route::post('register', [RegisterController::class, 'register'])
+                ->name('register.submit');
+
+            // Password reset request form
+            Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])
+                ->name('password.request');
+
+            // Send password reset link
+            Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])
+                ->name('password.email');
+
+            // Password reset form (with token)
+            Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])
+                ->name('password.reset');
+
+            // Password reset submission
+            Route::post('password/reset', [ResetPasswordController::class, 'reset'])
+                ->name('password.update');
+        });
 
         /*
         |--------------------------------------------------------------------------
-        | Registration
+        | Authenticated Routes (logout)
         |--------------------------------------------------------------------------
         */
-        Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-        Route::post('register', [RegisterController::class, 'register']);
+        Route::middleware('auth')->group(function () {
 
-        /*
-        |--------------------------------------------------------------------------
-        | Password Reset
-        |--------------------------------------------------------------------------
-        */
-        Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])
-            ->name('password.request');
-        Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])
-            ->name('password.email');
-        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])
-            ->name('password.reset');
-        Route::post('password/reset', [ResetPasswordController::class, 'reset'])
-            ->name('password.update');
+            // Logout
+            Route::post('logout', [AuthController::class, 'logout'])
+                ->name('logout');
+        });
+
     });
