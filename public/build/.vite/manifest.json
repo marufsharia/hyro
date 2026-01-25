@@ -1,0 +1,13 @@
+{
+  "resources/css/hyro.css": {
+    "file": "assets/hyro-UWxD6xBh.css",
+    "src": "resources/css/hyro.css",
+    "isEntry": true
+  },
+  "resources/js/hyro.js": {
+    "file": "assets/hyro-DnbrDI8A.js",
+    "name": "hyro",
+    "src": "resources/js/hyro.js",
+    "isEntry": true
+  }
+}
