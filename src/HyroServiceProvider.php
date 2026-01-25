@@ -4,6 +4,7 @@ namespace Marufsharia\Hyro;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 use Marufsharia\Hyro\Contracts\AuthorizationResolverContract;
 use Marufsharia\Hyro\Contracts\CacheInvalidatorContract;
@@ -67,6 +68,9 @@ class HyroServiceProvider extends ServiceProvider
         $this->registerMacros();
         $this->registerAuthorization();
         $this->registerEventListeners();
+
+        // Automatically add trait to User model if not already present
+        $this->addTraitToUserModel();
 
         // Register event service provider
         $this->app->register(EventServiceProvider::class);
@@ -184,6 +188,7 @@ class HyroServiceProvider extends ServiceProvider
     {
         $this->commands([
             // User Commands
+            \Marufsharia\Hyro\Console\Commands\User\HyroListUsersCommand::class,
             \Marufsharia\Hyro\Console\Commands\User\AssignRoleCommand::class,
             \Marufsharia\Hyro\Console\Commands\User\SuspendCommand::class,
             \Marufsharia\Hyro\Console\Commands\User\ListRolesCommand::class,
@@ -237,13 +242,13 @@ class HyroServiceProvider extends ServiceProvider
             return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::tags(); ?>';
         });
 
-        /*  \Blade::directive('hyroCss', function () {
+          \Blade::directive('hyroCss', function () {
               return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::css(); ?>';
           });
 
           \Blade::directive('hyroJs', function () {
               return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::js(); ?>';
-          });*/
+          });
 
 
         // Register Blade components
@@ -324,6 +329,40 @@ class HyroServiceProvider extends ServiceProvider
         //     'ip_address' => request()->ip(),
         //     'user_agent' => request()->userAgent(),
         // ]);
+    }
+
+    protected function addTraitToUserModel()
+    {
+        $userModelPath = app_path('Models/User.php');
+
+        if (!File::exists($userModelPath)) {
+            return;
+        }
+
+        $content = File::get($userModelPath);
+
+        // Only add if trait not already used
+        if (str_contains($content, 'HasHyroFeatures')) {
+            return;
+        }
+
+        // Add "use" statement for trait
+        if (!str_contains($content, 'use Marufsharia\Hyro\Traits\HasHyroFeatures;')) {
+            $content = preg_replace(
+                '/namespace App\\\\Models;/',
+                "namespace App\\Models;\n\nuse Marufsharia\\Hyro\\Traits\\HasHyroFeatures;",
+                $content
+            );
+        }
+
+        // Add trait inside User class
+        $content = preg_replace(
+            '/class User extends Authenticatable\s*\{/',
+            "class User extends Authenticatable\n{\n    use HasHyroFeatures;",
+            $content
+        );
+
+        File::put($userModelPath, $content);
     }
 
 

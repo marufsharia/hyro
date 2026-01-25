@@ -26,6 +26,6 @@ class DashboardController extends Controller
             }])->latest()->take(5)->get(),
         ];
 
-        return view('hyro::admin.dashboard', compact('stats'));
+        return view('hyro::admin.dashboard.dashboard', compact('stats'));
     }
 }

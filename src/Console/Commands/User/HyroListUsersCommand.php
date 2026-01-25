@@ -1,6 +1,6 @@
 <?php
 
-namespace MarufSharia\Hyro\Console\Commands\UserManagement;
+namespace Marufsharia\Hyro\Console\Commands\User;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +48,7 @@ class HyroListUsersCommand extends Command
         // Get suspensions for all users
         $userSuspensions = DB::table('hyro_user_suspensions')
             ->whereIn('user_id', $userIds)
-            ->whereNull('ended_at')
+            ->whereNull('unsuspended_at')
             ->orderBy('created_at', 'desc')
             ->get()
             ->groupBy('user_id');

@@ -14,6 +14,18 @@ class HyroAsset
         return json_decode(file_get_contents($manifestPath), true);
     }
 
+    public static function css(): ?string
+    {
+        $css = self::asset('resources/css/hyro.css');
+        return $css ? "<link rel=\"stylesheet\" href=\"{$css}\">" : null;
+    }
+
+    public static function js(): ?string
+    {
+        $js = self::asset('resources/js/hyro.js');
+        return $js ? "<script type=\"module\" src=\"{$js}\"></script>" : null;
+    }
+
     public static function asset(string $entry): ?string
     {
         $manifest = static::manifest();

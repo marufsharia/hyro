@@ -2,22 +2,22 @@
 
 namespace Marufsharia\Hyro\Http\Controllers\Admin\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
 
 class RegisterController extends Controller
 {
-    use RegistersUsers;
-
     /**
      * Where to redirect users after registration.
      *
      * @var string
      */
-    protected $redirectTo = '/dashboard';
+    protected $redirectTo = '/admin/hyro/dashboard';
 
     /**
      * Create a new controller instance.
@@ -28,7 +28,19 @@ class RegisterController extends Controller
     {
         $this->middleware('guest');
     }
+    /**
+     * Get the redirect path after registration.
+     *
+     * @return string
+     */
+    protected function redirectTo()
+    {
+        if (Route::has('hyro.admin.dashboard')) {
+            return route('hyro.admin.dashboard');
+        }
 
+        return $this->redirectTo;
+    }
     /**
      * Get a validator for an incoming registration request.
      *
@@ -66,6 +78,35 @@ class RegisterController extends Controller
      */
     public function showRegistrationForm()
     {
-        return view('hyro::auth.register');
+        return view('hyro::admin.auth.register');
+    }
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function register(Request $request)
+    {
+        $this->validator($request->all())->validate();
+
+        // Create the user
+        $user = $this->create($request->all());
+
+        // Log the user in
+        Auth::login($user);
+
+        // Regenerate session
+        $request->session()->regenerate();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Registration successful',
+                'user' => $user
+            ], 201);
+        }
+
+        return redirect($this->redirectTo());
     }
 }
