@@ -32,7 +32,7 @@ class HyroServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Merge default config
-        $this->mergeConfigFrom(__DIR__.'/../config/hyro.php', 'hyro');
+        $this->mergeConfigFrom(__DIR__ . '/../config/hyro.php', 'hyro');
 
         // Bind core contracts
         $this->bindCoreContracts();
@@ -73,7 +73,7 @@ class HyroServiceProvider extends ServiceProvider
 
         if (Config::get('hyro.api.enabled', false) && $this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../routes/api.php' => base_path('routes/hyro-api.php'),
+                __DIR__ . '/../routes/api.php' => base_path('routes/hyro-api.php'),
             ], 'hyro-api-routes');
         }
 
@@ -81,11 +81,11 @@ class HyroServiceProvider extends ServiceProvider
             $this->app->register(BladeDirectivesServiceProvider::class);
 
             // Load views
-            $this->loadViewsFrom(__DIR__.'/../resources/views', 'hyro');
+            $this->loadViewsFrom(__DIR__ . '/../resources/views', 'hyro');
 
             // Publish views
             $this->publishes([
-                __DIR__.'/../resources/views' => resource_path('views/vendor/hyro'),
+                __DIR__ . '/../resources/views' => resource_path('views/vendor/hyro'),
             ], 'hyro-views');
         }
     }
@@ -110,12 +110,12 @@ class HyroServiceProvider extends ServiceProvider
     {
         // Config
         $this->publishes([
-            __DIR__.'/../config/hyro.php' => config_path('hyro.php'),
+            __DIR__ . '/../config/hyro.php' => config_path('hyro.php'),
         ], 'hyro-config');
 
         // Migrations
         $this->publishes([
-            __DIR__.'/../database/migrations' => database_path('migrations'),
+            __DIR__ . '/../database/migrations' => database_path('migrations'),
         ], 'hyro-migrations');
 
         // Publish events and listeners
@@ -125,31 +125,33 @@ class HyroServiceProvider extends ServiceProvider
         ], 'hyro-events');
         // Views
         $this->publishes([
-            __DIR__.'/../resources/views' => resource_path('views/vendor/hyro'),
+            __DIR__ . '/../resources/views' => resource_path('views/vendor/hyro'),
         ], 'hyro-views');
 
         // Translations
         $this->publishes([
-            __DIR__.'/../resources/lang' => resource_path('lang/vendor/hyro'),
+            __DIR__ . '/../resources/lang' => resource_path('lang/vendor/hyro'),
         ], 'hyro-translations');
 
         // Publish compiled assets
+//        $this->publishes([
+//            __DIR__ . '/../public/css' => public_path('vendor/hyro/css'),
+//            __DIR__ . '/../public/js' => public_path('vendor/hyro/js'),
+//            __DIR__ . '/../public/images' => public_path('vendor/hyro/images'),
+//        ], 'hyro-assets');
+
         $this->publishes([
-            __DIR__ . '/../public/css' => public_path('vendor/hyro/css'),
-            __DIR__ . '/../public/js' => public_path('vendor/hyro/js'),
+            __DIR__ . '/../public/build' => public_path('vendor/hyro'),
             __DIR__ . '/../public/images' => public_path('vendor/hyro/images'),
         ], 'hyro-assets');
 
         // Publish source assets for development
-        $this->publishes([
-            __DIR__ . '/../resources/css' => resource_path('vendor/hyro/css'),
-            __DIR__ . '/../resources/js' => resource_path('vendor/hyro/js'),
-        ], 'hyro-source-assets');
+//        $this->publishes([
+//            __DIR__ . '/../resources/css' => resource_path('vendor/hyro/css'),
+//            __DIR__ . '/../resources/js' => resource_path('vendor/hyro/js'),
+//        ], 'hyro-source-assets');
 
-        // Publish webpack.mix.js for development
-        $this->publishes([
-            __DIR__ . '/../webpack.mix.js' => base_path('webpack.hyro.mix.js'),
-        ], 'hyro-mix');
+
     }
 
     /**
@@ -159,18 +161,18 @@ class HyroServiceProvider extends ServiceProvider
     {
         // Migrations
         if (config('hyro.database.migrations.autoload', true)) {
-            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         }
 
         // Routes
         if (config('hyro.api.enabled', false)) {
-            $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+            $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
         }
 
         if (config('hyro.ui.enabled', false)) {
-            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
-            $this->loadRoutesFrom(__DIR__.'/../routes/auth.php');
-            $this->loadViewsFrom(__DIR__.'/../resources/views', 'hyro');
+            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+            $this->loadRoutesFrom(__DIR__ . '/../routes/auth.php');
+            $this->loadViewsFrom(__DIR__ . '/../resources/views', 'hyro');
 
         }
     }
@@ -217,11 +219,11 @@ class HyroServiceProvider extends ServiceProvider
             \Marufsharia\Hyro\Console\Commands\Maintenance\StatusCommand::class,
             \Marufsharia\Hyro\Console\Commands\Maintenance\CleanupCommand::class,
             // Publish Assets
-            \Marufsharia\Hyro\Console\Commands\Publis\PublishHyroAssets::class,
-            \Marufsharia\Hyro\Console\Commands\Publis\HyroCompileCommand::class,
-            \Marufsharia\Hyro\Console\Commands\Publis\HyroPublishCommand::class,
-            \Marufsharia\Hyro\Console\Commands\Publis\ViteCompileCommand::class,
-            \Marufsharia\Hyro\Console\Commands\Publis\ViteDevCommand::class,
+            //  \Marufsharia\Hyro\Console\Commands\Publis\PublishHyroAssets::class,
+            // \Marufsharia\Hyro\Console\Commands\Publis\HyroCompileCommand::class,
+            // \Marufsharia\Hyro\Console\Commands\Publis\HyroPublishCommand::class,
+            // \Marufsharia\Hyro\Console\Commands\Publis\ViteCompileCommand::class,
+            //  \Marufsharia\Hyro\Console\Commands\Publis\ViteDevCommand::class,
         ]);
     }
 
@@ -230,23 +232,20 @@ class HyroServiceProvider extends ServiceProvider
      */
     private function registerBladeDirectives(): void
     {
+
         \Blade::directive('hyroAssets', function () {
-            return '<?php echo \Marufsharia\Hyro\Helpers\Vite::tags(); ?>';
+            return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::tags(); ?>';
         });
 
-        \Blade::directive('hyroCss', function () {
-            return '<?php
-            $asset = \Marufsharia\Hyro\Helpers\Vite::asset("assets/css/hyro.css");
-            echo $asset ? \'<link rel="stylesheet" href="\' . $asset . \'">\' : "";
-        ?>';
-        });
+        /*  \Blade::directive('hyroCss', function () {
+              return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::css(); ?>';
+          });
 
-        \Blade::directive('hyroJs', function () {
-            return '<?php
-            $asset = \Marufsharia\Hyro\Helpers\Vite::asset("assets/js/hyro.js");
-            echo $asset ? \'<script type="module" src="\' . $asset . \'"></script>\' : "";
-        ?>';
-        });
+          \Blade::directive('hyroJs', function () {
+              return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::js(); ?>';
+          });*/
+
+
         // Register Blade components
         \Blade::component('hyro::components.card', 'hyro-card');
         \Blade::component('hyro::components.button', 'hyro-button');
@@ -271,6 +270,7 @@ class HyroServiceProvider extends ServiceProvider
         $gateRegistrar = $this->app->make(GateRegistrar::class);
         $gateRegistrar->register();
     }
+
     /**
      * Register EventListeners.
      */
@@ -325,7 +325,6 @@ class HyroServiceProvider extends ServiceProvider
         //     'user_agent' => request()->userAgent(),
         // ]);
     }
-
 
 
 }

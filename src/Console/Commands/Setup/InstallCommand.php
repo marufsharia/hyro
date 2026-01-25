@@ -71,14 +71,16 @@ class InstallCommand extends BaseCommand
                 $this->publishAssets();
             }
             // Publish assets
-            if ($this->confirm('Publish compiled assets?', true)) {
+            //if ($this->confirm('Publish compiled assets?', true)) {
+                $this->info('📦 Publish compiled assets');
                 $this->call('vendor:publish', ['--tag' => 'hyro-assets']);
-            }
+           // }
 
             // Publish views
-            if ($this->confirm('Publish views?', false)) {
+           // if ($this->confirm('Publish views?', false)) {
+            $this->info('📦 Publish views');
                 $this->call('vendor:publish', ['--tag' => 'hyro-views']);
-            }
+           // }
 
             if ($runAll || $this->option('migrate')) {
                 $this->runMigrations();

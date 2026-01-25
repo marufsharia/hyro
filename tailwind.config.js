@@ -1,7 +1,9 @@
-module.exports = {
+export default {
     content: [
-        './resources/views/**/*.blade.php',
-        './resources/js/**/*.js',
+        './resources/**/*.blade.php',
+        './resources/**/*.js',
+        './resources/**/*.vue',
+        './src/**/*.php',
     ],
     theme: {
         extend: {},
@@ -9,4 +11,4 @@ module.exports = {
     plugins: [
         require('@tailwindcss/forms'),
     ],
-};
+}
