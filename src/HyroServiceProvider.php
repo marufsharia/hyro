@@ -2,6 +2,7 @@
 
 namespace Marufsharia\Hyro;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
@@ -17,6 +18,7 @@ use Marufsharia\Hyro\Events\RoleRevoked;
 use Marufsharia\Hyro\Events\UserSuspended;
 use Marufsharia\Hyro\Events\UserUnsuspended;
 use Marufsharia\Hyro\Facades\Hyro;
+use Marufsharia\Hyro\Http\Middleware\RedirectIfAuthenticated;
 use Marufsharia\Hyro\Listeners\TokenSynchronizationListener;
 use Marufsharia\Hyro\Providers\ApiServiceProvider;
 use Marufsharia\Hyro\Providers\BladeDirectivesServiceProvider;
@@ -57,13 +59,13 @@ class HyroServiceProvider extends ServiceProvider
      * Bootstrap services.
      * All boot logic goes here.
      */
-    public function boot(): void
+    public function boot(Router $router): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishResources();
             $this->registerCommands();
         }
-
+        $router->aliasMiddleware('hyro.guest', RedirectIfAuthenticated::class);
         $this->loadConditionalResources();
         $this->registerBladeDirectives();
         $this->registerMacros();

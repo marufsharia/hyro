@@ -1,31 +1,18 @@
-import { defineConfig } from 'vite'
-import laravel from 'laravel-vite-plugin'
-import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: [
-                'resources/js/hyro.js',
-                'resources/css/hyro.css',
-            ],
+            input: ['resources/css/hyro.css', 'resources/js/hyro.js'],
             refresh: true,
         }),
-
+        tailwindcss(),
     ],
-
-    build: {
-        outDir: 'public/build',
-        emptyOutDir: true,
-        manifest: true,
+    server: {
+        watch: {
+            ignored: ['**/storage/framework/views/**'],
+        },
     },
-
-    css: {
-        postcss: path.resolve(__dirname, 'postcss.config.mjs'),
-    },
-})
+});

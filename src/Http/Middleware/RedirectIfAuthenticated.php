@@ -13,9 +13,7 @@ class RedirectIfAuthenticated
      */
     public function handle(Request $request, Closure $next, $guard = null)
     {
-        // Use the guard if provided, e.g., 'web' or 'admin'
-        if (Auth::guard($guard)->check()) {
-            // Redirect logged-in users to dashboard instead of home
+       if (Auth::guard($guard)->check()) {
             return redirect()->route('hyro.admin.dashboard');
         }
 

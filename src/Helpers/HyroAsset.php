@@ -5,7 +5,7 @@ class HyroAsset
 {
     protected static function manifest(): array
     {
-        $manifestPath = public_path('vendor/hyro/.vite/manifest.json');
+        $manifestPath = public_path('vendor/hyro/manifest.json');
 
         if (! file_exists($manifestPath)) {
             return [];

@@ -16,7 +16,7 @@ Route::prefix(config('hyro.admin.route.prefix'))
         | Guest Routes (login, register, password reset)
         |--------------------------------------------------------------------------
         */
-        Route::middleware('guest')->group(function () {
+        Route::middleware('hyro.guest')->group(function () {
 
             // Login page or redirect to dashboard if already logged in
             Route::get('/', function () {

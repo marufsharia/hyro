@@ -38,7 +38,9 @@ return [
     */
     'admin' => [
         'enabled' => env('HYRO_ADMIN_ENABLED', true),
-
+        'redirects' => [
+            'authenticated' => 'dashboard',
+        ],
         'route' => [
             'prefix' => env('HYRO_ADMIN_PREFIX', 'admin/hyro'),
             'middleware' => [
