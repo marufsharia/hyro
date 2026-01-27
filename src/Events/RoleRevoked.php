@@ -12,7 +12,7 @@ class RoleRevoked
     use Dispatchable, SerializesModels;
 
     /**
-     * The user instance.
+     * The users instance.
      */
     public User $user;
 
@@ -22,7 +22,7 @@ class RoleRevoked
     public Role $role;
 
     /**
-     * The user who performed the revocation.
+     * The users who performed the revocation.
      */
     public ?User $revoker;
 
@@ -51,6 +51,6 @@ class RoleRevoked
      */
     public function broadcastOn(): string
     {
-        return 'user.' . $this->user->id;
+        return 'users.' . $this->user->id;
     }
 }

@@ -10,11 +10,11 @@ use Illuminate\Support\Facades\Config;
 trait HasHyroFeatures
 {
     /**
-     * The user's roles.
+     * The users's roles.
      */
     public function roles()
     {
-        $userModel = Config::get('hyro.models.user', \App\Models\User::class);
+        $userModel = Config::get('hyro.models.users', \App\Models\User::class);
         $pivotTable = Config::get('hyro.database.tables.role_user', 'hyro_role_user');
 
         return $this->belongsToMany(Role::class, $pivotTable)
@@ -27,7 +27,7 @@ trait HasHyroFeatures
     }
 
     /**
-     * Check if user has a specific role.
+     * Check if users has a specific role.
      */
     public function hasRole($role): bool
     {
@@ -47,7 +47,7 @@ trait HasHyroFeatures
     }
 
     /**
-     * Assign a role to the user.
+     * Assign a role to the users.
      */
     public function assignRole($role, $assignedBy = null)
     {
@@ -68,7 +68,7 @@ trait HasHyroFeatures
     }
 
     /**
-     * Revoke a role from the user.
+     * Revoke a role from the users.
      */
     public function removeRole($role, $removedBy = null)
     {
@@ -85,7 +85,7 @@ trait HasHyroFeatures
     }
 
     /**
-     * Get all privileges for the user.
+     * Get all privileges for the users.
      */
     public function getAllPrivileges()
     {
@@ -99,7 +99,7 @@ trait HasHyroFeatures
     }
 
     /**
-     * Check if user has a privilege.
+     * Check if users has a privilege.
      */
     public function hasPrivilege($privilegeSlug): bool
     {

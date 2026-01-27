@@ -49,7 +49,7 @@ class AuthorizationService implements AuthorizationResolverContract
         array $arguments = [],
         bool $shouldLog = true
     ): bool {
-        // Check if user is suspended
+        // Check if users is suspended
         if ($this->isUserSuspended($user)) {
             $this->logAuthorizationAttempt($user, $ability, false, 'user_suspended', $shouldLog);
             return false;
@@ -127,7 +127,7 @@ class AuthorizationService implements AuthorizationResolverContract
             return null;
         }
 
-        // Get all user privileges
+        // Get all users privileges
         $userPrivileges = $user->hyroPrivilegeSlugs();
 
         // Check against configured wildcard patterns
@@ -139,7 +139,7 @@ class AuthorizationService implements AuthorizationResolverContract
             }
         }
 
-        // Check user's wildcard privileges
+        // Check users's wildcard privileges
         foreach ($userPrivileges as $privilege) {
             if ($this->isWildcard($privilege) && $this->matchesWildcard($privilege, $ability)) {
                 return true;
@@ -170,7 +170,7 @@ class AuthorizationService implements AuthorizationResolverContract
                 }
             }
 
-            return false; // Explicit mapping found but user doesn't have required role
+            return false; // Explicit mapping found but users doesn't have required role
         }
 
         return null;
@@ -200,7 +200,7 @@ class AuthorizationService implements AuthorizationResolverContract
     }
 
     /**
-     * Check if a user is suspended.
+     * Check if a users is suspended.
      */
     private function isUserSuspended(Authenticatable $user): bool
     {
@@ -276,7 +276,7 @@ class AuthorizationService implements AuthorizationResolverContract
     }
 
     /**
-     * Get all abilities a user has.
+     * Get all abilities a users has.
      */
     public function getAbilitiesForUser(Authenticatable $user): array
     {
@@ -322,7 +322,7 @@ class AuthorizationService implements AuthorizationResolverContract
     }
 
     /**
-     * Check if user has any of the given abilities.
+     * Check if users has any of the given abilities.
      */
     public function hasAnyAbility(Authenticatable $user, array $abilities): bool
     {
@@ -336,7 +336,7 @@ class AuthorizationService implements AuthorizationResolverContract
     }
 
     /**
-     * Check if user has all of the given abilities.
+     * Check if users has all of the given abilities.
      */
     public function hasAllAbilities(Authenticatable $user, array $abilities): bool
     {

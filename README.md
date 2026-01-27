@@ -41,7 +41,7 @@ php artisan migrate
 Create first admin:
 ```
 ```bash
-php artisan hyro:create-user --admin
+php artisan hyro:create-users --admin
 ```
 ⚙️ Configuration
 Enable/disable features via .env:
@@ -70,7 +70,7 @@ php artisan vendor:publish --tag=hyro-config
 
 ```bash
 php artisan hyro:install          # Install Hyro
-php artisan hyro:create-user      # Create a new user
+php artisan hyro:create-users      # Create a new users
 php artisan hyro:status   
 ```        
 ### Check Hyro status (coming soon)

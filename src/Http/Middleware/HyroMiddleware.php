@@ -21,12 +21,12 @@ abstract class HyroMiddleware
     {
         $user = Auth::user();
 
-        // If no user is authenticated, deny access
+        // If no users is authenticated, deny access
         if (!$user) {
-            return $this->unauthorizedResponse($request, 'No authenticated user');
+            return $this->unauthorizedResponse($request, 'No authenticated users');
         }
 
-        // Check if user is suspended
+        // Check if users is suspended
         if (method_exists($user, 'isSuspended') && $user->isSuspended()) {
             return $this->suspendedResponse($request, $user);
         }
@@ -45,7 +45,7 @@ abstract class HyroMiddleware
     }
 
     /**
-     * Check if the user is authorized.
+     * Check if the users is authorized.
      */
     abstract protected function checkAuthorization($user, array $requirements, Request $request): bool;
 
@@ -86,7 +86,7 @@ abstract class HyroMiddleware
     }
 
     /**
-     * Handle suspended user access.
+     * Handle suspended users access.
      */
     protected function suspendedResponse(Request $request, $user): Response
     {

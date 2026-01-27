@@ -39,7 +39,7 @@ class EnsureHasAbility extends HyroMiddleware
         // Extract model instances from route parameters based on ability name
         $arguments = [];
 
-        // Example: For ability 'update' on resource 'users', look for user model in route
+        // Example: For ability 'update' on resource 'users', look for users model in route
         if (preg_match('/^([a-z]+)\.(update|delete|view)$/', $ability, $matches)) {
             $resource = $matches[1];
             $model = $this->resolveModelFromRoute($request, $resource);
@@ -64,7 +64,7 @@ class EnsureHasAbility extends HyroMiddleware
             return null;
         }
 
-        // Look for route parameter (e.g., 'user', 'userId', 'id')
+        // Look for route parameter (e.g., 'users', 'userId', 'id')
         $parameterNames = [
             $resource,
             str_singular($resource),

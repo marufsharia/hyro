@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\Password;
 class UserCreateRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Determine if the users is authorized to make this request.
      */
     public function authorize(): bool
     {
@@ -21,7 +21,7 @@ class UserCreateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
         $table = (new $userModel)->getTable();
 
         $rules = [

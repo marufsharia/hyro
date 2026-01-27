@@ -42,7 +42,7 @@ Route::prefix('auth')->group(function () {
 
 // User management
 Route::apiResource('users', UserController::class)->except(['store']);
-Route::prefix('users/{user}')->group(function () {
+Route::prefix('users/{users}')->group(function () {
     // Roles
     Route::post('roles', [UserController::class, 'assignRole']);
     Route::delete('roles/{role}', [UserController::class, 'removeRole']);
@@ -126,18 +126,18 @@ Route::get('documentation', function () {
         'description' => 'Enterprise-grade authorization system API',
         'endpoints' => [
             'auth' => [
-                'POST /api/hyro/auth/login' => 'Authenticate user',
-                'POST /api/hyro/auth/register' => 'Register new user',
-                'POST /api/hyro/auth/logout' => 'Logout user',
-                'GET /api/hyro/auth/me' => 'Get authenticated user',
-                'GET /api/hyro/auth/check-privilege/{privilege}' => 'Check if user has privilege',
-                'GET /api/hyro/auth/check-role/{role}' => 'Check if user has role',
+                'POST /api/hyro/auth/login' => 'Authenticate users',
+                'POST /api/hyro/auth/register' => 'Register new users',
+                'POST /api/hyro/auth/logout' => 'Logout users',
+                'GET /api/hyro/auth/me' => 'Get authenticated users',
+                'GET /api/hyro/auth/check-privilege/{privilege}' => 'Check if users has privilege',
+                'GET /api/hyro/auth/check-role/{role}' => 'Check if users has role',
             ],
             'users' => [
                 'GET /api/hyro/users' => 'List all users',
-                'GET /api/hyro/users/{id}' => 'Get user details',
-                'PUT /api/hyro/users/{id}' => 'Update user',
-                'DELETE /api/hyro/users/{id}' => 'Delete user',
+                'GET /api/hyro/users/{id}' => 'Get users details',
+                'PUT /api/hyro/users/{id}' => 'Update users',
+                'DELETE /api/hyro/users/{id}' => 'Delete users',
             ],
             'roles' => [
                 'GET /api/hyro/roles' => 'List all roles',

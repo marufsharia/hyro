@@ -28,7 +28,7 @@ trait Validatable
     }
 
     /**
-     * Validate user identifier.
+     * Validate users identifier.
      */
     protected function validateUserIdentifier(string $identifier): void
     {
@@ -40,7 +40,7 @@ trait Validatable
             // Check if it's a valid username format
             if (!preg_match('/^[a-zA-Z0-9_\-\.]{3,}$/', $identifier)) {
                 throw new CommandValidationException(
-                    'Invalid user identifier. Use email, ID, or username (min 3 chars, alphanumeric)'
+                    'Invalid users identifier. Use email, ID, or username (min 3 chars, alphanumeric)'
                 );
             }
         }

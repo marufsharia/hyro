@@ -12,7 +12,7 @@ use Illuminate\Routing\Controller;
 class UserRoleController extends Controller
 {
     /**
-     * Show the form for editing user roles.
+     * Show the form for editing users roles.
      *
      * @param  \App\Models\User  $user
      * @return \Illuminate\View\View
@@ -22,11 +22,11 @@ class UserRoleController extends Controller
         $roles = Role::orderBy('name')->get();
         $user->load('roles');
 
-        return view('hyro::users.roles', compact('user', 'roles'));
+        return view('hyro::admin.users.roles', compact('user', 'roles'));
     }
 
     /**
-     * Update user roles.
+     * Update users roles.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\User  $user
@@ -54,7 +54,7 @@ class UserRoleController extends Controller
 
         $user->roles()->sync($validated['roles'] ?? []);
 
-        // Clear user role cache
+        // Clear users role cache
         if (method_exists($user, 'clearHyroRoleCache')) {
             $user->clearHyroRoleCache();
         }

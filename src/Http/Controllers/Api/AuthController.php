@@ -32,7 +32,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Authenticate user and return token.
+     * Authenticate users and return token.
      */
     public function login(LoginRequest $request): JsonResponse
     {
@@ -49,7 +49,7 @@ class AuthController extends BaseController
 
             $user = Auth::user();
 
-            // Check if user is suspended
+            // Check if users is suspended
             if (method_exists($user, 'isSuspended') && $user->isSuspended()) {
                 Auth::logout();
 
@@ -81,7 +81,7 @@ class AuthController extends BaseController
             ]);
 
             return $this->successResponse([
-                'user' => new UserResource($user),
+                'users' => new UserResource($user),
                 'token' => $token,
                 'token_type' => 'bearer',
                 'expires_at' => $request->input('expires_at'),
@@ -92,12 +92,12 @@ class AuthController extends BaseController
     }
 
     /**
-     * Register a new user.
+     * Register a new users.
      */
     public function register(RegisterRequest $request): JsonResponse
     {
         try {
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
 
             $user = $userModel::create([
                 'name' => $request->input('name'),
@@ -106,12 +106,12 @@ class AuthController extends BaseController
             ]);
 
             // Assign default role if configured
-            $defaultRole = Config::get('hyro.registration.default_role', 'user');
+            $defaultRole = Config::get('hyro.registration.default_role', 'users');
             if ($defaultRole && method_exists($user, 'assignRole')) {
                 $user->assignRole($defaultRole, 'Auto-assigned on registration');
             }
 
-            // Create token for the new user
+            // Create token for the new users
             $token = $this->tokenService->createToken(
                 $user,
                 'Registration Token',
@@ -123,7 +123,7 @@ class AuthController extends BaseController
             $this->logAuditAction('user_registered', $user);
 
             return $this->successResponse([
-                'user' => new UserResource($user),
+                'users' => new UserResource($user),
                 'token' => $token,
                 'token_type' => 'bearer',
                 'expires_at' => now()->addDays(30)->toISOString(),
@@ -134,7 +134,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Logout the authenticated user (revoke current token).
+     * Logout the authenticated users (revoke current token).
      */
     public function logout(Request $request): JsonResponse
     {
@@ -155,7 +155,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Get the authenticated user.
+     * Get the authenticated users.
      */
     public function me(Request $request): JsonResponse
     {
@@ -164,7 +164,7 @@ class AuthController extends BaseController
             $include = $request->input('include', '');
 
             // Build response data
-            $data = ['user' => new UserResource($user)];
+            $data = ['users' => new UserResource($user)];
 
             // Include additional data if requested
             if (str_contains($include, 'roles') && method_exists($user, 'roles')) {
@@ -219,7 +219,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Get all tokens for the authenticated user.
+     * Get all tokens for the authenticated users.
      */
     public function tokens(Request $request): JsonResponse
     {
@@ -299,7 +299,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Revoke all tokens for the authenticated user.
+     * Revoke all tokens for the authenticated users.
      */
     public function revokeAllTokens(Request $request): JsonResponse
     {
@@ -323,7 +323,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Check if the user has a specific privilege.
+     * Check if the users has a specific privilege.
      */
     public function checkPrivilege(Request $request, string $privilege): JsonResponse
     {
@@ -347,7 +347,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Check if the user has a specific role.
+     * Check if the users has a specific role.
      */
     public function checkRole(Request $request, string $role): JsonResponse
     {

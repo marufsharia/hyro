@@ -11,12 +11,12 @@ class UserUnsuspended
     use Dispatchable, SerializesModels;
 
     /**
-     * The user instance.
+     * The users instance.
      */
     public User $user;
 
     /**
-     * The user who performed the unsuspension.
+     * The users who performed the unsuspension.
      */
     public ?User $unsuspender;
 
@@ -45,6 +45,6 @@ class UserUnsuspended
      */
     public function broadcastOn(): string
     {
-        return 'user.' . $this->user->id;
+        return 'users.' . $this->user->id;
     }
 }

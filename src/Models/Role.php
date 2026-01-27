@@ -126,7 +126,7 @@ class Role extends Model
      */
     public function users(): BelongsToMany
     {
-        $userModel = Config::get('hyro.models.user', \App\Models\User::class);
+        $userModel = Config::get('hyro.models.users', \App\Models\User::class);
         $pivotTable = Config::get('hyro.database.tables.role_user', 'hyro_role_user');
 
         return $this->belongsToMany($userModel, $pivotTable)
@@ -238,7 +238,7 @@ class Role extends Model
     }
 
     /**
-     * Scope: Get only non-expired role assignments for a user.
+     * Scope: Get only non-expired role assignments for a users.
      */
     public function scopeActiveForUser(Builder $query, $userId): Builder
     {

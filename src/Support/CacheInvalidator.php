@@ -21,7 +21,7 @@ class CacheInvalidator implements CacheInvalidatorContract
         Cache::deleteMultiple($keys);
 
         // Also invalidate any related caches
-        $pattern = Config::get('hyro.cache.prefix', 'hyro:') . "user:{$userId}:*";
+        $pattern = Config::get('hyro.cache.prefix', 'hyro:') . "users:{$userId}:*";
         $this->invalidateByPattern($pattern);
     }
 
@@ -34,7 +34,7 @@ class CacheInvalidator implements CacheInvalidatorContract
         Cache::forget($key);
 
         // Invalidate all users who have this role
-        $pattern = Config::get('hyro.cache.prefix', 'hyro:') . "user:*:roles";
+        $pattern = Config::get('hyro.cache.prefix', 'hyro:') . "users:*:roles";
         $this->invalidateByPattern($pattern);
     }
 
@@ -48,7 +48,7 @@ class CacheInvalidator implements CacheInvalidatorContract
         $this->invalidateByPattern($pattern);
 
         // Invalidate all users
-        $pattern = Config::get('hyro.cache.prefix', 'hyro:') . "user:*:privileges";
+        $pattern = Config::get('hyro.cache.prefix', 'hyro:') . "users:*:privileges";
         $this->invalidateByPattern($pattern);
     }
 
@@ -66,7 +66,7 @@ class CacheInvalidator implements CacheInvalidatorContract
      */
     public function getUserRolesCacheKey($userId): string
     {
-        return Config::get('hyro.cache.prefix', 'hyro:') . "user:{$userId}:roles";
+        return Config::get('hyro.cache.prefix', 'hyro:') . "users:{$userId}:roles";
     }
 
     /**
@@ -74,7 +74,7 @@ class CacheInvalidator implements CacheInvalidatorContract
      */
     public function getUserPrivilegesCacheKey($userId): string
     {
-        return Config::get('hyro.cache.prefix', 'hyro:') . "user:{$userId}:privileges";
+        return Config::get('hyro.cache.prefix', 'hyro:') . "users:{$userId}:privileges";
     }
 
     /**

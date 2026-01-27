@@ -16,7 +16,7 @@ class RoleCreated
     public Role $role;
 
     /**
-     * The user who created the role.
+     * The users who created the role.
      */
     public ?object $creator;
 

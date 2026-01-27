@@ -6,20 +6,20 @@ use Marufsharia\Hyro\Console\Commands\BaseCommand;
 
 class SyncRolesCommand extends BaseCommand
 {
-    protected $signature = 'hyro:user:sync-roles
-                            {user : User email or ID}
+    protected $signature = 'hyro:users:sync-roles
+                            {users : User email or ID}
                             {roles* : Role slugs or IDs to sync}
                             {--dry-run : Preview changes without applying them}
                             {--force : Skip confirmation prompts}
                             {--detach : Remove existing roles not in the list}';
 
-    protected $description = 'Sync user roles with provided list';
+    protected $description = 'Sync users roles with provided list';
 
     protected function executeCommand(): void
     {
-        $user = $this->findUser($this->argument('user'));
+        $user = $this->findUser($this->argument('users'));
         if (!$user) {
-            $this->error("User not found: " . $this->argument('user'));
+            $this->error("User not found: " . $this->argument('users'));
             return;
         }
 
@@ -58,7 +58,7 @@ class SyncRolesCommand extends BaseCommand
             ]
         );
 
-        if (!$this->confirmDestructiveAction('Sync user roles?')) {
+        if (!$this->confirmDestructiveAction('Sync users roles?')) {
             $this->infoMessage('Operation cancelled.');
             return;
         }
@@ -67,9 +67,9 @@ class SyncRolesCommand extends BaseCommand
             $user->syncRoles($roles, $this->option('detach'));
 
             if (!$this->dryRun) {
-                $this->info("Roles synced for user '{$user->email}'");
+                $this->info("Roles synced for users '{$user->email}'");
             } else {
-                $this->info("[DRY RUN] Would sync roles for user '{$user->email}'");
+                $this->info("[DRY RUN] Would sync roles for users '{$user->email}'");
             }
 
             $this->stats['processed']++;

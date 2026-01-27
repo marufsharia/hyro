@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static \Marufsharia\Hyro\HyroManager driver(string $driver = null)
- * @method static \Marufsharia\Hyro\Contracts\UserContract user()
+ * @method static \Marufsharia\Hyro\Contracts\UserContract users()
  * @method static \Marufsharia\Hyro\Models\Role role()
  * @method static \Marufsharia\Hyro\Models\Privilege privilege()
  * @method static \Marufsharia\Hyro\Contracts\AuditLogger audit()

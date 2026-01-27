@@ -27,14 +27,14 @@ class TokenSynchronizationListener
             $user = $event->user;
             $role = $event->role;
 
-            // Get all active tokens for the user
+            // Get all active tokens for the users
             $tokens = $user->tokens()->where('revoked', false)->get();
 
             if ($tokens->isEmpty()) {
                 return;
             }
 
-            // Get user's updated abilities
+            // Get users's updated abilities
             $newAbilities = $user->getAllAbilities()->toArray();
 
             // Update each token's abilities
@@ -72,14 +72,14 @@ class TokenSynchronizationListener
             $user = $event->user;
             $role = $event->role;
 
-            // Get all active tokens for the user
+            // Get all active tokens for the users
             $tokens = $user->tokens()->where('revoked', false)->get();
 
             if ($tokens->isEmpty()) {
                 return;
             }
 
-            // Get user's updated abilities
+            // Get users's updated abilities
             $newAbilities = $user->getAllAbilities()->toArray();
 
             // Update each token's abilities
@@ -125,14 +125,14 @@ class TokenSynchronizationListener
             }
 
             foreach ($users as $user) {
-                // Get all active tokens for the user
+                // Get all active tokens for the users
                 $tokens = $user->tokens()->where('revoked', false)->get();
 
                 if ($tokens->isEmpty()) {
                     continue;
                 }
 
-                // Get user's updated abilities
+                // Get users's updated abilities
                 $newAbilities = $user->getAllAbilities()->toArray();
 
                 // Update each token's abilities
@@ -179,14 +179,14 @@ class TokenSynchronizationListener
             }
 
             foreach ($users as $user) {
-                // Get all active tokens for the user
+                // Get all active tokens for the users
                 $tokens = $user->tokens()->where('revoked', false)->get();
 
                 if ($tokens->isEmpty()) {
                     continue;
                 }
 
-                // Get user's updated abilities
+                // Get users's updated abilities
                 $newAbilities = $user->getAllAbilities()->toArray();
 
                 // Update each token's abilities
@@ -224,14 +224,14 @@ class TokenSynchronizationListener
         try {
             $user = $event->user;
 
-            // Get all active tokens for the user
+            // Get all active tokens for the users
             $tokens = $user->tokens()->where('revoked', false)->get();
 
             if ($tokens->isEmpty()) {
                 return;
             }
 
-            // Revoke all tokens for suspended user
+            // Revoke all tokens for suspended users
             foreach ($tokens as $token) {
                 $token->update([
                     'revoked' => true,
@@ -240,7 +240,7 @@ class TokenSynchronizationListener
                 ]);
             }
 
-            Log::info('Tokens revoked after user suspension', [
+            Log::info('Tokens revoked after users suspension', [
                 'user_id' => $user->id,
                 'tokens_revoked' => $tokens->count(),
                 'event' => 'user_suspended',
@@ -248,7 +248,7 @@ class TokenSynchronizationListener
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to revoke tokens after user suspension', [
+            Log::error('Failed to revoke tokens after users suspension', [
                 'user_id' => $event->user->id ?? null,
                 'error' => $e->getMessage(),
             ]);
@@ -267,8 +267,8 @@ class TokenSynchronizationListener
         try {
             $user = $event->user;
 
-            // Note: We don't automatically restore tokens when a user is unsuspended
-            // The user will need to generate new tokens
+            // Note: We don't automatically restore tokens when a users is unsuspended
+            // The users will need to generate new tokens
             Log::info('User unsuspended - tokens remain revoked', [
                 'user_id' => $user->id,
                 'event' => 'user_unsuspended',
@@ -277,7 +277,7 @@ class TokenSynchronizationListener
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to handle user unsuspension for tokens', [
+            Log::error('Failed to handle users unsuspension for tokens', [
                 'user_id' => $event->user->id ?? null,
                 'error' => $e->getMessage(),
             ]);

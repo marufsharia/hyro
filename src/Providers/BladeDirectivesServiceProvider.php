@@ -39,16 +39,16 @@ class BladeDirectivesServiceProvider extends ServiceProvider
      */
     private function registerConditionalDirectives(): void
     {
-        // @hyrocan - Check if user has ability
+        // @hyrocan - Check if users has ability
         Blade::if('hyrocan', function ($ability, ...$arguments) {
             $user = Auth::user();
 
-            // Null user safe - return false
+            // Null users safe - return false
             if (!$user) {
                 return false;
             }
 
-            // Check if user has the Hyro trait
+            // Check if users has the Hyro trait
             if (!method_exists($user, 'hasPrivilege')) {
                 return false;
             }
@@ -72,16 +72,16 @@ class BladeDirectivesServiceProvider extends ServiceProvider
             }
         });
 
-        // @hasrole - Check if user has specific role
+        // @hasrole - Check if users has specific role
         Blade::if('hasrole', function ($role) {
             $user = Auth::user();
 
-            // Null user safe
+            // Null users safe
             if (!$user) {
                 return false;
             }
 
-            // Check if user has the Hyro trait
+            // Check if users has the Hyro trait
             if (!method_exists($user, 'hasRole')) {
                 return false;
             }
@@ -102,16 +102,16 @@ class BladeDirectivesServiceProvider extends ServiceProvider
             }
         });
 
-        // @hasanyrole - Check if user has any of the given roles
+        // @hasanyrole - Check if users has any of the given roles
         Blade::if('hasanyrole', function ($roles) {
             $user = Auth::user();
 
-            // Null user safe
+            // Null users safe
             if (!$user) {
                 return false;
             }
 
-            // Check if user has the Hyro trait
+            // Check if users has the Hyro trait
             if (!method_exists($user, 'hasAnyRole')) {
                 return false;
             }
@@ -135,16 +135,16 @@ class BladeDirectivesServiceProvider extends ServiceProvider
             }
         });
 
-        // @hasallroles - Check if user has all of the given roles
+        // @hasallroles - Check if users has all of the given roles
         Blade::if('hasallroles', function ($roles) {
             $user = Auth::user();
 
-            // Null user safe
+            // Null users safe
             if (!$user) {
                 return false;
             }
 
-            // Check if user has the Hyro trait
+            // Check if users has the Hyro trait
             if (!method_exists($user, 'hasRoles')) {
                 return false;
             }
@@ -168,16 +168,16 @@ class BladeDirectivesServiceProvider extends ServiceProvider
             }
         });
 
-        // @hasprivilege - Check if user has specific privilege
+        // @hasprivilege - Check if users has specific privilege
         Blade::if('hasprivilege', function ($privilege) {
             $user = Auth::user();
 
-            // Null user safe
+            // Null users safe
             if (!$user) {
                 return false;
             }
 
-            // Check if user has the Hyro trait
+            // Check if users has the Hyro trait
             if (!method_exists($user, 'hasPrivilege')) {
                 return false;
             }
@@ -198,16 +198,16 @@ class BladeDirectivesServiceProvider extends ServiceProvider
             }
         });
 
-        // @hasanyprivilege - Check if user has any of the given privileges
+        // @hasanyprivilege - Check if users has any of the given privileges
         Blade::if('hasanyprivilege', function ($privileges) {
             $user = Auth::user();
 
-            // Null user safe
+            // Null users safe
             if (!$user) {
                 return false;
             }
 
-            // Check if user has the Hyro trait
+            // Check if users has the Hyro trait
             if (!method_exists($user, 'hasAnyPrivilege')) {
                 return false;
             }
@@ -231,16 +231,16 @@ class BladeDirectivesServiceProvider extends ServiceProvider
             }
         });
 
-        // @hasallprivileges - Check if user has all of the given privileges
+        // @hasallprivileges - Check if users has all of the given privileges
         Blade::if('hasallprivileges', function ($privileges) {
             $user = Auth::user();
 
-            // Null user safe
+            // Null users safe
             if (!$user) {
                 return false;
             }
 
-            // Check if user has the Hyro trait
+            // Check if users has the Hyro trait
             if (!method_exists($user, 'hasPrivileges')) {
                 return false;
             }
@@ -268,12 +268,12 @@ class BladeDirectivesServiceProvider extends ServiceProvider
         Blade::if('hyro', function ($conditions) {
             $user = Auth::user();
 
-            // Null user safe
+            // Null users safe
             if (!$user) {
                 return false;
             }
 
-            // Check if user has the Hyro trait
+            // Check if users has the Hyro trait
             if (!method_exists($user, 'hasRole') || !method_exists($user, 'hasPrivilege')) {
                 return false;
             }
@@ -294,16 +294,16 @@ class BladeDirectivesServiceProvider extends ServiceProvider
             }
         });
 
-        // @suspended - Check if user is suspended
+        // @suspended - Check if users is suspended
         Blade::if('suspended', function () {
             $user = Auth::user();
 
-            // Null user safe (non-authenticated users are not suspended)
+            // Null users safe (non-authenticated users are not suspended)
             if (!$user) {
                 return false;
             }
 
-            // Check if user has the Hyro trait
+            // Check if users has the Hyro trait
             if (!method_exists($user, 'isSuspended')) {
                 return false;
             }
@@ -324,16 +324,16 @@ class BladeDirectivesServiceProvider extends ServiceProvider
             }
         });
 
-        // @notsuspended - Check if user is NOT suspended
+        // @notsuspended - Check if users is NOT suspended
         Blade::if('notsuspended', function () {
             $user = Auth::user();
 
-            // Null user safe (non-authenticated users are not suspended)
+            // Null users safe (non-authenticated users are not suspended)
             if (!$user) {
                 return true;
             }
 
-            // Check if user has the Hyro trait
+            // Check if users has the Hyro trait
             if (!method_exists($user, 'isSuspended')) {
                 return true;
             }
@@ -360,17 +360,17 @@ class BladeDirectivesServiceProvider extends ServiceProvider
      */
     private function registerInlineDirectives(): void
     {
-        // @hyro_user - Get current user with Hyro methods
+        // @hyro_user - Get current users with Hyro methods
         Blade::directive('hyro_user', function () {
             return '<?php echo app(\Marufsharia\Hyro\Blade\HyroBladeHelper::class)->getCurrentUser(); ?>';
         });
 
-        // @hyro_roles - Get user's roles
+        // @hyro_roles - Get users's roles
         Blade::directive('hyro_roles', function ($expression) {
             return '<?php echo app(\Marufsharia\Hyro\Blade\HyroBladeHelper::class)->getUserRoles(' . $expression . '); ?>';
         });
 
-        // @hyro_privileges - Get user's privileges
+        // @hyro_privileges - Get users's privileges
         Blade::directive('hyro_privileges', function ($expression) {
             return '<?php echo app(\Marufsharia\Hyro\Blade\HyroBladeHelper::class)->getUserPrivileges(' . $expression . '); ?>';
         });

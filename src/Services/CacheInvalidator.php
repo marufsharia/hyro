@@ -12,10 +12,10 @@ class CacheInvalidator implements CacheInvalidatorContract
      * Cache key prefixes
      */
     protected array $prefixes = [
-        'user_roles' => 'hyro.user.roles.',
-        'user_privileges' => 'hyro.user.privileges.',
+        'user_roles' => 'hyro.users.roles.',
+        'user_privileges' => 'hyro.users.privileges.',
         'role_privileges' => 'hyro.role.privileges.',
-        'user_all' => 'hyro.user.all.',
+        'user_all' => 'hyro.users.all.',
         'role_all' => 'hyro.role.all.',
     ];
 
@@ -39,28 +39,28 @@ class CacheInvalidator implements CacheInvalidatorContract
     }
 
     /**
-     * Invalidate all cache entries for a user.
+     * Invalidate all cache entries for a users.
      */
     public function invalidateUserCache($userId): void
     {
         try {
             if ($this->useTags) {
-                Cache::tags(['hyro', "user.{$userId}"])->flush();
+                Cache::tags(['hyro', "users.{$userId}"])->flush();
             } else {
-                // Invalidate specific user-related cache keys
+                // Invalidate specific users-related cache keys
                 Cache::forget($this->getUserRolesCacheKey($userId));
                 Cache::forget($this->getUserPrivilegesCacheKey($userId));
-                Cache::forget("hyro.user.{$userId}.permissions");
-                Cache::forget("hyro.user.{$userId}.abilities");
-                Cache::forget("hyro.user.{$userId}.status");
+                Cache::forget("hyro.users.{$userId}.permissions");
+                Cache::forget("hyro.users.{$userId}.abilities");
+                Cache::forget("hyro.users.{$userId}.status");
 
                 // Also invalidate pattern-based keys
-                $this->invalidatePattern("hyro.user.{$userId}.*");
+                $this->invalidatePattern("hyro.users.{$userId}.*");
             }
 
             Log::debug('User cache invalidated', ['user_id' => $userId]);
         } catch (\Exception $e) {
-            Log::error('Failed to invalidate user cache', [
+            Log::error('Failed to invalidate users cache', [
                 'user_id' => $userId,
                 'error' => $e->getMessage(),
             ]);
@@ -149,7 +149,7 @@ class CacheInvalidator implements CacheInvalidatorContract
     }
 
     /**
-     * Get cache key for user roles.
+     * Get cache key for users roles.
      */
     public function getUserRolesCacheKey($userId): string
     {
@@ -157,7 +157,7 @@ class CacheInvalidator implements CacheInvalidatorContract
     }
 
     /**
-     * Get cache key for user privileges.
+     * Get cache key for users privileges.
      */
     public function getUserPrivilegesCacheKey($userId): string
     {
@@ -173,7 +173,7 @@ class CacheInvalidator implements CacheInvalidatorContract
     }
 
     /**
-     * Cache user roles with optional tags.
+     * Cache users roles with optional tags.
      */
     public function cacheUserRoles($userId, $roles, ?int $duration = null): bool
     {
@@ -181,14 +181,14 @@ class CacheInvalidator implements CacheInvalidatorContract
         $duration = $duration ?? $this->cacheDuration;
 
         if ($this->useTags) {
-            return Cache::tags(['hyro', "user.{$userId}"])->put($key, $roles, $duration);
+            return Cache::tags(['hyro', "users.{$userId}"])->put($key, $roles, $duration);
         }
 
         return Cache::put($key, $roles, $duration);
     }
 
     /**
-     * Get cached user roles.
+     * Get cached users roles.
      */
     public function getCachedUserRoles($userId)
     {
@@ -197,7 +197,7 @@ class CacheInvalidator implements CacheInvalidatorContract
     }
 
     /**
-     * Cache user privileges with optional tags.
+     * Cache users privileges with optional tags.
      */
     public function cacheUserPrivileges($userId, $privileges, ?int $duration = null): bool
     {
@@ -205,14 +205,14 @@ class CacheInvalidator implements CacheInvalidatorContract
         $duration = $duration ?? $this->cacheDuration;
 
         if ($this->useTags) {
-            return Cache::tags(['hyro', "user.{$userId}"])->put($key, $privileges, $duration);
+            return Cache::tags(['hyro', "users.{$userId}"])->put($key, $privileges, $duration);
         }
 
         return Cache::put($key, $privileges, $duration);
     }
 
     /**
-     * Get cached user privileges.
+     * Get cached users privileges.
      */
     public function getCachedUserPrivileges($userId)
     {
@@ -245,7 +245,7 @@ class CacheInvalidator implements CacheInvalidatorContract
     }
 
     /**
-     * Check if user roles are cached.
+     * Check if users roles are cached.
      */
     public function hasUserRolesCache($userId): bool
     {
@@ -254,7 +254,7 @@ class CacheInvalidator implements CacheInvalidatorContract
     }
 
     /**
-     * Check if user privileges are cached.
+     * Check if users privileges are cached.
      */
     public function hasUserPrivilegesCache($userId): bool
     {
@@ -329,7 +329,7 @@ class CacheInvalidator implements CacheInvalidatorContract
         $this->invalidatePrivilegeCache($privilegeId);
 
         // Also invalidate all users with this role
-        $this->invalidatePattern("hyro.user.*.roles.{$roleId}");
+        $this->invalidatePattern("hyro.users.*.roles.{$roleId}");
     }
 
     /**
@@ -341,7 +341,7 @@ class CacheInvalidator implements CacheInvalidatorContract
         $this->invalidatePrivilegeCache($privilegeId);
 
         // Also invalidate all users with this role
-        $this->invalidatePattern("hyro.user.*.roles.{$roleId}");
+        $this->invalidatePattern("hyro.users.*.roles.{$roleId}");
     }
 
     /**

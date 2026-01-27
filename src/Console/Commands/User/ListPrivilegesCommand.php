@@ -6,20 +6,20 @@ use Marufsharia\Hyro\Console\Commands\BaseCommand;
 
 class ListPrivilegesCommand extends BaseCommand
 {
-    protected $signature = 'hyro:user:list-privileges
-                            {user : User email or ID}
+    protected $signature = 'hyro:users:list-privileges
+                            {users : User email or ID}
                             {--format=table : Output format (table, json, csv)}
                             {--effective : Show effective privileges from all roles}
                             {--direct : Show only directly assigned privileges}
                             {--group-by=scope : Group by (scope, category, none)}';
 
-    protected $description = 'List privileges for a user';
+    protected $description = 'List privileges for a users';
 
     protected function executeCommand(): void
     {
-        $user = $this->findUser($this->argument('user'));
+        $user = $this->findUser($this->argument('users'));
         if (!$user) {
-            $this->error("User not found: " . $this->argument('user'));
+            $this->error("User not found: " . $this->argument('users'));
             return;
         }
 

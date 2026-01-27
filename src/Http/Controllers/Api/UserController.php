@@ -36,7 +36,7 @@ class UserController extends BaseController
     public function index(Request $request): JsonResponse
     {
         try {
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
 
             [$perPage, $page] = $this->getPaginationParams($request);
             [$sortBy, $sortOrder] = $this->getSortingParams($request);
@@ -86,12 +86,12 @@ class UserController extends BaseController
     }
 
     /**
-     * Create a new user.
+     * Create a new users.
      */
     public function store(UserCreateRequest $request): JsonResponse
     {
         try {
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
 
             $user = DB::transaction(function () use ($request, $userModel) {
                 $user = $userModel::create([
@@ -107,7 +107,7 @@ class UserController extends BaseController
 
                 // Assign default role if no roles provided
                 if (!$request->has('roles') || empty($request->input('roles'))) {
-                    $defaultRole = Config::get('hyro.registration.default_role', 'user');
+                    $defaultRole = Config::get('hyro.registration.default_role', 'users');
                     if ($defaultRole) {
                         $user->assignRole($defaultRole, 'Auto-assigned on creation');
                     }
@@ -132,12 +132,12 @@ class UserController extends BaseController
     }
 
     /**
-     * Get a specific user.
+     * Get a specific users.
      */
     public function show(Request $request, string $id): JsonResponse
     {
         try {
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($id);
 
             // Include relationships if requested
@@ -166,12 +166,12 @@ class UserController extends BaseController
     }
 
     /**
-     * Update a user.
+     * Update a users.
      */
     public function update(UserUpdateRequest $request, string $id): JsonResponse
     {
         try {
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($id);
 
             // Store old values for audit log
@@ -221,12 +221,12 @@ class UserController extends BaseController
     }
 
     /**
-     * Delete a user.
+     * Delete a users.
      */
     public function destroy(Request $request, string $id): JsonResponse
     {
         try {
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($id);
 
             // Prevent deleting yourself
@@ -239,14 +239,14 @@ class UserController extends BaseController
             }
 
             DB::transaction(function () use ($user, $request) {
-                // Store user data for audit log before deletion
+                // Store users data for audit log before deletion
                 $userData = $user->toArray();
 
                 // Revoke all tokens first
                 $tokenCount = $user->tokens()->count();
                 $user->tokens()->delete();
 
-                // Delete the user
+                // Delete the users
                 $user->delete();
 
                 // Log the deletion
@@ -266,14 +266,14 @@ class UserController extends BaseController
     }
 
     /**
-     * Assign a role to a user.
+     * Assign a role to a users.
      */
     public function assignRole(Request $request, string $userId): JsonResponse
     {
         try {
             $this->requirePrivilege('roles.assign');
 
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($userId);
 
             $request->validate([
@@ -292,7 +292,7 @@ class UserController extends BaseController
             $this->tokenService->checkAndSyncIfNeeded($user);
 
             return $this->successResponse([
-                'user' => new UserResource($user),
+                'users' => new UserResource($user),
                 'role' => $request->input('role'),
                 'assigned_at' => now()->toISOString(),
             ], 'Role assigned successfully');
@@ -304,14 +304,14 @@ class UserController extends BaseController
     }
 
     /**
-     * Remove a role from a user.
+     * Remove a role from a users.
      */
     public function removeRole(Request $request, string $userId, string $role): JsonResponse
     {
         try {
             $this->requirePrivilege('roles.assign');
 
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($userId);
 
             $user->removeRole($role);
@@ -320,7 +320,7 @@ class UserController extends BaseController
             $this->tokenService->checkAndSyncIfNeeded($user);
 
             return $this->successResponse([
-                'user' => new UserResource($user),
+                'users' => new UserResource($user),
                 'role' => $role,
                 'removed_at' => now()->toISOString(),
             ], 'Role removed successfully');
@@ -332,14 +332,14 @@ class UserController extends BaseController
     }
 
     /**
-     * Suspend a user.
+     * Suspend a users.
      */
     public function suspend(Request $request, string $userId): JsonResponse
     {
         try {
             $this->requirePrivilege('users.suspend');
 
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($userId);
 
             $request->validate([
@@ -358,7 +358,7 @@ class UserController extends BaseController
             );
 
             return $this->successResponse([
-                'user' => new UserResource($user),
+                'users' => new UserResource($user),
                 'suspended_at' => now()->toISOString(),
                 'suspended_until' => $durationSeconds
                     ? now()->addSeconds($durationSeconds)->toISOString()
@@ -373,20 +373,20 @@ class UserController extends BaseController
     }
 
     /**
-     * Unsuspend a user.
+     * Unsuspend a users.
      */
     public function unsuspend(Request $request, string $userId): JsonResponse
     {
         try {
             $this->requirePrivilege('users.suspend');
 
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($userId);
 
             $user->unsuspend();
 
             return $this->successResponse([
-                'user' => new UserResource($user),
+                'users' => new UserResource($user),
                 'unsuspended_at' => now()->toISOString(),
             ], 'User unsuspended successfully');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -397,14 +397,14 @@ class UserController extends BaseController
     }
 
     /**
-     * Get user's suspensions.
+     * Get users's suspensions.
      */
     public function suspensions(Request $request, string $userId): JsonResponse
     {
         try {
             $this->requirePrivilege('users.view');
 
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($userId);
 
             [$perPage, $page] = $this->getPaginationParams($request);
@@ -426,14 +426,14 @@ class UserController extends BaseController
     }
 
     /**
-     * Get user's active suspension.
+     * Get users's active suspension.
      */
     public function activeSuspension(Request $request, string $userId): JsonResponse
     {
         try {
             $this->requirePrivilege('users.view');
 
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($userId);
 
             $suspension = $user->activeSuspension();
@@ -456,14 +456,14 @@ class UserController extends BaseController
     }
 
     /**
-     * Get user's roles.
+     * Get users's roles.
      */
     public function roles(Request $request, string $userId): JsonResponse
     {
         try {
             $this->requirePrivilege('users.view');
 
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($userId);
 
             $roles = $user->hyroRoleSlugs();
@@ -481,14 +481,14 @@ class UserController extends BaseController
     }
 
     /**
-     * Get user's privileges.
+     * Get users's privileges.
      */
     public function privileges(Request $request, string $userId): JsonResponse
     {
         try {
             $this->requirePrivilege('users.view');
 
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($userId);
 
             $privileges = $user->hyroPrivilegeSlugs();
@@ -506,14 +506,14 @@ class UserController extends BaseController
     }
 
     /**
-     * Sync user's tokens.
+     * Sync users's tokens.
      */
     public function syncTokens(Request $request, string $userId): JsonResponse
     {
         try {
             $this->requirePrivilege('tokens.update');
 
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($userId);
 
             $this->tokenService->checkAndSyncIfNeeded($user);
@@ -530,14 +530,14 @@ class UserController extends BaseController
     }
 
     /**
-     * Revoke all user's tokens.
+     * Revoke all users's tokens.
      */
     public function revokeAllTokens(Request $request, string $userId): JsonResponse
     {
         try {
             $this->requirePrivilege('tokens.delete');
 
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $user = $userModel::findOrFail($userId);
 
             $tokenCount = $user->tokens()->count();

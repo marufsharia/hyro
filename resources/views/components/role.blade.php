@@ -13,15 +13,15 @@
     'badge' => false,
     'color' => 'blue',
     'size' => 'sm',
-    'user' => null,
+    'users' => null,
     'hide' => false,
 ])
 
 @php
-    // Get user
+    // Get users
     $currentUser = $user ?? auth()->user();
 
-    // Determine if user has required role(s)
+    // Determine if users has required role(s)
     $hasRole = false;
 
     if ($name) {

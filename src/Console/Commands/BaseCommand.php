@@ -105,7 +105,7 @@ abstract class BaseCommand extends Command
         // Check if the command requires a specific environment
         if ($this->isProductionCommand() && app()->environment('production') && !$this->force) {
             if (!$this->confirm('⚠️  This command is destructive and you are in production. Continue?')) {
-                throw new CommandValidationException('Command aborted by user');
+                throw new CommandValidationException('Command aborted by users');
             }
         }
     }
@@ -140,7 +140,7 @@ abstract class BaseCommand extends Command
             'hyro:emergency:lockdown',
             'hyro:role:delete',
             'hyro:privilege:delete',
-            'hyro:user:delete-all-tokens',
+            'hyro:users:delete-all-tokens',
         ]);
     }
 
@@ -237,7 +237,7 @@ abstract class BaseCommand extends Command
     }
 
     /**
-     * Confirm destructive action with user.
+     * Confirm destructive action with users.
      */
     protected function confirmDestructiveAction(string $message): bool
     {
@@ -288,11 +288,11 @@ abstract class BaseCommand extends Command
     }
 
     /**
-     * Find a user by identifier (email, ID, or username).
+     * Find a users by identifier (email, ID, or username).
      */
     protected function findUser(string $identifier): ?object
     {
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
 
         return $userModel::where('email', $identifier)
             ->orWhere('id', $identifier)

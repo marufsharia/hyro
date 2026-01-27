@@ -9,23 +9,23 @@ use App\Models\User;
 
 class CreateUserCommand extends Command
 {
-    protected $signature = 'hyro:create-user
+    protected $signature = 'hyro:create-users
                             {--name= : User name}
                             {--email= : User email}
                             {--password= : User password}
-                            {--admin : Make user an admin}';
+                            {--admin : Make users an admin}';
 
-    protected $description = 'Create a new Hyro user';
+    protected $description = 'Create a new Hyro users';
 
     public function handle(): int
     {
-        $this->info('👤 Creating new Hyro user...');
+        $this->info('👤 Creating new Hyro users...');
         $this->line('');
 
         // Get password minimum length from config
         $minPasswordLength = config('hyro.auth.password_min_length', 8);
 
-        // Collect user information with retry logic
+        // Collect users information with retry logic
         $name = $this->getValidName();
         $email = $this->getValidEmail();
         $password = $this->getValidPassword($minPasswordLength);
@@ -41,12 +41,12 @@ class CreateUserCommand extends Command
             ['Admin', $isAdmin ? 'Yes' : 'No'],
         ]);
 
-        if (!$this->option('no-interaction') && !$this->confirm('Create this user?')) {
+        if (!$this->option('no-interaction') && !$this->confirm('Create this users?')) {
             $this->info('User creation cancelled.');
             return Command::SUCCESS;
         }
 
-        // Create user
+        // Create users
         try {
             $user = User::create([
                 'name' => $name,
@@ -71,7 +71,7 @@ class CreateUserCommand extends Command
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error("❌ Failed to create user: {$e->getMessage()}");
+            $this->error("❌ Failed to create users: {$e->getMessage()}");
             return Command::FAILURE;
         }
     }
@@ -82,7 +82,7 @@ class CreateUserCommand extends Command
 
         while (true) {
             if (!$name) {
-                $name = $this->ask('What is the user\'s name?');
+                $name = $this->ask('What is the users\'s name?');
             }
 
             // Validate name
@@ -109,7 +109,7 @@ class CreateUserCommand extends Command
 
         while (true) {
             if (!$email) {
-                $email = $this->ask('What is the user\'s email?');
+                $email = $this->ask('What is the users\'s email?');
             }
 
             // Validate email format
@@ -121,7 +121,7 @@ class CreateUserCommand extends Command
 
             // Check if email already exists
             if (User::where('email', $email)->exists()) {
-                $this->error("❌ A user with email '{$email}' already exists.");
+                $this->error("❌ A users with email '{$email}' already exists.");
                 $email = null;
                 continue;
             }

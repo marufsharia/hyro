@@ -8,17 +8,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 interface HyroUserContract
 {
     /**
-     * Get all roles assigned to the user.
+     * Get all roles assigned to the users.
      */
     public function roles(): BelongsToMany;
 
     /**
-     * Get all privileges the user has through roles.
+     * Get all privileges the users has through roles.
      */
     public function privileges(): BelongsToMany;
 
     /**
-     * Get all suspensions for the user.
+     * Get all suspensions for the users.
      */
     public function suspensions(): HasMany;
 
@@ -28,77 +28,77 @@ interface HyroUserContract
     public function activeSuspension();
 
     /**
-     * Check if user has a specific role.
+     * Check if users has a specific role.
      */
     public function hasRole(string $role): bool;
 
     /**
-     * Check if user has all of the given roles.
+     * Check if users has all of the given roles.
      */
     public function hasRoles(array $roles): bool;
 
     /**
-     * Check if user has any of the given roles.
+     * Check if users has any of the given roles.
      */
     public function hasAnyRole(array $roles): bool;
 
     /**
-     * Check if user has a specific privilege.
+     * Check if users has a specific privilege.
      */
     public function hasPrivilege(string $privilege): bool;
 
     /**
-     * Check if user has all of the given privileges.
+     * Check if users has all of the given privileges.
      */
     public function hasPrivileges(array $privileges): bool;
 
     /**
-     * Check if user has any of the given privileges.
+     * Check if users has any of the given privileges.
      */
     public function hasAnyPrivilege(array $privileges): bool;
 
     /**
-     * Get all role slugs assigned to the user.
+     * Get all role slugs assigned to the users.
      */
     public function hyroRoleSlugs(): array;
 
     /**
-     * Get all privilege slugs available to the user.
+     * Get all privilege slugs available to the users.
      */
     public function hyroPrivilegeSlugs(): array;
 
     /**
-     * Suspend the user.
+     * Suspend the users.
      */
     public function suspend(string $reason, ?string $details = null, ?int $duration = null): void;
 
     /**
-     * Unsuspend the user.
+     * Unsuspend the users.
      */
     public function unsuspend(): void;
 
     /**
-     * Check if user is currently suspended.
+     * Check if users is currently suspended.
      */
     public function isSuspended(): bool;
 
     /**
-     * Assign a role to the user.
+     * Assign a role to the users.
      */
     public function assignRole(string $role, ?string $reason = null, ?\DateTimeInterface $expiresAt = null): void;
 
     /**
-     * Remove a role from the user.
+     * Remove a role from the users.
      */
     public function removeRole(string $role): void;
 
     /**
-     * Sync user roles.
+     * Sync users roles.
      */
     public function syncRoles(array $roles, bool $detach = true): void;
 
     /**
-     * Get the user's identifier for audit logs.
+     * Get the users's identifier for audit logs.
      */
     public function getAuditIdentifier(): string;
 }

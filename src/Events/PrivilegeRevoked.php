@@ -23,7 +23,7 @@ class PrivilegeRevoked
     public Privilege $privilege;
 
     /**
-     * The user who performed the revocation.
+     * The users who performed the revocation.
      */
     public ?User $revoker;
 

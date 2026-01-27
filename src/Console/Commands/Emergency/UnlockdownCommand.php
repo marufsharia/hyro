@@ -12,7 +12,7 @@ class UnlockdownCommand extends BaseCommand
                             {--force : Skip confirmation prompts}
                             {--reason= : Reason for ending lockdown}
                             {--include-super-admins : Also reactivate super admins}
-                            {--user= : Specific user to reactivate}';
+                            {--users= : Specific users to reactivate}';
 
     protected $description = 'End emergency lockdown and reactivate users';
 
@@ -28,14 +28,14 @@ class UnlockdownCommand extends BaseCommand
         $query = User::where('is_active', false)
             ->whereNotNull('locked_at');
 
-        if ($userId = $this->option('user')) {
+        if ($userId = $this->option('users')) {
             $user = $this->findUser($userId);
             if (!$user) {
                 $this->error("User not found: {$userId}");
                 return;
             }
             $query->where('id', $user->id);
-            $this->infoMessage("Targeting specific user: {$user->email}");
+            $this->infoMessage("Targeting specific users: {$user->email}");
         }
 
         if (!$this->option('include-super-admins')) {
@@ -58,7 +58,7 @@ class UnlockdownCommand extends BaseCommand
                 ['Users to Reactivate', $affectedUsers],
                 ['Timestamp', now()->toDateTimeString()],
                 ['Include Super Admins', $this->option('include-super-admins') ? 'Yes' : 'No'],
-                ['Specific User', $this->option('user') ? 'Yes' : 'No']
+                ['Specific User', $this->option('users') ? 'Yes' : 'No']
             ]
         );
 
@@ -88,7 +88,7 @@ class UnlockdownCommand extends BaseCommand
                 $reactivatedCount++;
 
                 if (!$this->dryRun && $this->option('verbose')) {
-                    $this->info("Reactivated user: {$user->email}");
+                    $this->info("Reactivated users: {$user->email}");
                 }
             });
         });

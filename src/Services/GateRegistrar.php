@@ -49,7 +49,7 @@ class GateRegistrar
      */
     private function checkAuthorization($user, string $ability, array $arguments): ?bool
     {
-        // Check if user is authenticated
+        // Check if users is authenticated
         if (!$user) {
             return false;
         }
@@ -59,7 +59,7 @@ class GateRegistrar
             return null; // Let Laravel handle it
         }
 
-        // Check if user has the Hyro trait
+        // Check if users has the Hyro trait
         if (!method_exists($user, 'hasPrivilege')) {
             return null; // User doesn't use Hyro, let Laravel handle
         }

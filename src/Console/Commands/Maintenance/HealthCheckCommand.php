@@ -273,7 +273,7 @@ class HealthCheckCommand extends BaseCommand
 
         try {
             // Check for orphaned role_user records
-            $userModel = Config::get('hyro.models.user');
+            $userModel = Config::get('hyro.models.users');
             $orphanedRoleUser = DB::table(Config::get('hyro.database.tables.role_user'))
                 ->whereNotExists(function ($query) use ($userModel) {
                     $query->select(DB::raw(1))
@@ -380,7 +380,7 @@ class HealthCheckCommand extends BaseCommand
         }
 
         // Check for users with too many privileges (potential security risk)
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
         $users = $userModel::has('roles')->withCount('roles')->get();
 
         foreach ($users as $user) {

@@ -1,4 +1,4 @@
-@extends('hyro::layouts.app')
+@extends('hyro::admin.layouts.app')
 
 @section('header', 'Roles Management')
 

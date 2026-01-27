@@ -62,7 +62,7 @@ trait ValidatesInputWithRetry
 
                 // In interactive mode, give option to retry
                 if (!$this->option('no-interaction') && !$this->confirm('Try again?', true)) {
-                    throw new \RuntimeException('Validation cancelled by user.');
+                    throw new \RuntimeException('Validation cancelled by users.');
                 }
 
                 $attempt++;

@@ -23,19 +23,19 @@ trait HasHyroAccess
      */
     protected static function bootHasHyroAccess(): void
     {
-        // Invalidate cache when user is saved (roles/privileges might have changed)
+        // Invalidate cache when users is saved (roles/privileges might have changed)
         static::saved(function ($user) {
             app(CacheInvalidatorContract::class)->invalidateUserCache($user->id);
         });
 
-        // Invalidate cache when user is deleted
+        // Invalidate cache when users is deleted
         static::deleted(function ($user) {
             app(CacheInvalidatorContract::class)->invalidateUserCache($user->id);
         });
     }
 
     /**
-     * Get all roles assigned to the user.
+     * Get all roles assigned to the users.
      */
     public function roles(): BelongsToMany
     {
@@ -52,7 +52,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Get all privileges the user has through roles.
+     * Get all privileges the users has through roles.
      */
     public function privileges(): BelongsToMany
     {
@@ -75,7 +75,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Get all suspensions for the user.
+     * Get all suspensions for the users.
      */
     public function suspensions(): HasMany
     {
@@ -94,7 +94,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Get cached role slugs for the user.
+     * Get cached role slugs for the users.
      */
     public function getCachedRoleSlugs(): array
     {
@@ -109,7 +109,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Get cached privilege slugs for the user.
+     * Get cached privilege slugs for the users.
      */
     public function getCachedPrivilegeSlugs(): array
     {
@@ -133,7 +133,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Check if user has a specific role.
+     * Check if users has a specific role.
      */
     public function hasRole(string $role): bool
     {
@@ -146,7 +146,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Check if user has all of the given roles.
+     * Check if users has all of the given roles.
      */
     public function hasRoles(array $roles): bool
     {
@@ -163,7 +163,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Check if user has any of the given roles.
+     * Check if users has any of the given roles.
      */
     public function hasAnyRole(array $roles): bool
     {
@@ -180,7 +180,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Check if user has a specific privilege.
+     * Check if users has a specific privilege.
      */
     public function hasPrivilege(string $privilege): bool
     {
@@ -233,7 +233,7 @@ trait HasHyroAccess
             $configuredPatterns = Config::get('hyro.wildcards.patterns', []);
             foreach (array_keys($configuredPatterns) as $pattern) {
                 if ($this->matchesWildcard($pattern, $privilege)) {
-                    // Check if user has this wildcard pattern
+                    // Check if users has this wildcard pattern
                     if (in_array($pattern, $privileges)) {
                         return true;
                     }
@@ -263,7 +263,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Check if user has all of the given privileges.
+     * Check if users has all of the given privileges.
      */
     public function hasPrivileges(array $privileges): bool
     {
@@ -285,7 +285,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Check if user has any of the given privileges.
+     * Check if users has any of the given privileges.
      */
     public function hasAnyPrivilege(array $privileges): bool
     {
@@ -307,7 +307,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Get all role slugs assigned to the user.
+     * Get all role slugs assigned to the users.
      */
     public function hyroRoleSlugs(): array
     {
@@ -315,7 +315,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Get all privilege slugs available to the user.
+     * Get all privilege slugs available to the users.
      */
     public function hyroPrivilegeSlugs(): array
     {
@@ -323,7 +323,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Suspend the user.
+     * Suspend the users.
      */
     public function suspend(string $reason, ?string $details = null, ?int $duration = null): void
     {
@@ -350,7 +350,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Unsuspend the user.
+     * Unsuspend the users.
      */
     public function unsuspend(): void
     {
@@ -368,7 +368,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Check if user is currently suspended.
+     * Check if users is currently suspended.
      */
     public function isSuspended(): bool
     {
@@ -376,7 +376,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Assign a role to the user.
+     * Assign a role to the users.
      */
     public function assignRole(string $role, ?string $reason = null, ?\DateTimeInterface $expiresAt = null): void
     {
@@ -416,7 +416,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Remove a role from the user.
+     * Remove a role from the users.
      */
     public function removeRole(string $role): void
     {
@@ -439,7 +439,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Sync user roles.
+     * Sync users roles.
      */
     public function syncRoles(array $roles, bool $detach = true): void
     {
@@ -493,7 +493,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Get the user's identifier for audit logs.
+     * Get the users's identifier for audit logs.
      */
     public function getAuditIdentifier(): string
     {
@@ -501,7 +501,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Clear all cached data for this user.
+     * Clear all cached data for this users.
      */
     public function clearHyroCache(): void
     {
@@ -509,7 +509,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Check if user has a privilege via any method (alias for hasPrivilege).
+     * Check if users has a privilege via any method (alias for hasPrivilege).
      */
     public function canDo(string $privilege): bool
     {
@@ -517,7 +517,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Check if user has a role (alias for hasRole).
+     * Check if users has a role (alias for hasRole).
      */
     public function isA(string $role): bool
     {
@@ -525,7 +525,7 @@ trait HasHyroAccess
     }
 
     /**
-     * Check if user has any of the given roles (alias for hasAnyRole).
+     * Check if users has any of the given roles (alias for hasAnyRole).
      */
     public function isAnyOf(array $roles): bool
     {

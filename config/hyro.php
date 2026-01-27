@@ -140,7 +140,7 @@ return [
         ],
 
         'models' => [
-            'user' => \App\Models\User::class,
+            'users' => \App\Models\User::class,
             'role' => \Marufsharia\Hyro\Models\Role::class,
             'privilege' => \Marufsharia\Hyro\Models\Privilege::class,
             'user_suspension' => \Marufsharia\Hyro\Models\UserSuspension::class,
@@ -168,7 +168,7 @@ return [
             'enabled' => true,
             'character' => '*',
             'patterns' => [
-                'user.*',
+                'users.*',
                 'admin.*',
                 '*.view',
                 '*.create',

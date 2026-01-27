@@ -107,7 +107,7 @@ class HyroServiceProvider extends ServiceProvider
     {
         $this->app->bind(
             HyroUserContract::class,
-            config('hyro.models.user', \App\Models\User::class)
+            config('hyro.models.users', \App\Models\User::class)
         );
 
         // Additional bindings will be added in Phase 3

@@ -19,18 +19,18 @@ class HyroBladeHelper
     }
 
     /**
-     * Get the current authenticated user (safe for null).
+     * Get the current authenticated users (safe for null).
      */
     public function getCurrentUser(): mixed
     {
         $user = Auth::user();
 
-        // Return null user object with safe methods if no user
+        // Return null users object with safe methods if no users
         if (!$user) {
             return new class {
                 public function __call($method, $args)
                 {
-                    // Safe defaults for null user
+                    // Safe defaults for null users
                     if (str_starts_with($method, 'has')) {
                         return false;
                     }
@@ -53,13 +53,13 @@ class HyroBladeHelper
     }
 
     /**
-     * Check if user has any of the given abilities.
+     * Check if users has any of the given abilities.
      */
     public function canAny(array $abilities, $user = null): bool
     {
         $user = $user ?: Auth::user();
 
-        // Null user safe
+        // Null users safe
         if (!$user) {
             return false;
         }
@@ -82,13 +82,13 @@ class HyroBladeHelper
     }
 
     /**
-     * Check if user has all of the given abilities.
+     * Check if users has all of the given abilities.
      */
     public function canAll(array $abilities, $user = null): bool
     {
         $user = $user ?: Auth::user();
 
-        // Null user safe
+        // Null users safe
         if (!$user) {
             return false;
         }
@@ -111,13 +111,13 @@ class HyroBladeHelper
     }
 
     /**
-     * Get user's roles as formatted string.
+     * Get users's roles as formatted string.
      */
     public function getUserRoles($user = null, string $glue = ', '): string
     {
         $user = $user ?: Auth::user();
 
-        // Null user safe
+        // Null users safe
         if (!$user || !method_exists($user, 'hyroRoleSlugs')) {
             return '';
         }
@@ -132,13 +132,13 @@ class HyroBladeHelper
     }
 
     /**
-     * Get user's privileges as formatted string.
+     * Get users's privileges as formatted string.
      */
     public function getUserPrivileges($user = null, string $glue = ', '): string
     {
         $user = $user ?: Auth::user();
 
-        // Null user safe
+        // Null users safe
         if (!$user || !method_exists($user, 'hyroPrivilegeSlugs')) {
             return '';
         }
@@ -153,13 +153,13 @@ class HyroBladeHelper
     }
 
     /**
-     * Check if user has role (safe method).
+     * Check if users has role (safe method).
      */
     public function hasRole(string $role, $user = null): bool
     {
         $user = $user ?: Auth::user();
 
-        // Null user safe
+        // Null users safe
         if (!$user || !method_exists($user, 'hasRole')) {
             return false;
         }
@@ -177,13 +177,13 @@ class HyroBladeHelper
     }
 
     /**
-     * Check if user has privilege (safe method).
+     * Check if users has privilege (safe method).
      */
     public function hasPrivilege(string $privilege, $user = null): bool
     {
         $user = $user ?: Auth::user();
 
-        // Null user safe
+        // Null users safe
         if (!$user || !method_exists($user, 'hasPrivilege')) {
             return false;
         }
@@ -201,13 +201,13 @@ class HyroBladeHelper
     }
 
     /**
-     * Check if user is suspended (safe method).
+     * Check if users is suspended (safe method).
      */
     public function isSuspended($user = null): bool
     {
         $user = $user ?: Auth::user();
 
-        // Null user safe (non-authenticated users are not suspended)
+        // Null users safe (non-authenticated users are not suspended)
         if (!$user || !method_exists($user, 'isSuspended')) {
             return false;
         }
@@ -221,13 +221,13 @@ class HyroBladeHelper
     }
 
     /**
-     * Get user's role badges HTML.
+     * Get users's role badges HTML.
      */
     public function roleBadges($user = null, array $options = []): string
     {
         $user = $user ?: Auth::user();
 
-        // Null user safe
+        // Null users safe
         if (!$user || !method_exists($user, 'hyroRoleSlugs')) {
             return '';
         }
@@ -241,7 +241,7 @@ class HyroBladeHelper
                 'admin' => 'bg-red-100 text-red-800',
                 'super-admin' => 'bg-purple-100 text-purple-800',
                 'editor' => 'bg-blue-100 text-blue-800',
-                'user' => 'bg-gray-100 text-gray-800',
+                'users' => 'bg-gray-100 text-gray-800',
             ];
 
             $defaultColor = $options['default_color'] ?? 'bg-gray-100 text-gray-800';
@@ -264,13 +264,13 @@ class HyroBladeHelper
     }
 
     /**
-     * Get user's privilege chips HTML.
+     * Get users's privilege chips HTML.
      */
     public function privilegeChips($user = null, array $options = []): string
     {
         $user = $user ?: Auth::user();
 
-        // Null user safe
+        // Null users safe
         if (!$user || !method_exists($user, 'hyroPrivilegeSlugs')) {
             return '';
         }
@@ -370,7 +370,7 @@ class HyroBladeHelper
         ];
 
         if (!$user) {
-            $status['message'] = 'No authenticated user';
+            $status['message'] = 'No authenticated users';
             return $status;
         }
 

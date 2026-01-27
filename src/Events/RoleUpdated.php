@@ -16,7 +16,7 @@ class RoleUpdated
     public Role $role;
 
     /**
-     * The user who updated the role.
+     * The users who updated the role.
      */
     public ?object $updater;
 

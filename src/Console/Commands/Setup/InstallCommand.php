@@ -168,9 +168,9 @@ class InstallCommand extends BaseCommand
                 'is_system' => true,
             ],
             [
-                'slug' => 'user',
+                'slug' => 'users',
                 'name' => 'User',
-                'description' => 'Regular user with basic privileges',
+                'description' => 'Regular users with basic privileges',
                 'is_protected' => false,
                 'is_system' => true,
             ],
@@ -259,7 +259,7 @@ class InstallCommand extends BaseCommand
         $this->info('║ 1. Review config/hyro.php                                ║');
         $this->info('║ 2. Add HasHyroAccess trait to your User model           ║');
         $this->info('║ 3. Run: php artisan hyro:health-check                   ║');
-        $this->info('║ 4. Check: php artisan hyro:user:list-roles              ║');
+        $this->info('║ 4. Check: php artisan hyro:users:list-roles              ║');
         $this->info('║                                                          ║');
         $this->info('║ Documentation: https://github.com/marufsharia/hyro       ║');
         $this->info('╚══════════════════════════════════════════════════════════╝');

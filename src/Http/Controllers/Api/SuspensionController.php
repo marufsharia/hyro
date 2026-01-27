@@ -59,8 +59,8 @@ class SuspensionController extends BaseController
 
             // Include relationships if requested
             $include = $request->input('include', '');
-            if (str_contains($include, 'user')) {
-                $suspensions->load('user');
+            if (str_contains($include, 'users')) {
+                $suspensions->load('users');
             }
 
             if (str_contains($include, 'suspender')) {
@@ -124,8 +124,8 @@ class SuspensionController extends BaseController
 
             // Include relationships if requested
             $include = $request->input('include', '');
-            if (str_contains($include, 'user')) {
-                $suspension->load('user');
+            if (str_contains($include, 'users')) {
+                $suspension->load('users');
             }
 
             if (str_contains($include, 'suspender')) {
@@ -214,8 +214,8 @@ class SuspensionController extends BaseController
                 ->orderBy('suspended_at', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);
 
-            // Include user relationship
-            $suspensions->load('user');
+            // Include users relationship
+            $suspensions->load('users');
 
             return $this->collectionResponse(
                 UserSuspensionResource::collection($suspensions),
@@ -240,8 +240,8 @@ class SuspensionController extends BaseController
                 ->orderBy('suspended_at', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);
 
-            // Include user relationship
-            $suspensions->load('user');
+            // Include users relationship
+            $suspensions->load('users');
 
             return $this->collectionResponse(
                 UserSuspensionResource::collection($suspensions),

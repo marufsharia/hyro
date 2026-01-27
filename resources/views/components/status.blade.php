@@ -8,14 +8,14 @@
     'ability' => null,
     'role' => null,
     'privilege' => null,
-    'user' => null,
+    'users' => null,
     'showIcon' => true,
     'showText' => true,
     'size' => 'sm',
 ])
 
 @php
-    // Get user
+    // Get users
     $currentUser = $user ?? auth()->user();
 
     // Determine what to check

@@ -6,19 +6,19 @@ use Marufsharia\Hyro\Console\Commands\BaseCommand;
 
 class RemoveRoleCommand extends BaseCommand
 {
-    protected $signature = 'hyro:user:remove-role
-                            {user : User email or ID}
+    protected $signature = 'hyro:users:remove-role
+                            {users : User email or ID}
                             {role : Role slug or ID}
                             {--dry-run : Preview changes without applying them}
                             {--force : Skip confirmation prompts}';
 
-    protected $description = 'Remove a role from a user';
+    protected $description = 'Remove a role from a users';
 
     protected function executeCommand(): void
     {
-        $user = $this->findUser($this->argument('user'));
+        $user = $this->findUser($this->argument('users'));
         if (!$user) {
-            $this->error("User not found: " . $this->argument('user'));
+            $this->error("User not found: " . $this->argument('users'));
             return;
         }
 
@@ -34,7 +34,7 @@ class RemoveRoleCommand extends BaseCommand
         }
 
         if (!$this->confirmDestructiveAction(
-            "Remove role '{$role->name}' from user '{$user->email}'?"
+            "Remove role '{$role->name}' from users '{$user->email}'?"
         )) {
             $this->infoMessage('Operation cancelled.');
             return;
@@ -44,9 +44,9 @@ class RemoveRoleCommand extends BaseCommand
             $user->removeRole($role);
 
             if (!$this->dryRun) {
-                $this->info("Role '{$role->name}' removed from user '{$user->email}'");
+                $this->info("Role '{$role->name}' removed from users '{$user->email}'");
             } else {
-                $this->info("[DRY RUN] Would remove role '{$role->name}' from user '{$user->email}'");
+                $this->info("[DRY RUN] Would remove role '{$role->name}' from users '{$user->email}'");
             }
 
             $this->stats['processed']++;

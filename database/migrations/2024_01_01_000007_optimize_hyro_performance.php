@@ -21,7 +21,7 @@ return new class extends Migration
 
     private function createMaterializedViews(): void
     {
-        // For PostgreSQL: Create materialized view for fast user privilege resolution
+        // For PostgreSQL: Create materialized view for fast users privilege resolution
         if (Config::get('database.default') === 'pgsql') {
             $rolesTable = Config::get('hyro.database.tables.roles', 'hyro_roles');
             $privilegesTable = Config::get('hyro.database.tables.privileges', 'hyro_privileges');

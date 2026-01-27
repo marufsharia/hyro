@@ -12,11 +12,11 @@ class UserRepository
 
     public function __construct(array $config)
     {
-        $this->userModel = $config['database']['models']['user'] ?? \App\Models\User::class;
+        $this->userModel = $config['database']['models']['users'] ?? \App\Models\User::class;
     }
 
     /**
-     * Get a user by ID
+     * Get a users by ID
      */
     public function find(int $id): ?HyroUserContract
     {
@@ -32,7 +32,7 @@ class UserRepository
     }
 
     /**
-     * Create a new user
+     * Create a new users
      */
     public function create(array $data): HyroUserContract
     {
@@ -40,7 +40,7 @@ class UserRepository
     }
 
     /**
-     * Update a user
+     * Update a users
      */
     public function update(int $id, array $data): bool
     {
@@ -49,7 +49,7 @@ class UserRepository
     }
 
     /**
-     * Delete a user
+     * Delete a users
      */
     public function delete(int $id): bool
     {

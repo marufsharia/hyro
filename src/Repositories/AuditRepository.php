@@ -38,7 +38,7 @@ class AuditRepository
     }
 
     /**
-     * Get audit logs for a specific user
+     * Get audit logs for a specific users
      *
      * @param int $userId
      * @return \Illuminate\Database\Eloquent\Collection

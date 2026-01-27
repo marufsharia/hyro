@@ -7,7 +7,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 interface AuthorizationResolverContract
 {
     /**
-     * Authorize a user for a specific ability.
+     * Authorize a users for a specific ability.
      */
     public function authorize(
         Authenticatable $user,
@@ -17,17 +17,17 @@ interface AuthorizationResolverContract
     ): bool;
 
     /**
-     * Get all abilities a user has.
+     * Get all abilities a users has.
      */
     public function getAbilitiesForUser(Authenticatable $user): array;
 
     /**
-     * Check if user has any of the given abilities.
+     * Check if users has any of the given abilities.
      */
     public function hasAnyAbility(Authenticatable $user, array $abilities): bool;
 
     /**
-     * Check if user has all of the given abilities.
+     * Check if users has all of the given abilities.
      */
     public function hasAllAbilities(Authenticatable $user, array $abilities): bool;
 }

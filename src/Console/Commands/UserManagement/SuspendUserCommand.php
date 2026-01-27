@@ -9,19 +9,19 @@ use Marufsharia\Hyro\Facades\Hyro;
 
 class SuspendUserCommand extends Command
 {
-    protected $signature = 'hyro:suspend-user
-                            {user : User ID, email, or username}
+    protected $signature = 'hyro:suspend-users
+                            {users : User ID, email, or username}
                             {--reason= : Reason for suspension}
                             {--duration= : Duration in days (0 for permanent)}
                             {--unsuspend : Unsuspend instead of suspend}
                             {--force : Force suspension without confirmation}
                             {--no-interaction : Run non-interactively}';
 
-    protected $description = 'Suspend or unsuspend a Hyro user';
+    protected $description = 'Suspend or unsuspend a Hyro users';
 
     public function handle(): int
     {
-        $userIdentifier = $this->argument('user');
+        $userIdentifier = $this->argument('users');
         $shouldUnsuspend = $this->option('unsuspend');
 
         if ($shouldUnsuspend) {
@@ -33,9 +33,9 @@ class SuspendUserCommand extends Command
 
     protected function handleSuspend(string $userIdentifier): int
     {
-        $this->info('🚫 Suspending user...');
+        $this->info('🚫 Suspending users...');
 
-        // Find user
+        // Find users
         $user = $this->findUser($userIdentifier);
         if (!$user) {
             $this->error("❌ User not found: {$userIdentifier}");
@@ -65,16 +65,16 @@ class SuspendUserCommand extends Command
                 ['Duration', $duration === 0 ? 'Permanent' : "{$duration} days"],
             ]);
 
-            if (!$this->confirm('Are you sure you want to suspend this user?')) {
+            if (!$this->confirm('Are you sure you want to suspend this users?')) {
                 $this->info('Suspension cancelled.');
                 return Command::SUCCESS;
             }
         }
 
         try {
-            // Suspend the user
+            // Suspend the users
             DB::transaction(function () use ($user, $reason, $duration) {
-                // Update user table
+                // Update users table
                 $user->suspended_at = now();
                 $user->save();
 
@@ -105,16 +105,16 @@ class SuspendUserCommand extends Command
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error("❌ Failed to suspend user: {$e->getMessage()}");
+            $this->error("❌ Failed to suspend users: {$e->getMessage()}");
             return Command::FAILURE;
         }
     }
 
     protected function handleUnsuspend(string $userIdentifier): int
     {
-        $this->info('✅ Unsuspending user...');
+        $this->info('✅ Unsuspending users...');
 
-        // Find user
+        // Find users
         $user = $this->findUser($userIdentifier);
         if (!$user) {
             $this->error("❌ User not found: {$userIdentifier}");
@@ -138,7 +138,7 @@ class SuspendUserCommand extends Command
                 ['Reason', $reason],
             ]);
 
-            if (!$this->confirm('Are you sure you want to unsuspend this user?')) {
+            if (!$this->confirm('Are you sure you want to unsuspend this users?')) {
                 $this->info('Unsuspension cancelled.');
                 return Command::SUCCESS;
             }
@@ -146,7 +146,7 @@ class SuspendUserCommand extends Command
 
         try {
             DB::transaction(function () use ($user, $reason) {
-                // Update user table
+                // Update users table
                 $user->suspended_at = null;
                 $user->save();
 
@@ -170,14 +170,14 @@ class SuspendUserCommand extends Command
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error("❌ Failed to unsuspend user: {$e->getMessage()}");
+            $this->error("❌ Failed to unsuspend users: {$e->getMessage()}");
             return Command::FAILURE;
         }
     }
 
     protected function findUser(string $identifier)
     {
-        $userModel = config('hyro.models.user', App\Models\User::class);
+        $userModel = config('hyro.models.users', App\Models\User::class);
 
         // Try by ID
         if (is_numeric($identifier)) {

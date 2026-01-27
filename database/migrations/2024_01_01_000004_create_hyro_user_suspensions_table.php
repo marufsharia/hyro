@@ -76,13 +76,13 @@ return new class extends Migration
 
         if ($driver === 'mysql') {
             DB::statement(
-                "ALTER TABLE {$tableName} COMMENT = 'Tracks user suspensions with automatic/manual tracking and indefinite/temporary periods'"
+                "ALTER TABLE {$tableName} COMMENT = 'Tracks users suspensions with automatic/manual tracking and indefinite/temporary periods'"
             );
         }
 
         if ($driver === 'pgsql') {
             DB::statement(
-                "COMMENT ON TABLE {$tableName} IS 'Tracks user suspensions with automatic/manual tracking and indefinite/temporary periods'"
+                "COMMENT ON TABLE {$tableName} IS 'Tracks users suspensions with automatic/manual tracking and indefinite/temporary periods'"
             );
         }
 

@@ -57,7 +57,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * Create a new user instance after a valid registration.
+     * Create a new users instance after a valid registration.
      *
      * @param  array  $data
      * @return \App\Models\User
@@ -91,10 +91,10 @@ class RegisterController extends Controller
     {
         $this->validator($request->all())->validate();
 
-        // Create the user
+        // Create the users
         $user = $this->create($request->all());
 
-        // Log the user in
+        // Log the users in
         Auth::login($user);
 
         // Regenerate session
@@ -103,7 +103,7 @@ class RegisterController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Registration successful',
-                'user' => $user
+                'users' => $user
             ], 201);
         }
 

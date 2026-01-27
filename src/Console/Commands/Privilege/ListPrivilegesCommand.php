@@ -114,7 +114,7 @@ class ListPrivilegesCommand extends BaseCommand
 
     protected function isProtectedPrivilege($privilege): bool
     {
-        $protectedPrivileges = config('hyro.protected_privileges', ['*', 'user:manage', 'role:view']);
+        $protectedPrivileges = config('hyro.protected_privileges', ['*', 'users:manage', 'role:view']);
         return in_array($privilege->slug, $protectedPrivileges);
     }
 

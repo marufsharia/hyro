@@ -77,7 +77,7 @@ class AuthController extends Controller
     {
         $this->validateLogin($request);
 
-        // Check if the user has too many login attempts
+        // Check if the users has too many login attempts
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
             return $this->sendLockoutResponse($request);
@@ -94,7 +94,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Validate the user login request.
+     * Validate the users login request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return void
@@ -110,7 +110,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Attempt to log the user into the application.
+     * Attempt to log the users into the application.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return bool
@@ -145,7 +145,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Determine if the user has too many failed login attempts.
+     * Determine if the users has too many failed login attempts.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return bool
@@ -159,7 +159,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Increment the login attempts for the user.
+     * Increment the login attempts for the users.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return void
@@ -173,7 +173,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Redirect the user after determining they are locked out.
+     * Redirect the users after determining they are locked out.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return void
@@ -197,7 +197,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Clear the login locks for the given user credentials.
+     * Clear the login locks for the given users credentials.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return void
@@ -230,7 +230,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Send the response after the user was authenticated.
+     * Send the response after the users was authenticated.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
@@ -251,7 +251,7 @@ class AuthController extends Controller
     }
 
     /**
-     * The user has been authenticated.
+     * The users has been authenticated.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user
@@ -279,7 +279,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Log the user out of the application.
+     * Log the users out of the application.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse

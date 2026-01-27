@@ -23,7 +23,7 @@ class RoleController extends Controller
             ->orderBy('name')
             ->paginate(20);
 
-        return view('hyro::roles.index', compact('roles'));
+        return view('hyro::admin.roles.index', compact('roles'));
     }
 
     /**
@@ -35,7 +35,7 @@ class RoleController extends Controller
     {
         $privileges = Privilege::orderBy('name')->get();
 
-        return view('hyro::roles.create', compact('privileges'));
+        return view('hyro::admin.roles.create', compact('privileges'));
     }
 
     /**
@@ -81,7 +81,7 @@ class RoleController extends Controller
         $privileges = Privilege::orderBy('name')->get();
         $role->load('privileges');
 
-        return view('hyro::roles.edit', compact('role', 'privileges'));
+        return view('hyro::admin.roles.edit', compact('role', 'privileges'));
     }
 
     /**

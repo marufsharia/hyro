@@ -12,7 +12,7 @@ class RoleAssigned
     use Dispatchable, SerializesModels;
 
     /**
-     * The user instance.
+     * The users instance.
      */
     public User $user;
 
@@ -22,7 +22,7 @@ class RoleAssigned
     public Role $role;
 
     /**
-     * The user who performed the assignment.
+     * The users who performed the assignment.
      */
     public ?User $assigner;
 
@@ -51,6 +51,6 @@ class RoleAssigned
      */
     public function broadcastOn(): string
     {
-        return 'user.' . $this->user->id;
+        return 'users.' . $this->user->id;
     }
 }

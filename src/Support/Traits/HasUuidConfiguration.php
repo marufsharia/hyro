@@ -40,7 +40,7 @@ trait HasUuidConfiguration
     }
 
     /**
-     * Add user foreign key with configurable table name.
+     * Add users foreign key with configurable table name.
      */
     protected function addUserForeignKey(Blueprint $table, string $column = 'user_id'): void
     {

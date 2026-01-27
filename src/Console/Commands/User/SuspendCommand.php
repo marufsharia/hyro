@@ -12,19 +12,19 @@ class SuspendCommand extends BaseCommand
 {
     use Confirmable, Validatable;
 
-    protected $signature = 'hyro:user:suspend
-                            {user : User identifier (email, ID, or username)}
+    protected $signature = 'hyro:users:suspend
+                            {users : User identifier (email, ID, or username)}
                             {reason : Reason for suspension}
                             {--duration= : Suspension duration (e.g., "1 hour", "2 days", or minutes as number)}
                             {--details= : Additional details}
                             {--dry-run : Preview changes}
                             {--force : Skip confirmation}';
 
-    protected $description = 'Suspend a user account';
+    protected $description = 'Suspend a users account';
 
     protected function executeCommand(): void
     {
-        $userIdentifier = $this->argument('user');
+        $userIdentifier = $this->argument('users');
         $reason = $this->argument('reason');
         $duration = $this->option('duration');
         $details = $this->option('details');
@@ -63,7 +63,7 @@ class SuspendCommand extends BaseCommand
             ['Mode', $this->dryRun ? 'Dry Run' : 'Live'],
         ];
 
-        if (!$this->confirmDestructiveOperation('Suspend user account', [
+        if (!$this->confirmDestructiveOperation('Suspend users account', [
             ['User Access', 'Immediately blocked'],
             ['Active Sessions', 'All tokens will be revoked'],
             ['API Access', 'All API calls will be rejected'],
@@ -90,18 +90,18 @@ class SuspendCommand extends BaseCommand
                         'duration_seconds' => $durationSeconds,
                         'suspended_by' => 'cli',
                     ], [
-                        'tags' => ['cli', 'user', 'suspension'],
+                        'tags' => ['cli', 'users', 'suspension'],
                     ]);
                 }
             } else {
-                $this->info("🔍 [Dry Run] Would suspend user '{$user->email}'");
+                $this->info("🔍 [Dry Run] Would suspend users '{$user->email}'");
             }
         });
     }
 
     private function unsuspendUser($user): void
     {
-        if (!$this->confirm("Unsuspend user '{$user->email}'?", false)) {
+        if (!$this->confirm("Unsuspend users '{$user->email}'?", false)) {
             return;
         }
 
@@ -114,11 +114,11 @@ class SuspendCommand extends BaseCommand
                     AuditLog::log('user_unsuspended', $user, null, [
                         'unsuspended_by' => 'cli',
                     ], [
-                        'tags' => ['cli', 'user', 'unsuspension'],
+                        'tags' => ['cli', 'users', 'unsuspension'],
                     ]);
                 }
             } else {
-                $this->info("🔍 [Dry Run] Would unsuspend user '{$user->email}'");
+                $this->info("🔍 [Dry Run] Would unsuspend users '{$user->email}'");
             }
         });
     }

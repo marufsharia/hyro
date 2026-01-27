@@ -8,7 +8,7 @@ use Marufsharia\Hyro\Models\User;
 class RevokeTokensCommand extends BaseCommand
 {
     protected $signature = 'hyro:token:revoke
-                            {--user= : User email or ID (revoke all if not specified)}
+                            {--users= : User email or ID (revoke all if not specified)}
                             {--token-id= : Specific token ID to revoke}
                             {--name= : Revoke tokens with specific name}
                             {--type= : Token type (access, refresh, etc.)}
@@ -30,7 +30,7 @@ class RevokeTokensCommand extends BaseCommand
 
         $query = \DB::table('personal_access_tokens')->where('revoked', false);
 
-        if ($userId = $this->option('user')) {
+        if ($userId = $this->option('users')) {
             $user = $this->findUser($userId);
             if (!$user) {
                 $this->error("User not found: {$userId}");
@@ -38,7 +38,7 @@ class RevokeTokensCommand extends BaseCommand
             }
             $query->where('tokenable_id', $user->id)
                 ->where('tokenable_type', get_class($user));
-            $this->infoMessage("Targeting user: {$user->email}");
+            $this->infoMessage("Targeting users: {$user->email}");
         }
 
         if ($name = $this->option('name')) {
@@ -67,7 +67,7 @@ class RevokeTokensCommand extends BaseCommand
                 ['Operation', 'Token Revocation'],
                 ['Reason', $reason],
                 ['Tokens to Revoke', $tokenCount],
-                ['User Filter', $this->option('user') ?? 'All Users'],
+                ['User Filter', $this->option('users') ?? 'All Users'],
                 ['Name Filter', $this->option('name') ?? 'Any'],
                 ['Type Filter', $this->option('type') ?? 'Any'],
                 ['Older Than', $this->option('older-than') ? "{$this->option('older-than')} days" : 'Any']

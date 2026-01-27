@@ -13,11 +13,11 @@ class RevokeAllTokensCommand extends BaseCommand
     use Confirmable;
 
     protected $signature = 'hyro:emergency:revoke-all-tokens
-                            {--except-admin : Keep admin user tokens}
+                            {--except-admin : Keep admin users tokens}
                             {--dry-run : Preview changes}
                             {--force : Skip confirmation}';
 
-    protected $description = 'EMERGENCY: Revoke all user tokens (security breach response)';
+    protected $description = 'EMERGENCY: Revoke all users tokens (security breach response)';
 
     protected function executeCommand(): void
     {
@@ -46,7 +46,7 @@ class RevokeAllTokensCommand extends BaseCommand
             return;
         }
 
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
         $roleModel = Config::get('hyro.models.role');
 
         // Get users to revoke tokens from

@@ -60,7 +60,7 @@ class NotificationListener
     }
 
     /**
-     * Notify administrators about user suspension.
+     * Notify administrators about users suspension.
      */
     protected function notifyAdminsAboutSuspension(UserSuspended $event): void
     {

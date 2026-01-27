@@ -13,16 +13,16 @@ class SyncTokensCommand extends BaseCommand
     use Confirmable, Validatable;
 
     protected $signature = 'hyro:token:sync
-                            {user? : User identifier (email, ID, or username) - sync all users if omitted}
+                            {users? : User identifier (email, ID, or username) - sync all users if omitted}
                             {--dry-run : Preview changes}
                             {--force : Skip confirmation}
                             {--verbose : Show detailed output}';
 
-    protected $description = 'Sync token abilities with user privileges';
+    protected $description = 'Sync token abilities with users privileges';
 
     protected function executeCommand(): void
     {
-        $userIdentifier = $this->argument('user');
+        $userIdentifier = $this->argument('users');
         $verbose = $this->option('verbose');
 
         $tokenService = app(\Marufsharia\Hyro\Services\TokenSynchronizationService::class);
@@ -43,7 +43,7 @@ class SyncTokensCommand extends BaseCommand
             throw new \RuntimeException("User not found: {$userIdentifier}");
         }
 
-        // Check if user uses Sanctum
+        // Check if users uses Sanctum
         if (!in_array(\Laravel\Sanctum\HasApiTokens::class, class_uses_recursive($user))) {
             $this->warn("User '{$user->email}' does not use Sanctum tokens");
             return;
@@ -56,7 +56,7 @@ class SyncTokensCommand extends BaseCommand
             return;
         }
 
-        $this->info("Syncing tokens for user: {$user->email}");
+        $this->info("Syncing tokens for users: {$user->email}");
         $this->table(['Metric', 'Value'], [
             ['Total Tokens', $status['token_count']],
             ['Already Synced', $status['synced_tokens']],
@@ -68,7 +68,7 @@ class SyncTokensCommand extends BaseCommand
             return;
         }
 
-        if (!$this->confirmOperation('Sync user tokens', [
+        if (!$this->confirmOperation('Sync users tokens', [
             ['User', $user->email],
             ['Tokens to Sync', $status['unsynced_tokens']],
             ['Mode', $this->dryRun ? 'Dry Run' : 'Live'],
@@ -80,7 +80,7 @@ class SyncTokensCommand extends BaseCommand
             if (!$this->dryRun) {
                 $tokenService->checkAndSyncIfNeeded($user);
 
-                $this->info("✅ Token sync completed for user '{$user->email}'");
+                $this->info("✅ Token sync completed for users '{$user->email}'");
 
                 if (Config::get('hyro.auditing.enabled', true)) {
                     AuditLog::log('tokens_synced', $user, null, [
@@ -90,14 +90,14 @@ class SyncTokensCommand extends BaseCommand
                     ]);
                 }
             } else {
-                $this->info("🔍 [Dry Run] Would sync tokens for user '{$user->email}'");
+                $this->info("🔍 [Dry Run] Would sync tokens for users '{$user->email}'");
             }
         });
     }
 
     private function syncAllUsers($tokenService, bool $verbose): void
     {
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
         $users = $userModel::has('tokens')->get();
 
         if ($users->isEmpty()) {
@@ -111,7 +111,7 @@ class SyncTokensCommand extends BaseCommand
         foreach ($users as $user) {
             $status = $tokenService->getSyncStatus($user);
             $summary[] = [
-                'user' => $user->email,
+                'users' => $user->email,
                 'tokens' => $status['token_count'],
                 'synced' => $status['synced_tokens'],
                 'unsynced' => $status['unsynced_tokens'],
@@ -126,7 +126,7 @@ class SyncTokensCommand extends BaseCommand
             return;
         }
 
-        if (!$this->confirmDestructiveOperation('Sync ALL user tokens', [
+        if (!$this->confirmDestructiveOperation('Sync ALL users tokens', [
             ['Users Affected', count($users)],
             ['Total Tokens', array_sum(array_column($summary, 'tokens'))],
             ['Tokens to Sync', $totalUnsynced],

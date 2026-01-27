@@ -65,7 +65,7 @@ class DeleteRoleCommand extends BaseCommand
         }
 
         $this->executeInTransaction(function () use ($role) {
-            // Handle user reassignment if requested
+            // Handle users reassignment if requested
             if ($this->option('reassign-to')) {
                 $this->reassignUsers($role);
             }
@@ -86,7 +86,7 @@ class DeleteRoleCommand extends BaseCommand
 
     protected function isProtectedRole($role): bool
     {
-        $protectedRoles = config('hyro.protected_roles', ['super-admin', 'admin', 'user']);
+        $protectedRoles = config('hyro.protected_roles', ['super-admin', 'admin', 'users']);
 
         return in_array($role->slug, $protectedRoles) ||
             in_array($role->name, $protectedRoles);
@@ -113,9 +113,9 @@ class DeleteRoleCommand extends BaseCommand
             $count++;
 
             if (!$this->dryRun) {
-                $this->info("Reassigned user '{$user->email}' from '{$role->name}' to '{$targetRole->name}'");
+                $this->info("Reassigned users '{$user->email}' from '{$role->name}' to '{$targetRole->name}'");
             } else {
-                $this->info("[DRY RUN] Would reassign user '{$user->email}'");
+                $this->info("[DRY RUN] Would reassign users '{$user->email}'");
             }
         }
 

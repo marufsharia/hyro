@@ -23,7 +23,7 @@ class PrivilegeController extends Controller
             ->orderBy('name')
             ->paginate(20);
 
-        return view('hyro::privileges.index', compact('privileges'));
+        return view('hyro::admin.privileges.index', compact('privileges'));
     }
 
     /**
@@ -33,7 +33,7 @@ class PrivilegeController extends Controller
      */
     public function create(): View
     {
-        return view('hyro::privileges.create');
+        return view('hyro::admin.privileges.create');
     }
 
     /**
@@ -65,7 +65,7 @@ class PrivilegeController extends Controller
      */
     public function edit(Privilege $privilege): View
     {
-        return view('hyro::privileges.edit', compact('privilege'));
+        return view('hyro::admin.privileges.edit', compact('privilege'));
     }
 
     /**

@@ -41,7 +41,7 @@ class LockdownCommand extends BaseCommand
             return;
         }
 
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
         $roleModel = Config::get('hyro.models.role');
 
         // Find admin role
@@ -67,7 +67,7 @@ class LockdownCommand extends BaseCommand
         $this->withProgressBar($nonAdminUsers, function ($user) use (&$actions, $reason) {
             try {
                 if (!$this->dryRun) {
-                    // Suspend user
+                    // Suspend users
                     $user->suspend($reason, 'Emergency system lockdown', null);
                     $actions['suspend_users']++;
 
@@ -78,7 +78,7 @@ class LockdownCommand extends BaseCommand
                         $actions['revoke_tokens'] += $tokenCount;
                     }
 
-                    // Log individual user lockdown
+                    // Log individual users lockdown
                     if (Config::get('hyro.auditing.enabled', true)) {
                         AuditLog::log('user_locked_down', $user, null, [
                             'reason' => $reason,

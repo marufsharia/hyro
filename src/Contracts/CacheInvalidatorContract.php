@@ -5,7 +5,7 @@ namespace Marufsharia\Hyro\Contracts;
 interface CacheInvalidatorContract
 {
     /**
-     * Invalidate all cache entries for a user.
+     * Invalidate all cache entries for a users.
      */
     public function invalidateUserCache($userId): void;
 
@@ -25,12 +25,12 @@ interface CacheInvalidatorContract
     public function invalidateAllCache(): void;
 
     /**
-     * Get cache key for user roles.
+     * Get cache key for users roles.
      */
     public function getUserRolesCacheKey($userId): string;
 
     /**
-     * Get cache key for user privileges.
+     * Get cache key for users privileges.
      */
     public function getUserPrivilegesCacheKey($userId): string;
 

@@ -121,11 +121,11 @@ class AuditLog extends Model
     }
 
     /**
-     * Get the user who performed the action.
+     * Get the users who performed the action.
      */
     public function user(): MorphTo
     {
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
         return $this->morphTo()->whereMorphType($userModel);
     }
 
@@ -179,7 +179,7 @@ class AuditLog extends Model
     }
 
     /**
-     * Scope: Get logs for a specific user.
+     * Scope: Get logs for a specific users.
      */
     public function scopeForUser(Builder $query, $userId): Builder
     {
@@ -269,7 +269,7 @@ class AuditLog extends Model
             $log->subject_id = $subject->getKey();
         }
 
-        // Set user
+        // Set users
         $log->user_id = auth()->id();
 
         $log->save();

@@ -63,12 +63,12 @@ class UserSuspension extends Model
         });
 
         static::created(function (UserSuspension $suspension) {
-            // Revoke user tokens if configured
+            // Revoke users tokens if configured
             if (Config::get('hyro.security.suspension.auto_revoke_tokens', true)) {
                 $suspension->user->tokens()->delete();
             }
 
-            // Invalidate user cache
+            // Invalidate users cache
             app(CacheInvalidatorContract::class)->invalidateUserCache($suspension->user_id);
         });
 
@@ -81,29 +81,29 @@ class UserSuspension extends Model
     }
 
     /**
-     * Get the user who was suspended.
+     * Get the users who was suspended.
      */
     public function user(): BelongsTo
     {
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
         return $this->belongsTo($userModel, 'user_id');
     }
 
     /**
-     * Get the admin who suspended the user.
+     * Get the admin who suspended the users.
      */
     public function suspender(): BelongsTo
     {
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
         return $this->belongsTo($userModel, 'suspended_by');
     }
 
     /**
-     * Get the admin who unsuspended the user.
+     * Get the admin who unsuspended the users.
      */
     public function unsuspender(): BelongsTo
     {
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
         return $this->belongsTo($userModel, 'unsuspended_by');
     }
 
@@ -164,7 +164,7 @@ class UserSuspension extends Model
     }
 
     /**
-     * Scope: Get suspensions for a specific user.
+     * Scope: Get suspensions for a specific users.
      */
     public function scopeForUser($query, $userId)
     {

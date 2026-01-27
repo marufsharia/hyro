@@ -6,19 +6,19 @@ use Marufsharia\Hyro\Console\Commands\BaseCommand;
 
 class UnsuspendCommand extends BaseCommand
 {
-    protected $signature = 'hyro:user:unsuspend
-                            {user : User email or ID}
+    protected $signature = 'hyro:users:unsuspend
+                            {users : User email or ID}
                             {--reason= : Reason for unsuspension}
                             {--dry-run : Preview changes without applying them}
                             {--force : Skip confirmation prompts}';
 
-    protected $description = 'Unsuspend a user account';
+    protected $description = 'Unsuspend a users account';
 
     protected function executeCommand(): void
     {
-        $user = $this->findUser($this->argument('user'));
+        $user = $this->findUser($this->argument('users'));
         if (!$user) {
-            $this->error("User not found: " . $this->argument('user'));
+            $this->error("User not found: " . $this->argument('users'));
             return;
         }
 
@@ -41,7 +41,7 @@ class UnsuspendCommand extends BaseCommand
             ]
         );
 
-        if (!$this->confirmDestructiveAction("Unsuspend user '{$user->email}'?")) {
+        if (!$this->confirmDestructiveAction("Unsuspend users '{$user->email}'?")) {
             $this->infoMessage('Operation cancelled.');
             return;
         }
@@ -58,7 +58,7 @@ class UnsuspendCommand extends BaseCommand
             if (!$this->dryRun) {
                 $this->info("User '{$user->email}' has been unsuspended");
             } else {
-                $this->info("[DRY RUN] Would unsuspend user '{$user->email}'");
+                $this->info("[DRY RUN] Would unsuspend users '{$user->email}'");
             }
 
             $this->stats['processed']++;

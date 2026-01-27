@@ -66,8 +66,8 @@ class HyroSeeder extends Seeder
             ],
             [
                 'name' => 'User',
-                'slug' => 'user',
-                'description' => 'Regular authenticated user',
+                'slug' => 'users',
+                'description' => 'Regular authenticated users',
                 'is_protected' => false,
                 'is_default' => true,
                 'level' => 10,
@@ -105,13 +105,13 @@ class HyroSeeder extends Seeder
     {
         return [
             // User Management
-            ['slug' => 'users.view', 'name' => 'View Users', 'description' => 'Can view user profiles', 'group' => 'users'],
+            ['slug' => 'users.view', 'name' => 'View Users', 'description' => 'Can view users profiles', 'group' => 'users'],
             ['slug' => 'users.create', 'name' => 'Create Users', 'description' => 'Can create new users', 'group' => 'users'],
             ['slug' => 'users.edit', 'name' => 'Edit Users', 'description' => 'Can edit existing users', 'group' => 'users'],
             ['slug' => 'users.delete', 'name' => 'Delete Users', 'description' => 'Can delete users', 'group' => 'users', 'dangerous' => true],
-            ['slug' => 'users.suspend', 'name' => 'Suspend Users', 'description' => 'Can suspend user accounts', 'group' => 'users'],
+            ['slug' => 'users.suspend', 'name' => 'Suspend Users', 'description' => 'Can suspend users accounts', 'group' => 'users'],
             ['slug' => 'users.impersonate', 'name' => 'Impersonate Users', 'description' => 'Can impersonate other users', 'group' => 'users', 'dangerous' => true],
-            ['slug' => 'users.export', 'name' => 'Export Users', 'description' => 'Can export user data', 'group' => 'users'],
+            ['slug' => 'users.export', 'name' => 'Export Users', 'description' => 'Can export users data', 'group' => 'users'],
 
             // Role Management
             ['slug' => 'roles.view', 'name' => 'View Roles', 'description' => 'Can view roles', 'group' => 'roles'],

@@ -12,19 +12,19 @@ class AssignRoleCommand extends BaseCommand
 {
     use Confirmable, Validatable;
 
-    protected $signature = 'hyro:user:assign-role
-                            {user : User identifier (email, ID, or username)}
+    protected $signature = 'hyro:users:assign-role
+                            {users : User identifier (email, ID, or username)}
                             {role : Role slug or ID}
                             {--reason= : Reason for assignment}
                             {--expires= : Expiration time (e.g., "1 hour", "2 days", or minutes as number)}
                             {--dry-run : Preview changes}
                             {--force : Skip confirmation}';
 
-    protected $description = 'Assign a role to a user';
+    protected $description = 'Assign a role to a users';
 
     protected function executeCommand(): void
     {
-        $userIdentifier = $this->argument('user');
+        $userIdentifier = $this->argument('users');
         $roleIdentifier = $this->argument('role');
         $reason = $this->option('reason');
         $expiresAt = $this->validateDuration($this->option('expires'));
@@ -33,7 +33,7 @@ class AssignRoleCommand extends BaseCommand
         $this->validateUserIdentifier($userIdentifier);
         $this->validateRoleIdentifier($roleIdentifier);
 
-        // Find user and role
+        // Find users and role
         $user = $this->findUser($userIdentifier);
         $role = $this->findRole($roleIdentifier);
 
@@ -71,7 +71,7 @@ class AssignRoleCommand extends BaseCommand
             ['Mode', $this->dryRun ? 'Dry Run' : 'Live'],
         ];
 
-        if (!$this->confirmOperation('Assign role to user', $details)) {
+        if (!$this->confirmOperation('Assign role to users', $details)) {
             return;
         }
 
@@ -80,7 +80,7 @@ class AssignRoleCommand extends BaseCommand
             $user->assignRole($role->slug, $reason, $expiresAt);
 
             if (!$this->dryRun) {
-                $this->info("✅ Role '{$role->slug}' assigned to user '{$user->email}'");
+                $this->info("✅ Role '{$role->slug}' assigned to users '{$user->email}'");
 
                 // Log audit
                 if (Config::get('hyro.auditing.enabled', true)) {
@@ -89,11 +89,11 @@ class AssignRoleCommand extends BaseCommand
                         'reason' => $reason,
                         'expires_at' => $expiresAt?->toISOString(),
                     ], [
-                        'tags' => ['cli', 'user', 'role'],
+                        'tags' => ['cli', 'users', 'role'],
                     ]);
                 }
             } else {
-                $this->info("🔍 [Dry Run] Would assign role '{$role->slug}' to user '{$user->email}'");
+                $this->info("🔍 [Dry Run] Would assign role '{$role->slug}' to users '{$user->email}'");
             }
         });
     }

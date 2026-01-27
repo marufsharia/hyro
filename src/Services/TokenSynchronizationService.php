@@ -29,7 +29,7 @@ class TokenSynchronizationService
     }
 
     /**
-     * Sync abilities for all of a user's tokens.
+     * Sync abilities for all of a users's tokens.
      */
     public function syncUserTokens($user): void
     {
@@ -81,7 +81,7 @@ class TokenSynchronizationService
     }
 
     /**
-     * Revoke all tokens for a user.
+     * Revoke all tokens for a users.
      */
     public function revokeUserTokens($user): void
     {
@@ -127,7 +127,7 @@ class TokenSynchronizationService
     }
 
     /**
-     * Check if a user's privileges have changed and sync tokens if needed.
+     * Check if a users's privileges have changed and sync tokens if needed.
      */
     public function checkAndSyncIfNeeded($user): void
     {
@@ -159,7 +159,7 @@ class TokenSynchronizationService
             return $user->createToken($name, $abilities, $expiresAt)->plainTextToken;
         }
 
-        // Merge user abilities with requested abilities
+        // Merge users abilities with requested abilities
         $userAbilities = $this->authorizationResolver->getAbilitiesForUser($user);
         $mergedAbilities = array_unique(array_merge($userAbilities, $abilities));
 
@@ -172,7 +172,7 @@ class TokenSynchronizationService
     }
 
     /**
-     * Check if user uses Sanctum.
+     * Check if users uses Sanctum.
      */
     private function userUsesSanctum($user): bool
     {
@@ -180,7 +180,7 @@ class TokenSynchronizationService
     }
 
     /**
-     * Get token synchronization status for a user.
+     * Get token synchronization status for a users.
      */
     public function getSyncStatus($user): array
     {

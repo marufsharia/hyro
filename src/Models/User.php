@@ -105,7 +105,7 @@ class User extends Authenticatable
 
         static::created(function ($user) {
             // Assign default role if configured
-            $defaultRole = config('hyro.roles.default', 'user');
+            $defaultRole = config('hyro.roles.default', 'users');
             if ($defaultRole && !$user->is_super_admin) {
                 $role = Role::where('slug', $defaultRole)->first();
                 if ($role) {
@@ -116,7 +116,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's roles.
+     * Get the users's roles.
      */
     public function roles()
     {
@@ -126,7 +126,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's directly assigned privileges.
+     * Get the users's directly assigned privileges.
      */
     public function privileges()
     {
@@ -136,7 +136,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's audit logs.
+     * Get the users's audit logs.
      */
     public function auditLogs()
     {
@@ -144,7 +144,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's tokens.
+     * Get the users's tokens.
      */
     public function tokens()
     {
@@ -152,7 +152,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's assigned by relationships.
+     * Get the users's assigned by relationships.
      */
     public function assignedBy()
     {
@@ -192,7 +192,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has a specific role.
+     * Check if users has a specific role.
      */
     public function hasRole($role): bool
     {
@@ -212,7 +212,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has any of the given roles.
+     * Check if users has any of the given roles.
      */
     public function hasAnyRole(array $roles): bool
     {
@@ -230,7 +230,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has all of the given roles.
+     * Check if users has all of the given roles.
      */
     public function hasAllRoles(array $roles): bool
     {
@@ -248,7 +248,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Assign a role to the user.
+     * Assign a role to the users.
      */
     public function assignRole($role, $assignedBy = null): self
     {
@@ -273,7 +273,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Remove a role from the user.
+     * Remove a role from the users.
      */
     public function removeRole($role, $removedBy = null): self
     {
@@ -295,7 +295,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Sync roles for the user.
+     * Sync roles for the users.
      */
     public function syncRoles(array $roles, bool $detach = true, $syncedBy = null): self
     {
@@ -338,7 +338,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has a specific privilege.
+     * Check if users has a specific privilege.
      */
     public function hasPrivilege($privilege, $scope = null): bool
     {
@@ -377,7 +377,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has any of the given privileges.
+     * Check if users has any of the given privileges.
      */
     public function hasAnyPrivilege(array $privileges, $scope = null): bool
     {
@@ -395,7 +395,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has all of the given privileges.
+     * Check if users has all of the given privileges.
      */
     public function hasAllPrivileges(array $privileges, $scope = null): bool
     {
@@ -413,7 +413,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all abilities for the user (including from roles).
+     * Get all abilities for the users (including from roles).
      */
     public function getAllAbilities()
     {
@@ -435,7 +435,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all privileges for the user (including from roles).
+     * Get all privileges for the users (including from roles).
      */
     public function getAllPrivileges()
     {
@@ -457,7 +457,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Grant a privilege directly to the user.
+     * Grant a privilege directly to the users.
      */
     public function grantPrivilege($privilege, $grantedBy = null, $scope = null): self
     {
@@ -481,7 +481,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Revoke a directly assigned privilege from the user.
+     * Revoke a directly assigned privilege from the users.
      */
     public function revokePrivilege($privilege, $scope = null): self
     {
@@ -502,7 +502,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Suspend the user.
+     * Suspend the users.
      */
     public function suspend(?string $reason = null, ?int $durationDays = null, $suspendedBy = null): self
     {
@@ -527,7 +527,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Unsuspend the user.
+     * Unsuspend the users.
      */
     public function unsuspend(?string $reason = null, $unsuspendedBy = null): self
     {
@@ -550,7 +550,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Lock the user account.
+     * Lock the users account.
      */
     public function lock(?string $reason = null, $lockedBy = null): self
     {
@@ -567,7 +567,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Unlock the user account.
+     * Unlock the users account.
      */
     public function unlock(?string $reason = null, $unlockedBy = null): self
     {
@@ -583,7 +583,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Revoke all access tokens for the user.
+     * Revoke all access tokens for the users.
      */
     public function revokeAllTokens(?string $reason = null): int
     {
@@ -599,7 +599,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Create a new access token for the user.
+     * Create a new access token for the users.
      */
     public function createToken(string $name, array $abilities = ['*'], ?Carbon $expiresAt = null)
     {
@@ -620,7 +620,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Record user login.
+     * Record users login.
      */
     public function recordLogin(?string $ip = null): self
     {
@@ -633,7 +633,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is currently suspended.
+     * Check if users is currently suspended.
      */
     public function isSuspended(): bool
     {
@@ -654,7 +654,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is currently locked.
+     * Check if users is currently locked.
      */
     public function isLocked(): bool
     {
@@ -662,7 +662,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user can log in.
+     * Check if users can log in.
      */
     public function canLogin(): bool
     {
@@ -670,7 +670,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's status.
+     * Get the users's status.
      */
     public function getStatusAttribute(): string
     {
@@ -690,7 +690,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's full name.
+     * Get the users's full name.
      */
     public function getFullNameAttribute(): string
     {
@@ -716,7 +716,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is online (last activity within 5 minutes).
+     * Check if users is online (last activity within 5 minutes).
      */
     public function getIsOnlineAttribute(): bool
     {
@@ -745,7 +745,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Update user's password with hashing.
+     * Update users's password with hashing.
      */
     public function setPasswordAttribute($value): void
     {
@@ -753,7 +753,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's two-factor authentication QR code URL.
+     * Get the users's two-factor authentication QR code URL.
      */
     public function twoFactorQrCodeUrl(): string
     {
@@ -765,7 +765,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has two-factor authentication enabled.
+     * Check if users has two-factor authentication enabled.
      */
     public function hasTwoFactorEnabled(): bool
     {
@@ -785,7 +785,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's scoped privileges.
+     * Get the users's scoped privileges.
      */
     public function getScopedPrivileges($scopeType, $scopeId)
     {
@@ -796,7 +796,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has a privilege in a specific scope.
+     * Check if users has a privilege in a specific scope.
      */
     public function hasPrivilegeInScope($privilege, $scopeType, $scopeId): bool
     {
@@ -807,7 +807,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's effective permissions (privileges + role privileges).
+     * Get the users's effective permissions (privileges + role privileges).
      */
     public function getEffectivePermissions(): array
     {
@@ -833,7 +833,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is a member of a team (example scope).
+     * Check if users is a member of a team (example scope).
      */
     public function isMemberOf($team): bool
     {
@@ -843,7 +843,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get user's notification settings.
+     * Get users's notification settings.
      */
     public function getNotificationSettings(): array
     {
@@ -855,7 +855,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Update user's notification settings.
+     * Update users's notification settings.
      */
     public function updateNotificationSettings(array $settings): self
     {
@@ -922,7 +922,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Impersonate this user (for admins).
+     * Impersonate this users (for admins).
      */
     public function impersonate(): bool
     {
@@ -937,10 +937,10 @@ class User extends Authenticatable
             return false;
         }
 
-        // Store original user ID in session
+        // Store original users ID in session
         session()->put('impersonator_id', $impersonator->id);
 
-        // Log in as this user
+        // Log in as this users
         auth()->login($this);
 
         // Log the impersonation
@@ -960,15 +960,15 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user can impersonate others.
+     * Check if users can impersonate others.
      */
     public function canImpersonate(): bool
     {
-        return $this->is_super_admin || $this->hasPrivilege('user:impersonate');
+        return $this->is_super_admin || $this->hasPrivilege('users:impersonate');
     }
 
     /**
-     * Check if user is being impersonated.
+     * Check if users is being impersonated.
      */
     public function isImpersonated(): bool
     {

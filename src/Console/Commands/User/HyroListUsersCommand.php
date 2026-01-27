@@ -24,8 +24,8 @@ class HyroListUsersCommand extends Command
             return 1;
         }
 
-        // Get user model from config
-        $userModel = Config::get('hyro.models.user', Config::get('auth.providers.users.model', 'App\Models\User'));
+        // Get users model from config
+        $userModel = Config::get('hyro.models.users', Config::get('auth.providers.users.model', 'App\Models\User'));
         $userTable = (new $userModel)->getTable();
 
         // Get all users
@@ -57,7 +57,7 @@ class HyroListUsersCommand extends Command
         $rows = [];
 
         foreach ($users as $user) {
-            // Get roles for this user
+            // Get roles for this users
             $roles = $userRoles->get($user->id, collect())
                 ->pluck('name')
                 ->join(', ') ?: 'No roles';

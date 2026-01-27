@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\Password;
 class UserUpdateRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Determine if the users is authorized to make this request.
      */
     public function authorize(): bool
     {
@@ -21,9 +21,9 @@ class UserUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userModel = Config::get('hyro.models.user');
+        $userModel = Config::get('hyro.models.users');
         $table = (new $userModel)->getTable();
-        $userId = $this->route('user') ?? $this->user()->id;
+        $userId = $this->route('users') ?? $this->user()->id;
 
         $rules = [
             'name' => ['sometimes', 'string', 'max:255'],

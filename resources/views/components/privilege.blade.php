@@ -13,16 +13,16 @@
     'chip' => false,
     'icon' => null,
     'showIcon' => true,
-    'user' => null,
+    'users' => null,
     'hide' => false,
     'tooltip' => true,
 ])
 
 @php
-    // Get user
+    // Get users
     $currentUser = $user ?? auth()->user();
 
-    // Determine if user has required privilege(s)
+    // Determine if users has required privilege(s)
     $hasPrivilege = false;
 
     if ($name) {

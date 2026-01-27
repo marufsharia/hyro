@@ -6,19 +6,19 @@ use Marufsharia\Hyro\Console\Commands\BaseCommand;
 
 class ListRolesCommand extends BaseCommand
 {
-    protected $signature = 'hyro:user:list-roles
-                            {user : User email or ID}
+    protected $signature = 'hyro:users:list-roles
+                            {users : User email or ID}
                             {--format=table : Output format (table, json, csv)}
                             {--with-privileges : Include privileges for each role}
                             {--detailed : Show detailed role information}';
 
-    protected $description = 'List roles assigned to a user';
+    protected $description = 'List roles assigned to a users';
 
     protected function executeCommand(): void
     {
-        $user = $this->findUser($this->argument('user'));
+        $user = $this->findUser($this->argument('users'));
         if (!$user) {
-            $this->error("User not found: " . $this->argument('user'));
+            $this->error("User not found: " . $this->argument('users'));
             return;
         }
 
@@ -107,7 +107,7 @@ class ListRolesCommand extends BaseCommand
 
     protected function isProtectedRole($role): bool
     {
-        $protectedRoles = config('hyro.protected_roles', ['super-admin', 'admin', 'user']);
+        $protectedRoles = config('hyro.protected_roles', ['super-admin', 'admin', 'users']);
         return in_array($role->slug, $protectedRoles);
     }
 

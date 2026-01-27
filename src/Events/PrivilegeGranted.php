@@ -23,7 +23,7 @@ class PrivilegeGranted
     public Privilege $privilege;
 
     /**
-     * The user who performed the grant.
+     * The users who performed the grant.
      */
     public ?User $granter;
 

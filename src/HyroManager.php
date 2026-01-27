@@ -167,7 +167,7 @@ class HyroManager extends Manager
     */
 
     /**
-     * Access the user repository.
+     * Access the users repository.
      */
     public function user()
     {

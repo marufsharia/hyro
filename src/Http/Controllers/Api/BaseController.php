@@ -177,7 +177,7 @@ abstract class BaseController extends Controller
     }
 
     /**
-     * Validate the user has a specific privilege.
+     * Validate the users has a specific privilege.
      */
     protected function requirePrivilege(string $privilege): void
     {
@@ -189,7 +189,7 @@ abstract class BaseController extends Controller
     }
 
     /**
-     * Validate the user has a specific role.
+     * Validate the users has a specific role.
      */
     protected function requireRole(string $role): void
     {
@@ -201,7 +201,7 @@ abstract class BaseController extends Controller
     }
 
     /**
-     * Validate the user has any of the given roles.
+     * Validate the users has any of the given roles.
      */
     protected function requireAnyRole(array $roles): void
     {

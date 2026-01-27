@@ -2,60 +2,39 @@
 
 namespace Marufsharia\Hyro\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-use Marufsharia\Hyro\Contracts\CacheInvalidatorContract;
-use Marufsharia\Hyro\Events\PrivilegeCreated;
-use Marufsharia\Hyro\Events\PrivilegeDeleted;
-use Marufsharia\Hyro\Events\PrivilegeUpdated;
-use Marufsharia\Hyro\Support\Traits\HasUuid;
+use Illuminate\Support\Carbon;
 
 class Privilege extends Model
 {
-    use SoftDeletes;
-    use HasUuid;
-
     /**
      * The attributes that are mass assignable.
+     *
+     * @var array<string>
      */
     protected $fillable = [
-        'slug',
         'name',
-        'description',
-        'is_wildcard',
-        'wildcard_pattern',
+        'slug',
         'category',
-        'priority',
-        'is_protected',
-        'metadata',
+        'description',
+        'is_core',
     ];
 
     /**
      * The attributes that should be cast.
+     *
+     * @var array<string, string>
      */
     protected $casts = [
-        'is_wildcard' => 'boolean',
-        'is_protected' => 'boolean',
-        'priority' => 'integer',
-        'metadata' => 'array',
-        'deleted_at' => 'datetime',
+        'is_core' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     /**
-     * The event map for the model.
-     */
-    protected $dispatchesEvents = [
-        'created' => PrivilegeCreated::class,
-        'updated' => PrivilegeUpdated::class,
-        'deleted' => PrivilegeDeleted::class,
-    ];
-
-    /**
-     * Get the table associated with the model.
+     * Get the table name from config.
      */
     public function getTable(): string
     {
@@ -63,87 +42,30 @@ class Privilege extends Model
     }
 
     /**
-     * Boot the model.
-     */
-    protected static function booted(): void
-    {
-        static::creating(function (Privilege $privilege) {
-            // Auto-detect wildcard
-            if ($privilege->is_wildcard === null) {
-                $privilege->is_wildcard = str_contains($privilege->slug, '*');
-            }
-
-            // Set wildcard pattern
-            if ($privilege->is_wildcard && empty($privilege->wildcard_pattern)) {
-                $privilege->wildcard_pattern = $privilege->slug;
-            }
-
-            // Set default name if not provided
-            if (empty($privilege->name)) {
-                $privilege->name = str($privilege->slug)
-                    ->replace('.', ' ')
-                    ->replace('*', ' (any)')
-                    ->title()
-                    ->toString();
-            }
-
-            // Ensure slug is unique
-            $originalSlug = $privilege->slug;
-            $counter = 1;
-            while (self::where('slug', $privilege->slug)->withTrashed()->exists()) {
-                $privilege->slug = $originalSlug . '-' . $counter++;
-            }
-        });
-
-        static::updating(function (Privilege $privilege) {
-            // Prevent modification of protected privileges
-            if ($privilege->is_protected && $privilege->isDirty(['slug', 'is_protected'])) {
-                throw new \RuntimeException(
-                    "Cannot modify protected privilege '{$privilege->slug}'. Protected privileges cannot have their slug or protection status changed."
-                );
-            }
-
-            // Validate wildcard pattern
-            if ($privilege->is_wildcard && !str_contains($privilege->wildcard_pattern, '*')) {
-                throw new \RuntimeException(
-                    "Wildcard privilege '{$privilege->slug}' must have a wildcard pattern containing '*'"
-                );
-            }
-        });
-
-        static::deleting(function (Privilege $privilege) {
-            // Prevent deletion of protected privileges
-            if ($privilege->is_protected && !$privilege->forceDeleting) {
-                throw new \RuntimeException(
-                    "Cannot delete protected privilege '{$privilege->slug}'. Use forceDelete() to bypass protection."
-                );
-            }
-        });
-
-        static::deleted(function (Privilege $privilege) {
-            // Invalidate cache
-            app(CacheInvalidatorContract::class)->invalidatePrivilegeCache($privilege->id);
-        });
-
-        static::saved(function (Privilege $privilege) {
-            // Invalidate cache on save
-            app(CacheInvalidatorContract::class)->invalidatePrivilegeCache($privilege->id);
-        });
-    }
-
-    /**
-     * Get all roles that have this privilege.
+     * Get roles that have this privilege.
      */
     public function roles(): BelongsToMany
     {
-        $roleModel = Config::get('hyro.models.role');
+        $roleModel = Config::get('hyro.database.models.role');
+
+        // Fallback to default if config is not set
+        if (!$roleModel || !class_exists($roleModel)) {
+            $roleModel = \Marufsharia\Hyro\Models\Role::class;
+        }
+
         $pivotTable = Config::get('hyro.database.tables.privilege_role');
+
+        if (!$pivotTable) {
+            $pivotTable = 'hyro_privilege_role';
+        }
 
         return $this->belongsToMany($roleModel, $pivotTable)
             ->withPivot(['granted_by', 'granted_at', 'grant_reason', 'conditions', 'expires_at'])
             ->withTimestamps()
-            ->wherePivotNull('expires_at')
-            ->orWherePivot('expires_at', '>', now());
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            });
     }
 
     /**
@@ -151,105 +73,153 @@ class Privilege extends Model
      */
     public function users(): BelongsToMany
     {
-        $userModel = Config::get('hyro.models.user');
-        $roleModel = Config::get('hyro.models.role');
+        $userModel = Config::get('hyro.database.models.user');
+
+        // Fallback to default if config is not set
+        if (!$userModel || !class_exists($userModel)) {
+            $userModel = \App\Models\User::class;
+        }
+
+        $roleModel = Config::get('hyro.database.models.role');
+        if (!$roleModel || !class_exists($roleModel)) {
+            $roleModel = \Marufsharia\Hyro\Models\Role::class;
+        }
+
+        $userRoleTable = Config::get('hyro.database.tables.role_user');
         $privilegeRoleTable = Config::get('hyro.database.tables.privilege_role');
-        $roleUserTable = Config::get('hyro.database.tables.role_user');
 
-        // This is a many-to-many-through relationship simulation
+        if (!$userRoleTable) {
+            $userRoleTable = 'hyro_role_user';
+        }
+
+        if (!$privilegeRoleTable) {
+            $privilegeRoleTable = 'hyro_privilege_role';
+        }
+
         return $this->belongsToMany($userModel, $privilegeRoleTable, 'privilege_id', 'role_id')
-            ->withPivot(['granted_by', 'granted_at', 'grant_reason', 'conditions', 'expires_at as privilege_expires_at'])
-            ->wherePivot(function ($query) use ($privilegeRoleTable) {
-                $query->whereNull("{$privilegeRoleTable}.expires_at")
-                    ->orWhere("{$privilegeRoleTable}.expires_at", '>', now());
+            ->join($userRoleTable, function ($join) use ($userRoleTable, $privilegeRoleTable) {
+                $join->on("$userRoleTable.role_id", '=', "$privilegeRoleTable.role_id");
             })
-            ->withTimestamps();
+            ->select("{$userModel}::table.*")
+            ->distinct();
     }
 
     /**
-     * Check if this privilege matches a given slug (handles wildcards).
+     * Scope to get core privileges.
      */
-    public function matches(string $privilegeSlug): bool
+    public function scopeCore($query)
     {
-        // Exact match
-        if ($this->slug === $privilegeSlug) {
-            return true;
-        }
-
-        // Wildcard match
-        if ($this->is_wildcard && $this->wildcard_pattern) {
-            $regexPattern = '/^' . str_replace(
-                    ['*', '.'],
-                    ['.*', '\.'],
-                    $this->wildcard_pattern
-                ) . '$/';
-
-            return preg_match($regexPattern, $privilegeSlug) === 1;
-        }
-
-        return false;
+        return $query->where('is_core', true);
     }
 
     /**
-     * Scope: Get only wildcard privileges.
+     * Scope to get non-core privileges.
      */
-    public function scopeWildcards(Builder $query): Builder
+    public function scopeCustom($query)
     {
-        return $query->where('is_wildcard', true);
+        return $query->where('is_core', false);
     }
 
     /**
-     * Scope: Get privileges by category.
+     * Scope to get privileges by category.
      */
-    public function scopeInCategory(Builder $query, string $category): Builder
+    public function scopeInCategory($query, string $category)
     {
         return $query->where('category', $category);
     }
 
     /**
-     * Scope: Get privileges that match a slug (including wildcards).
+     * Check if this is a core admin privilege.
      */
-    public function scopeMatching(Builder $query, string $privilegeSlug): Builder
+    public function isCoreAdminPrivilege(): bool
     {
-        return $query->where(function ($q) use ($privilegeSlug) {
-            // Exact match
-            $q->where('slug', $privilegeSlug);
-
-            // Wildcard matches
-            if (Config::get('hyro.wildcards.enabled', true)) {
-                $wildcards = self::wildcards()->get();
-                foreach ($wildcards as $wildcard) {
-                    if ($wildcard->matches($privilegeSlug)) {
-                        $q->orWhere('id', $wildcard->id);
-                    }
-                }
-            }
-        });
+        $corePrivileges = ['access-hyro-admin', 'view-roles', 'create-roles', 'edit-roles', 'delete-roles'];
+        return in_array($this->slug, $corePrivileges);
     }
 
     /**
-     * Get all privilege slugs that match a given pattern (for wildcard expansion).
+     * Check if privilege is expired for a specific role.
      */
-    public static function expandWildcard(string $pattern): array
+    public function isExpiredForRole($role): bool
     {
-        if (!str_contains($pattern, '*')) {
-            return [$pattern];
+        $pivot = $this->roles()->where('role_id', $role->id)->first()?->pivot;
+
+        if (!$pivot) {
+            return true;
         }
 
-        $cacheKey = 'hyro:wildcard:expansion:' . md5($pattern);
-        $cacheTtl = Config::get('hyro.cache.ttl.wildcard_resolution', 300);
+        if (!$pivot->expires_at) {
+            return false;
+        }
 
-        return Cache::remember($cacheKey, $cacheTtl, function () use ($pattern) {
-            $regexPattern = '/^' . str_replace(
-                    ['*', '.'],
-                    ['.*', '\.'],
-                    $pattern
-                ) . '$/';
+        return Carbon::parse($pivot->expires_at)->isPast();
+    }
 
-            return self::where('slug', 'regexp', $regexPattern)
-                ->orWhere('wildcard_pattern', 'regexp', $regexPattern)
-                ->pluck('slug')
-                ->toArray();
-        });
+    /**
+     * Grant this privilege to a role.
+     */
+    public function grantToRole($role, $grantedBy = null, $reason = null, $expiresAt = null): void
+    {
+        $this->roles()->attach($role, [
+            'granted_by' => $grantedBy,
+            'grant_reason' => $reason,
+            'expires_at' => $expiresAt,
+            'granted_at' => now(),
+        ]);
+    }
+
+    /**
+     * Revoke this privilege from a role.
+     */
+    public function revokeFromRole($role): void
+    {
+        $this->roles()->detach($role);
+    }
+
+    /**
+     * Update privilege grant for a role.
+     */
+    public function updateGrantForRole($role, $data): void
+    {
+        $this->roles()->updateExistingPivot($role, $data);
+    }
+
+    /**
+     * Get the number of roles that have this privilege.
+     */
+    public function getRoleCountAttribute(): int
+    {
+        if ($this->relationLoaded('roles')) {
+            return $this->roles->count();
+        }
+
+        return $this->roles()->count();
+    }
+
+    /**
+     * Check if any role has this privilege.
+     */
+    public function hasAnyRole(): bool
+    {
+        return $this->role_count > 0;
+    }
+
+    /**
+     * Find privilege by slug.
+     */
+    public static function findBySlug(string $slug): ?self
+    {
+        return static::where('slug', $slug)->first();
+    }
+
+    /**
+     * Get all privileges grouped by category.
+     */
+    public static function groupedByCategory(): \Illuminate\Support\Collection
+    {
+        return static::orderBy('category')
+            ->orderBy('name')
+            ->get()
+            ->groupBy('category');
     }
 }

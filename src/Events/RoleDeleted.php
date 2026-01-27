@@ -16,7 +16,7 @@ class RoleDeleted
     public Role $role;
 
     /**
-     * The user who deleted the role.
+     * The users who deleted the role.
      */
     public ?object $deleter;
 
