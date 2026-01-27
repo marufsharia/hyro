@@ -45,7 +45,7 @@ return [
             'prefix' => env('HYRO_ADMIN_PREFIX', 'admin/hyro'),
             'middleware' => [
                 'web',
-                'auth',
+                'hyro.auth',
                // 'hyro.privilege:access-hyro-admin',
             ],
         ],

@@ -40,8 +40,9 @@ class AuthController extends Controller
         $this->middleware('guest')->except('logout');
         $this->middleware('throttle:5,1')->only('login');
     }
+
     /**
-     * Get the redirect path after registration.
+     * Get the redirect path after login.
      *
      * @return string
      */
@@ -53,6 +54,7 @@ class AuthController extends Controller
 
         return $this->redirectTo;
     }
+
     /**
      * Show the application's login form.
      *
@@ -60,7 +62,6 @@ class AuthController extends Controller
      */
     public function showLoginForm()
     {
-
         return view('hyro::admin.auth.login');
     }
 

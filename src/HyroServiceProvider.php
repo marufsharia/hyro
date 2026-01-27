@@ -3,6 +3,7 @@
 namespace Marufsharia\Hyro;
 
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
@@ -65,7 +66,9 @@ class HyroServiceProvider extends ServiceProvider
             $this->publishResources();
             $this->registerCommands();
         }
-        $router->aliasMiddleware('hyro.guest', RedirectIfAuthenticated::class);
+
+        $router->aliasMiddleware('hyro.auth', \Marufsharia\Hyro\Http\Middleware\Authenticate::class);
+        $router->aliasMiddleware('hyro.guest', \Marufsharia\Hyro\Http\Middleware\RedirectIfAuthenticated::class);
         $this->loadConditionalResources();
         $this->registerBladeDirectives();
         $this->registerMacros();

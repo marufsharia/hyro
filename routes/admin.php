@@ -5,7 +5,7 @@ use Marufsharia\Hyro\Http\Controllers\Admin\DashboardController;
 use Marufsharia\Hyro\Http\Controllers\Admin\RoleController;
 use Marufsharia\Hyro\Http\Controllers\Admin\PrivilegeController;
 use Marufsharia\Hyro\Http\Controllers\Admin\UserRoleController;
-
+require __DIR__.'/auth.php';
 /*
 |--------------------------------------------------------------------------
 | Hyro Admin Panel Routes

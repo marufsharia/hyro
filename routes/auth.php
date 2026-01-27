@@ -17,14 +17,22 @@ Route::prefix(config('hyro.admin.route.prefix'))
         |--------------------------------------------------------------------------
         */
         Route::middleware('hyro.guest')->group(function () {
+            Route::get('/', [AuthController::class, 'showLoginForm'])
+                ->name('login');
+
+            Route::get('/login', function () {
+                return redirect()->route('hyro.login');
+            });
 
             // Login page or redirect to dashboard if already logged in
-            Route::get('/', function () {
-                if (auth()->check()) {
-                    return redirect()->route('hyro.admin.dashboard');
-                }
-                return app(AuthController::class)->showLoginForm();
-            })->name('login');
+//            Route::get('/dashboard', function () {
+//                if (auth()->check()) {
+//                    return redirect()->route('hyro.admin.dashboard');
+//                }
+//                return app(AuthController::class)->showLoginForm();
+//            })->name('login');
+
+
 
             // Login submission
             Route::post('login', [AuthController::class, 'login'])
