@@ -347,4 +347,9 @@ abstract class BaseCommand extends Command
         $bar->finish();
         $this->newLine();
     }
+
+    protected function isVerbose(): bool
+    {
+        return $this->output->isVerbose();
+    }
 }

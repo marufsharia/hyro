@@ -113,11 +113,29 @@ return [
         'enabled' => env('HYRO_PLUGINS_ENABLED', true),
         'path' => env('HYRO_PLUGINS_PATH', base_path('hyro-plugins')),
         'autoload' => env('HYRO_PLUGINS_AUTOLOAD', true),
+        'remote_cache_ttl' => 1800,
         'cache' => [
             'enabled' => env('HYRO_PLUGINS_CACHE_ENABLED', true),
             'ttl' => env('HYRO_PLUGINS_CACHE_TTL', 3600),
         ],
+        // Remote sources configuration
+        'marketplace' => [
+            'enabled' => true,
+            'url' => env('HYRO_MARKETPLACE_URL', 'https://marketplace.hyro.io/api/v1'),
+            'api_key' => env('HYRO_MARKETPLACE_API_KEY'),
+        ],
+        'github' => [
+            'enabled' => true,
+        ],
+        'gitlab' => [
+            'enabled' => true,
+            'url' => env('HYRO_GITLAB_URL', 'https://gitlab.com/api/v4'),
+        ],
+        'packagist' => [
+            'enabled' => true,
+        ],
     ],
+
 
     /*
     |--------------------------------------------------------------------------

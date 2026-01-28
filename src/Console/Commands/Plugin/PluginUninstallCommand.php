@@ -8,9 +8,12 @@ namespace Marufsharia\Hyro\Console\Commands\Plugin;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Marufsharia\Hyro\Console\Commands\BaseCommand;
+use Marufsharia\Hyro\Console\Commands\Plugin\Concerns\PluginResolver;
+use PHPUnit\Exception;
 
 class PluginUninstallCommand extends BaseCommand
 {
+    use PluginResolver;
     protected $signature = 'hyro:plugin:uninstall {plugin : Plugin ID, name, or path} {--force : Force uninstallation} {--delete : Delete plugin files after uninstall}';
     protected $description = 'Uninstall a Hyro plugin (rollback migrations and run uninstall hook)';
 
@@ -21,9 +24,13 @@ class PluginUninstallCommand extends BaseCommand
         // 1. Refresh Plugin Manager to ensure we have latest state
         $pluginManager = app('hyro.plugins');
         $pluginManager->refresh();
+        try {
+            $pluginId = $this->findPlugin($inputName, $pluginManager);
+        } catch (Exception $e) {
+            // 2. Try multiple strategies to find the plugin
+            $pluginId = $this->resolvePluginId($inputName, $pluginManager);
+        }
 
-        // 2. Try multiple strategies to find the plugin
-        $pluginId = $this->resolvePluginId($inputName, $pluginManager);
 
         if (!$pluginId) {
             $this->components->error("❌ Plugin '{$inputName}' not found.");
@@ -40,7 +47,7 @@ class PluginUninstallCommand extends BaseCommand
         $this->line("   This will rollback migrations and remove data associated with this plugin.");
 
         if ($this->option('delete')) {
-            $this->components->caution("   ⚠️  DELETE FLAG ENABLED: Plugin files will be permanently deleted!");
+            $this->components->alert("   ⚠️  DELETE FLAG ENABLED: Plugin files will be permanently deleted!");
         }
 
         $this->newLine();
@@ -79,7 +86,7 @@ class PluginUninstallCommand extends BaseCommand
 
             // 5. Optionally delete plugin files
             if ($this->option('delete') && $pluginPath && File::exists($pluginPath)) {
-                $this->components->caution("Deleting plugin files from: {$pluginPath}");
+                $this->components->alert("Deleting plugin files from: {$pluginPath}");
 
                 // Double confirmation for deletion
                 if (!$this->option('force')) {

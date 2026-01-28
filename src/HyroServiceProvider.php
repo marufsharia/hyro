@@ -221,6 +221,9 @@ class HyroServiceProvider extends ServiceProvider
             \Marufsharia\Hyro\Console\Commands\Plugin\PluginUninstallCommand::class,
             \Marufsharia\Hyro\Console\Commands\Plugin\PluginActivateCommand::class,
             \Marufsharia\Hyro\Console\Commands\Plugin\PluginDeactivateCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Plugin\PluginMarketplaceCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Plugin\PluginUpgradeCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Plugin\PluginInstallRemoteCommand::class,
         ]);
     }
 
@@ -393,5 +396,12 @@ class HyroServiceProvider extends ServiceProvider
                 $this->app['log']->warning('Hyro: Could not load plugins: ' . $e->getMessage());
             }
         }
+    }
+
+
+    protected function isApplicationBoot(): bool
+    {
+        // Check if this is the main application boot, not a command execution
+        return $this->app->isBooted() && !$this->app->runningInConsole();
     }
 }
