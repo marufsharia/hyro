@@ -3,11 +3,9 @@
 namespace Marufsharia\Hyro;
 
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Marufsharia\Hyro\Contracts\AuthorizationResolverContract;
 use Marufsharia\Hyro\Contracts\CacheInvalidatorContract;
@@ -18,8 +16,6 @@ use Marufsharia\Hyro\Events\RoleAssigned;
 use Marufsharia\Hyro\Events\RoleRevoked;
 use Marufsharia\Hyro\Events\UserSuspended;
 use Marufsharia\Hyro\Events\UserUnsuspended;
-use Marufsharia\Hyro\Facades\Hyro;
-use Marufsharia\Hyro\Http\Middleware\RedirectIfAuthenticated;
 use Marufsharia\Hyro\Listeners\TokenSynchronizationListener;
 use Marufsharia\Hyro\Providers\ApiServiceProvider;
 use Marufsharia\Hyro\Providers\BladeDirectivesServiceProvider;
@@ -28,12 +24,12 @@ use Marufsharia\Hyro\Services\AuthorizationService;
 use Marufsharia\Hyro\Services\CacheInvalidator;
 use Marufsharia\Hyro\Services\GateRegistrar;
 use Marufsharia\Hyro\Services\TokenSynchronizationService;
+use Marufsharia\Hyro\Support\Plugins\PluginManager;
 
 class HyroServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
-     * No heavy logic here - only bindings.
      */
     public function register(): void
     {
@@ -43,22 +39,26 @@ class HyroServiceProvider extends ServiceProvider
         // Bind core contracts
         $this->bindCoreContracts();
 
+        // Register core services
         $this->app->singleton(AuthorizationResolverContract::class, AuthorizationService::class);
         $this->app->singleton(CacheInvalidatorContract::class, CacheInvalidator::class);
         $this->app->singleton(GateRegistrar::class);
         $this->app->singleton(TokenSynchronizationService::class);
+        $this->app->singleton(\Marufsharia\Hyro\Blade\HyroBladeHelper::class);
 
+        // Register Plugin Manager
+        $this->app->singleton('hyro.plugins', function ($app) {
+            return new PluginManager($app);
+        });
+
+        // Register API provider if enabled
         if (Config::get('hyro.api.enabled', false)) {
             $this->app->register(ApiServiceProvider::class);
         }
-
-        $this->app->singleton(\Marufsharia\Hyro\Blade\HyroBladeHelper::class);
-
     }
 
     /**
      * Bootstrap services.
-     * All boot logic goes here.
      */
     public function boot(Router $router): void
     {
@@ -67,37 +67,37 @@ class HyroServiceProvider extends ServiceProvider
             $this->registerCommands();
         }
 
+        // Register middleware
         $router->aliasMiddleware('hyro.auth', \Marufsharia\Hyro\Http\Middleware\Authenticate::class);
         $router->aliasMiddleware('hyro.guest', \Marufsharia\Hyro\Http\Middleware\RedirectIfAuthenticated::class);
+
+        // Load conditional resources
         $this->loadConditionalResources();
+
+        // Register components
         $this->registerBladeDirectives();
+        $this->registerLivewireComponents();
         $this->registerMacros();
         $this->registerAuthorization();
         $this->registerEventListeners();
 
-        // Automatically add trait to User model if not already present
+        // Auto-add trait to User model
         $this->addTraitToUserModel();
 
-        // Register event service provider
+        // Register service providers
         $this->app->register(EventServiceProvider::class);
 
-        if (Config::get('hyro.api.enabled', false) && $this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../routes/api.php' => base_path('routes/hyro-api.php'),
-            ], 'hyro-api-routes');
-        }
-
-        if (Config::get('hyro.ui.enabled', false)) {
+        if (Config::get('hyro.admin.enabled', false)) {
             $this->app->register(BladeDirectivesServiceProvider::class);
-
-            // Load views
             $this->loadViewsFrom(__DIR__ . '/../resources/views', 'hyro');
 
-            // Publish views
             $this->publishes([
                 __DIR__ . '/../resources/views' => resource_path('views/vendor/hyro'),
             ], 'hyro-views');
         }
+
+        // Boot plugins
+        $this->bootPlugins();
     }
 
     /**
@@ -107,10 +107,8 @@ class HyroServiceProvider extends ServiceProvider
     {
         $this->app->bind(
             HyroUserContract::class,
-            config('hyro.models.users', \App\Models\User::class)
+            config('hyro.database.models.users', \App\Models\User::class)
         );
-
-        // Additional bindings will be added in Phase 3
     }
 
     /**
@@ -128,11 +126,12 @@ class HyroServiceProvider extends ServiceProvider
             __DIR__ . '/../database/migrations' => database_path('migrations'),
         ], 'hyro-migrations');
 
-        // Publish events and listeners
+        // Events and listeners
         $this->publishes([
             __DIR__ . '/../Events/' => app_path('Events/Hyro'),
             __DIR__ . '/../Listeners/' => app_path('Listeners/Hyro'),
         ], 'hyro-events');
+
         // Views
         $this->publishes([
             __DIR__ . '/../resources/views' => resource_path('views/vendor/hyro'),
@@ -143,25 +142,11 @@ class HyroServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/lang' => resource_path('lang/vendor/hyro'),
         ], 'hyro-translations');
 
-        // Publish compiled assets
-//        $this->publishes([
-//            __DIR__ . '/../public/css' => public_path('vendor/hyro/css'),
-//            __DIR__ . '/../public/js' => public_path('vendor/hyro/js'),
-//            __DIR__ . '/../public/images' => public_path('vendor/hyro/images'),
-//        ], 'hyro-assets');
-
+        // Compiled assets
         $this->publishes([
             __DIR__ . '/../public/build' => public_path('vendor/hyro'),
             __DIR__ . '/../public/images' => public_path('vendor/hyro/images'),
         ], 'hyro-assets');
-
-        // Publish source assets for development
-//        $this->publishes([
-//            __DIR__ . '/../resources/css' => resource_path('vendor/hyro/css'),
-//            __DIR__ . '/../resources/js' => resource_path('vendor/hyro/js'),
-//        ], 'hyro-source-assets');
-
-
     }
 
     /**
@@ -183,10 +168,8 @@ class HyroServiceProvider extends ServiceProvider
             $this->loadRoutesFrom(__DIR__ . '/../routes/admin.php');
             $this->loadRoutesFrom(__DIR__ . '/../routes/auth.php');
             $this->loadViewsFrom(__DIR__ . '/../resources/views', 'hyro');
-
         }
     }
-
 
     /**
      * Register console commands.
@@ -222,20 +205,22 @@ class HyroServiceProvider extends ServiceProvider
             \Marufsharia\Hyro\Console\Commands\Emergency\LockdownCommand::class,
             \Marufsharia\Hyro\Console\Commands\Emergency\UnlockdownCommand::class,
 
-
             // Setup & Maintenance
             \Marufsharia\Hyro\Console\Commands\Setup\InstallCommand::class,
-
-            // Maintenance
             \Marufsharia\Hyro\Console\Commands\Maintenance\HealthCheckCommand::class,
             \Marufsharia\Hyro\Console\Commands\Maintenance\StatusCommand::class,
             \Marufsharia\Hyro\Console\Commands\Maintenance\CleanupCommand::class,
-            // Publish Assets
-            //  \Marufsharia\Hyro\Console\Commands\Publis\PublishHyroAssets::class,
-            // \Marufsharia\Hyro\Console\Commands\Publis\HyroCompileCommand::class,
-            // \Marufsharia\Hyro\Console\Commands\Publis\HyroPublishCommand::class,
-            // \Marufsharia\Hyro\Console\Commands\Publis\ViteCompileCommand::class,
-            //  \Marufsharia\Hyro\Console\Commands\Publis\ViteDevCommand::class,
+
+            // CRUD Generator
+            \Marufsharia\Hyro\Console\Commands\Crud\MakeCrudCommand::class,
+
+            // Plugin Commands
+            \Marufsharia\Hyro\Console\Commands\Plugin\PluginListCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Plugin\PluginMakeCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Plugin\PluginInstallCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Plugin\PluginUninstallCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Plugin\PluginActivateCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Plugin\PluginDeactivateCommand::class,
         ]);
     }
 
@@ -244,19 +229,17 @@ class HyroServiceProvider extends ServiceProvider
      */
     private function registerBladeDirectives(): void
     {
-
         \Blade::directive('hyroAssets', function () {
             return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::tags(); ?>';
         });
 
-          \Blade::directive('hyroCss', function () {
-              return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::css(); ?>';
-          });
+        \Blade::directive('hyroCss', function () {
+            return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::css(); ?>';
+        });
 
-          \Blade::directive('hyroJs', function () {
-              return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::js(); ?>';
-          });
-
+        \Blade::directive('hyroJs', function () {
+            return '<?php echo \Marufsharia\Hyro\Helpers\HyroAsset::js(); ?>';
+        });
 
         // Register Blade components
         \Blade::component('hyro::components.card', 'hyro-card');
@@ -264,6 +247,34 @@ class HyroServiceProvider extends ServiceProvider
         \Blade::component('hyro::components.alert', 'hyro-alert');
         \Blade::component('hyro::components.form', 'hyro-form');
         \Blade::component('hyro::components.table', 'hyro-table');
+        \Blade::component('hyro::components.modal', 'hyro-modal');
+    }
+
+    /**
+     * Register Livewire components.
+     */
+    private function registerLivewireComponents(): void
+    {
+        if (!config('hyro.livewire.enabled', true)) {
+            return;
+        }
+
+        // Check if Livewire is installed
+        if (!class_exists(\Livewire\Livewire::class)) {
+            return;
+        }
+
+        try {
+            // Register Livewire components
+            \Livewire\Livewire::component('hyro.role-manager', \Marufsharia\Hyro\Livewire\Admin\RoleManager::class);
+            \Livewire\Livewire::component('hyro.user-manager', \Marufsharia\Hyro\Livewire\Admin\UserManager::class);
+            \Livewire\Livewire::component('hyro.privilege-manager', \Marufsharia\Hyro\Livewire\Admin\PrivilegeManager::class);
+        } catch (\Exception $e) {
+            // Silently fail if Livewire components can't be registered
+            if ($this->app->runningInConsole()) {
+                $this->app['log']->warning('Hyro: Could not register Livewire components. Make sure Livewire is installed: composer require livewire/livewire');
+            }
+        }
     }
 
     /**
@@ -288,7 +299,7 @@ class HyroServiceProvider extends ServiceProvider
      */
     private function registerEventListeners(): void
     {
-        if (Config::get('hyro.tokens.synchronization.enabled', true)) {
+        if (Config::get('hyro.tokens.sync.enabled', true)) {
             Event::listen(RoleAssigned::class, [TokenSynchronizationListener::class, 'handleRoleAssigned']);
             Event::listen(RoleRevoked::class, [TokenSynchronizationListener::class, 'handleRoleRevoked']);
             Event::listen(PrivilegeGranted::class, [TokenSynchronizationListener::class, 'handlePrivilegeGranted']);
@@ -296,7 +307,8 @@ class HyroServiceProvider extends ServiceProvider
             Event::listen(UserSuspended::class, [TokenSynchronizationListener::class, 'handleUserSuspended']);
             Event::listen(UserUnsuspended::class, [TokenSynchronizationListener::class, 'handleUserUnsuspended']);
         }
-        // Register audit logging for all events
+
+        // Register audit logging
         $this->registerAuditLogging();
     }
 
@@ -316,7 +328,6 @@ class HyroServiceProvider extends ServiceProvider
 
         foreach ($events as $event) {
             Event::listen($event, function ($eventInstance) {
-                // Log to audit log
                 $this->logToAudit($eventInstance);
             });
         }
@@ -327,18 +338,13 @@ class HyroServiceProvider extends ServiceProvider
      */
     protected function logToAudit($event): void
     {
-        // This would be implemented based on your audit logging system
-        // Example:
-        // AuditLog::create([
-        //     'action' => $this->getEventAction($event),
-        //     'user_id' => $this->getEventUserId($event),
-        //     'details' => $this->getEventDetails($event),
-        //     'ip_address' => request()->ip(),
-        //     'user_agent' => request()->userAgent(),
-        // ]);
+        // Audit logging implementation
     }
 
-    protected function addTraitToUserModel()
+    /**
+     * Add HasHyroFeatures trait to User model.
+     */
+    protected function addTraitToUserModel(): void
     {
         $userModelPath = app_path('Models/User.php');
 
@@ -348,12 +354,10 @@ class HyroServiceProvider extends ServiceProvider
 
         $content = File::get($userModelPath);
 
-        // Only add if trait not already used
         if (str_contains($content, 'HasHyroFeatures')) {
             return;
         }
 
-        // Add "use" statement for trait
         if (!str_contains($content, 'use Marufsharia\Hyro\Traits\HasHyroFeatures;')) {
             $content = preg_replace(
                 '/namespace App\\\\Models;/',
@@ -362,7 +366,6 @@ class HyroServiceProvider extends ServiceProvider
             );
         }
 
-        // Add trait inside User class
         $content = preg_replace(
             '/class User extends Authenticatable\s*\{/',
             "class User extends Authenticatable\n{\n    use HasHyroFeatures;",
@@ -372,5 +375,23 @@ class HyroServiceProvider extends ServiceProvider
         File::put($userModelPath, $content);
     }
 
+    /**
+     * Boot plugins.
+     */
+    protected function bootPlugins(): void
+    {
+        if (!config('hyro.plugins.enabled', true)) {
+            return;
+        }
 
+        try {
+            $pluginManager = $this->app->make('hyro.plugins');
+            $pluginManager->discover();
+            $pluginManager->load();
+        } catch (\Exception $e) {
+            if ($this->app->runningInConsole()) {
+                $this->app['log']->warning('Hyro: Could not load plugins: ' . $e->getMessage());
+            }
+        }
+    }
 }

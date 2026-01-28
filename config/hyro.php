@@ -16,14 +16,8 @@ return [
     */
     'api' => [
         'enabled' => env('HYRO_API_ENABLED', false),
-
         'prefix' => env('HYRO_API_PREFIX', 'api/hyro'),
-
-        'middleware' => [
-            'api',
-            'auth:sanctum',
-        ],
-
+        'middleware' => ['api', 'auth:sanctum'],
         'rate_limit' => [
             'enabled' => env('HYRO_API_RATE_LIMIT', true),
             'max_attempts' => env('HYRO_API_MAX_ATTEMPTS', 60),
@@ -43,19 +37,12 @@ return [
         ],
         'route' => [
             'prefix' => env('HYRO_ADMIN_PREFIX', 'admin/hyro'),
-            'middleware' => [
-                'web',
-                'hyro.auth',
-               // 'hyro.privilege:access-hyro-admin',
-            ],
+            'middleware' => ['web', 'hyro.auth'],
         ],
-
-        'layout' => env('HYRO_ADMIN_LAYOUT', 'layouts.app'),
-
+        'layout' => env('HYRO_ADMIN_LAYOUT', 'hyro::admin.layouts.app'),
         'pagination' => [
             'per_page' => 20,
         ],
-
         'features' => [
             'user_management' => true,
         ],
@@ -68,26 +55,22 @@ return [
     */
     'auth' => [
         'enabled' => env('HYRO_AUTH_ENABLED', true),
-
         'routes' => [
             'login' => 'login',
             'logout' => 'logout',
             'register' => 'register',
-
             'password' => [
                 'request' => 'password.request',
                 'email' => 'password.email',
                 'reset' => 'password.reset',
                 'update' => 'password.update',
             ],
-
             'verification' => [
                 'notice' => 'verification.notice',
                 'verify' => 'verification.verify',
                 'resend' => 'verification.resend',
             ],
         ],
-
         'redirects' => [
             'login' => '/dashboard',
             'register' => '/dashboard',
@@ -108,6 +91,36 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Livewire CRUD System
+    |--------------------------------------------------------------------------
+    */
+    'livewire' => [
+        'enabled' => env('HYRO_LIVEWIRE_ENABLED', true),
+        'theme' => env('HYRO_LIVEWIRE_THEME', 'default'),
+        'layout' => env('HYRO_LIVEWIRE_LAYOUT', 'hyro::admin.layouts.app'),
+        'pagination' => [
+            'per_page' => env('HYRO_LIVEWIRE_PER_PAGE', 15),
+            'theme' => env('HYRO_LIVEWIRE_PAGINATION_THEME', 'tailwind'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Plugin System
+    |--------------------------------------------------------------------------
+    */
+    'plugins' => [
+        'enabled' => env('HYRO_PLUGINS_ENABLED', true),
+        'path' => env('HYRO_PLUGINS_PATH', base_path('hyro-plugins')),
+        'autoload' => env('HYRO_PLUGINS_AUTOLOAD', true),
+        'cache' => [
+            'enabled' => env('HYRO_PLUGINS_CACHE_ENABLED', true),
+            'ttl' => env('HYRO_PLUGINS_CACHE_TTL', 3600),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Assets
     |--------------------------------------------------------------------------
     */
@@ -124,12 +137,10 @@ return [
     */
     'database' => [
         'connection' => env('HYRO_DB_CONNECTION'),
-
         'migrations' => [
             'autoload' => true,
             'publish' => false,
         ],
-
         'tables' => [
             'roles' => 'hyro_roles',
             'privileges' => 'hyro_privileges',
@@ -138,7 +149,6 @@ return [
             'user_suspensions' => 'hyro_user_suspensions',
             'audit_logs' => 'hyro_audit_logs',
         ],
-
         'models' => [
             'users' => \App\Models\User::class,
             'role' => \Marufsharia\Hyro\Models\Role::class,
@@ -161,9 +171,7 @@ return [
             'role_fallback',
             'laravel_gate',
         ],
-
         'override_gate' => false,
-
         'wildcards' => [
             'enabled' => true,
             'character' => '*',
@@ -200,12 +208,10 @@ return [
     */
     'security' => [
         'fail_closed' => true,
-
         'protected_roles' => [
             'super-admin',
             'administrator',
         ],
-
         'password_policy' => [
             'enabled' => false,
             'min_length' => 12,
@@ -223,7 +229,6 @@ return [
     'auditing' => [
         'enabled' => true,
         'retention_days' => 365,
-
         'log' => [
             'ip' => true,
             'user_agent' => true,

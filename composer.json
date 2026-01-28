@@ -23,7 +23,9 @@
         "php": "^8.2",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
-        "livewire/livewire": "*",
+        "livewire/livewire": "^3.5",
+        "wire-elements/modal": "^2.0",
+        "jantinnerezo/livewire-alert": "^3.0",
         "ramsey/uuid": "^4.0"
     },
     "require-dev": {
@@ -38,7 +40,8 @@
                 "Marufsharia\\Hyro\\HyroServiceProvider"
             ],
             "aliases": {
-                "Hyro": "Marufsharia\\Hyro\\Facades\\Hyro"
+                "Hyro": "Marufsharia\\Hyro\\Facades\\Hyro",
+                "HyroPlugin": "Marufsharia\\Hyro\\Facades\\Plugin"
             }
         }
     },
@@ -51,7 +54,6 @@
         }
     },
     "scripts": {
-
         "build": [
             "@php artisan hyro:publish-assets --force",
             "npm run prod"
