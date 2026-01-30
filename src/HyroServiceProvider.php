@@ -96,6 +96,12 @@ class HyroServiceProvider extends ServiceProvider
             ], 'hyro-views');
         }
 
+        //crud route
+        $routeFile = base_path("routes/hyro-admin.php");
+
+        if (File::exists($routeFile)) {
+            $this->loadRoutesFrom($routeFile);
+        }
         // Boot plugins
         $this->bootPlugins();
     }
@@ -147,6 +153,11 @@ class HyroServiceProvider extends ServiceProvider
             __DIR__ . '/../public/build' => public_path('vendor/hyro'),
             __DIR__ . '/../public/images' => public_path('vendor/hyro/images'),
         ], 'hyro-assets');
+
+        // crud generator stub
+        $this->publishes([
+            __DIR__.'/../stubs/crud' => resource_path('stubs/hyro/crud'),
+        ], 'hyro-crud-stubs');
     }
 
     /**
@@ -212,7 +223,9 @@ class HyroServiceProvider extends ServiceProvider
             \Marufsharia\Hyro\Console\Commands\Maintenance\CleanupCommand::class,
 
             // CRUD Generator
-            \Marufsharia\Hyro\Console\Commands\Crud\MakeCrudCommand::class,
+            \MarufSharia\Hyro\Console\Commands\Crud\MakeCrudCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Crud\DiscoverCrudRoutesCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Crud\HyroModuleCommand::class,
 
             // Plugin Commands
             \Marufsharia\Hyro\Console\Commands\Plugin\PluginListCommand::class,
@@ -269,9 +282,9 @@ class HyroServiceProvider extends ServiceProvider
 
         try {
             // Register Livewire components
-            \Livewire\Livewire::component('hyro.role-manager', \Marufsharia\Hyro\Livewire\Admin\RoleManager::class);
-            \Livewire\Livewire::component('hyro.user-manager', \Marufsharia\Hyro\Livewire\Admin\UserManager::class);
-            \Livewire\Livewire::component('hyro.privilege-manager', \Marufsharia\Hyro\Livewire\Admin\PrivilegeManager::class);
+            \Livewire\Livewire::component('hyro.role-manager', \MarufSharia\Hyro\Livewire\Admin\RoleManager::class);
+            \Livewire\Livewire::component('hyro.user-manager', \MarufSharia\Hyro\Livewire\Admin\UserManager::class);
+            \Livewire\Livewire::component('hyro.privilege-manager', \MarufSharia\Hyro\Livewire\Admin\PrivilegeManager::class);
         } catch (\Exception $e) {
             // Silently fail if Livewire components can't be registered
             if ($this->app->runningInConsole()) {

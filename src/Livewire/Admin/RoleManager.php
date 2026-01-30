@@ -1,8 +1,8 @@
 <?php
 
-namespace Marufsharia\Hyro\Livewire\Admin;
+namespace MarufSharia\Hyro\Livewire\Admin;
 
-use Marufsharia\Hyro\Livewire\BaseCrudComponent;
+use MarufSharia\Hyro\Livewire\BaseCrudComponent;
 use Marufsharia\Hyro\Models\Role;
 use Marufsharia\Hyro\Models\Privilege;
 use Illuminate\Support\Str;
@@ -165,9 +165,16 @@ class RoleManager extends BaseCrudComponent
         $this->selectedPrivileges = [];
     }
 
-    protected function applyFilters($query)
+    /**
+     * Apply custom filters to the query
+     *
+     * @param mixed $query
+     * @return void
+     */
+    protected function applyFilters($query): void
     {
         // Add custom filters if needed
+        // Example: if ($this->filterStatus) { $query->where('status', $this->filterStatus); }
     }
 
     public function getItemsProperty()

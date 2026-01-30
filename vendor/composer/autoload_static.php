@@ -143,6 +143,10 @@ class ComposerStaticInit2c7b80197a4e01091f4712d1c275d77e
             'Illuminate\\Support\\' => 19,
             'Illuminate\\' => 11,
         ),
+        'H' => 
+        array (
+            'HyroPlugins\\' => 12,
+        ),
         'G' => 
         array (
             'GuzzleHttp\\UriTemplate\\' => 23,
@@ -451,6 +455,10 @@ class ComposerStaticInit2c7b80197a4e01091f4712d1c275d77e
         'Illuminate\\' => 
         array (
             0 => __DIR__ . '/..' . '/laravel/framework/src/Illuminate',
+        ),
+        'HyroPlugins\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/hyro-plugins',
         ),
         'GuzzleHttp\\UriTemplate\\' => 
         array (

@@ -1,0 +1,58 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+{{ softDeletesImport }}
+{{ auditImport }}
+
+class {{ modelName }} extends Model
+{
+    use HasFactory{{ softDeletesTrait }}{{ auditTrait }};
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+{{ fillable }}
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+{{ casts }}
+    ];
+
+{{ relations }}
+
+    /**
+     * Get the file URL for a field
+     */
+    public function getFileUrl(string $field): ?string
+    {
+        if (!$this->{$field}) {
+            return null;
+        }
+
+        return \Storage::disk('public')->url($this->{$field});
+    }
+
+    /**
+     * Get image thumbnail URL
+     */
+    public function getImageThumb(string $field, int $width = 150, int $height = 150): ?string
+    {
+        if (!$this->{$field}) {
+            return null;
+        }
+
+        // You can integrate with image processing library here
+        return $this->getFileUrl($field);
+    }
+}

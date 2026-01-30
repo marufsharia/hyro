@@ -1,0 +1,279 @@
+{{-- Text Input --}}
+@if($field['type'] === 'text' || $field['type'] === 'string')
+<div class="col-span-6 sm:col-span-{{ $field['col_span'] ?? 6 }}">
+    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ $field['label'] }}
+        @if(Str::contains($field['rules'] ?? '', 'required'))
+            <span class="text-red-500">*</span>
+        @endif
+    </label>
+    <input 
+        wire:model="{{ $fieldName }}"
+        type="text"
+        id="{{ $fieldName }}"
+        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+        placeholder="{{ $field['placeholder'] ?? 'Enter ' . strtolower($field['label']) }}">
+    @error($fieldName) 
+        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+    @enderror
+</div>
+@endif
+
+{{-- Email Input --}}
+@if($field['type'] === 'email')
+<div class="col-span-6 sm:col-span-{{ $field['col_span'] ?? 6 }}">
+    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ $field['label'] }}
+        @if(Str::contains($field['rules'] ?? '', 'required'))
+            <span class="text-red-500">*</span>
+        @endif
+    </label>
+    <input 
+        wire:model="{{ $fieldName }}"
+        type="email"
+        id="{{ $fieldName }}"
+        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+        placeholder="{{ $field['placeholder'] ?? 'Enter email address' }}">
+    @error($fieldName) 
+        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+    @enderror
+</div>
+@endif
+
+{{-- Number Input --}}
+@if($field['type'] === 'number' || $field['type'] === 'integer' || $field['type'] === 'decimal')
+<div class="col-span-6 sm:col-span-{{ $field['col_span'] ?? 3 }}">
+    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ $field['label'] }}
+        @if(Str::contains($field['rules'] ?? '', 'required'))
+            <span class="text-red-500">*</span>
+        @endif
+    </label>
+    <input 
+        wire:model="{{ $fieldName }}"
+        type="number"
+        step="{{ $field['step'] ?? ($field['type'] === 'decimal' ? '0.01' : '1') }}"
+        id="{{ $fieldName }}"
+        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+        placeholder="{{ $field['placeholder'] ?? '0' }}">
+    @error($fieldName) 
+        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+    @enderror
+</div>
+@endif
+
+{{-- Textarea --}}
+@if($field['type'] === 'textarea' || $field['type'] === 'text')
+<div class="col-span-6">
+    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ $field['label'] }}
+        @if(Str::contains($field['rules'] ?? '', 'required'))
+            <span class="text-red-500">*</span>
+        @endif
+    </label>
+    <textarea 
+        wire:model="{{ $fieldName }}"
+        id="{{ $fieldName }}"
+        rows="{{ $field['rows'] ?? 4 }}"
+        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+        placeholder="{{ $field['placeholder'] ?? 'Enter ' . strtolower($field['label']) }}"></textarea>
+    @error($fieldName) 
+        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+    @enderror
+</div>
+@endif
+
+{{-- Select Dropdown --}}
+@if($field['type'] === 'select')
+<div class="col-span-6 sm:col-span-{{ $field['col_span'] ?? 6 }}">
+    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ $field['label'] }}
+        @if(Str::contains($field['rules'] ?? '', 'required'))
+            <span class="text-red-500">*</span>
+        @endif
+    </label>
+    <select 
+        wire:model="{{ $fieldName }}"
+        id="{{ $fieldName }}"
+        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+        <option value="">Select {{ strtolower($field['label']) }}</option>
+        @foreach($field['options'] ?? [] as $value => $label)
+            <option value="{{ $value }}">{{ $label }}</option>
+        @endforeach
+    </select>
+    @error($fieldName) 
+        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+    @enderror
+</div>
+@endif
+
+{{-- Boolean/Checkbox --}}
+@if($field['type'] === 'boolean' || $field['type'] === 'checkbox')
+<div class="col-span-6 sm:col-span-{{ $field['col_span'] ?? 6 }}">
+    <div class="flex items-center">
+        <input 
+            wire:model="{{ $fieldName }}"
+            type="checkbox"
+            id="{{ $fieldName }}"
+            class="w-5 h-5 text-blue-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2">
+        <label for="{{ $fieldName }}" class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+            {{ $field['label'] }}
+        </label>
+    </div>
+    @error($fieldName) 
+        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+    @enderror
+</div>
+@endif
+
+{{-- Date Input --}}
+@if($field['type'] === 'date')
+<div class="col-span-6 sm:col-span-{{ $field['col_span'] ?? 6 }}">
+    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ $field['label'] }}
+        @if(Str::contains($field['rules'] ?? '', 'required'))
+            <span class="text-red-500">*</span>
+        @endif
+    </label>
+    <input 
+        wire:model="{{ $fieldName }}"
+        type="date"
+        id="{{ $fieldName }}"
+        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+    @error($fieldName) 
+        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+    @enderror
+</div>
+@endif
+
+{{-- DateTime Input --}}
+@if($field['type'] === 'datetime')
+<div class="col-span-6 sm:col-span-{{ $field['col_span'] ?? 6 }}">
+    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ $field['label'] }}
+        @if(Str::contains($field['rules'] ?? '', 'required'))
+            <span class="text-red-500">*</span>
+        @endif
+    </label>
+    <input 
+        wire:model="{{ $fieldName }}"
+        type="datetime-local"
+        id="{{ $fieldName }}"
+        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+    @error($fieldName) 
+        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+    @enderror
+</div>
+@endif
+
+{{-- File Upload (Image) --}}
+@if($field['type'] === 'file' || $field['type'] === 'image')
+<div class="col-span-6">
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ $field['label'] }}
+        @if(Str::contains($field['rules'] ?? '', 'required'))
+            <span class="text-red-500">*</span>
+        @endif
+    </label>
+    
+    <div class="mt-1"
+         x-data="{ uploading: false, progress: 0, preview: null }"
+         x-on:livewire-upload-start="uploading = true"
+         x-on:livewire-upload-finish="uploading = false; progress = 0"
+         x-on:livewire-upload-error="uploading = false"
+         x-on:livewire-upload-progress="progress = $event.detail.progress">
+        
+        {{-- Upload Area --}}
+        <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-blue-500 dark:hover:border-blue-400 transition-colors cursor-pointer"
+             onclick="document.getElementById('{{ $fieldName }}_input').click()">
+            <div class="space-y-2 text-center">
+                {{-- Preview Area --}}
+                <div class="mb-4">
+                    @if($field['type'] === 'image')
+                        {{-- Image Preview --}}
+                        @if($this->{$fieldName})
+                            @if(is_string($this->{$fieldName}))
+                                <img src="{{ Storage::disk($field['disk'] ?? 'public')->url($this->{$fieldName}) }}" 
+                                     class="mx-auto h-32 w-auto rounded-lg object-cover">
+                            @else
+                                <img src="{{ $this->{$fieldName}->temporaryUrl() }}" 
+                                     class="mx-auto h-32 w-auto rounded-lg object-cover">
+                            @endif
+                        @else
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        @endif
+                    @else
+                        {{-- File Preview --}}
+                        @if($this->{$fieldName})
+                            @if(is_string($this->{$fieldName}))
+                                <div class="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    <span class="text-sm">{{ basename($this->{$fieldName}) }}</span>
+                                </div>
+                            @else
+                                <div class="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    <span class="text-sm">{{ $this->{$fieldName}->getClientOriginalName() }}</span>
+                                </div>
+                            @endif
+                        @else
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        @endif
+                    @endif
+                </div>
+                
+                <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
+                    <span class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none px-2">
+                        <span>Upload a file</span>
+                        <input 
+                            wire:model="{{ $fieldName }}"
+                            id="{{ $fieldName }}_input"
+                            type="file"
+                            class="sr-only"
+                            accept="{{ $field['accept'] ?? ($field['type'] === 'image' ? 'image/*' : '*/*') }}">
+                    </span>
+                    <p class="pl-1">or drag and drop</p>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                    @if($field['type'] === 'image')
+                        PNG, JPG, GIF up to {{ $field['max_size'] ?? '2' }}MB
+                    @else
+                        {{ strtoupper(str_replace(['.',','], ' ', $field['accept'] ?? 'Any file')) }} up to {{ $field['max_size'] ?? '10' }}MB
+                    @endif
+                </p>
+                
+                {{-- Upload Progress --}}
+                <div x-show="uploading" class="mt-4" style="display: none;">
+                    <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                             :style="`width: ${progress}%`"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1" x-text="`Uploading... ${progress}%`"></p>
+                </div>
+            </div>
+        </div>
+        
+        {{-- Remove Button --}}
+        @if($this->{$fieldName})
+        <button 
+            type="button"
+            wire:click="$set('{{ $fieldName }}', null)"
+            class="mt-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+            Remove file
+        </button>
+        @endif
+    </div>
+    
+    @error($fieldName) 
+        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+    @enderror
+</div>
+@endif

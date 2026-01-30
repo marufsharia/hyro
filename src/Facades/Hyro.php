@@ -3,6 +3,7 @@
 namespace Marufsharia\Hyro\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Marufsharia\Hyro\Services\ModuleManager;
 
 /**
  * @method static \Marufsharia\Hyro\HyroManager driver(string $driver = null)
@@ -32,5 +33,21 @@ class Hyro extends Facade
     protected static function getFacadeAccessor(): string
     {
         return 'hyro';
+    }
+
+    /**
+     * Get sidebar items
+     */
+    public static function sidebar(): array
+    {
+        // If you have groups
+        $groups = ModuleManager::getSidebarGroups();
+
+        // Fallback: just return all modules
+        if (empty($groups)) {
+            return ModuleManager::enabled();
+        }
+
+        return $groups;
     }
 }

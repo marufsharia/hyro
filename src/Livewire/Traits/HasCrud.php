@@ -1,11 +1,13 @@
 <?php
 
-namespace Marufsharia\Hyro\Livewire\Traits;
+namespace MarufSharia\Hyro\Livewire\Traits;
 
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Powerful CRUD Trait for Livewire Components
@@ -19,6 +21,7 @@ trait HasCrud
     public $modelId;
     public $showModal = false;
     public $showDeleteModal = false;
+    public $showBulkDeleteModal = false;
     public $isEditing = false;
 
     // Search & Filter
@@ -30,6 +33,9 @@ trait HasCrud
     // Bulk Actions
     public $selectedRows = [];
     public $selectAll = false;
+
+    // File uploads temporary storage
+    protected array $temporaryFiles = [];
 
     /**
      * Get the model class for CRUD operations
@@ -46,7 +52,13 @@ trait HasCrud
      */
     protected function getSearchableFields(): array
     {
-        return ['name', 'title', 'email'];
+        $searchable = [];
+        foreach ($this->getFields() as $name => $field) {
+            if (in_array($field['type'], ['text', 'email', 'textarea'])) {
+                $searchable[] = $name;
+            }
+        }
+        return $searchable ?: ['id'];
     }
 
     /**
@@ -55,6 +67,14 @@ trait HasCrud
     protected function getTableColumns(): array
     {
         return array_keys($this->getFields());
+    }
+
+    /**
+     * Boot the trait
+     */
+    public function boot()
+    {
+        $this->initializeFields();
     }
 
     /**
@@ -69,7 +89,7 @@ trait HasCrud
     /**
      * Initialize form fields
      */
-    protected function initializeFields()
+    protected function initializeFields(): void
     {
         foreach ($this->getFields() as $field => $config) {
             if (!property_exists($this, $field)) {
@@ -79,7 +99,7 @@ trait HasCrud
     }
 
     /**
-     * Render the component
+     * Render the component - Uses Hyro default layout like Filament
      */
     public function render()
     {
@@ -87,7 +107,58 @@ trait HasCrud
             'items' => $this->getItems(),
             'columns' => $this->getTableColumns(),
             'fields' => $this->getFields(),
-        ])->layout(config('hyro.livewire.layout', 'hyro::admin.layouts.app'));
+            'resourceName' => $this->getResourceName(),
+            'resourceNamePlural' => $this->getResourceNamePlural(),
+        ])->layout($this->getLayout());
+    }
+
+    /**
+     * Get the layout for the component
+     * Priority: Component property > Config > Hyro default
+     */
+    protected function getLayout(): string
+    {
+        // 1. Check if component has custom layout property
+        if (property_exists($this, 'layout') && !empty($this->layout)) {
+            return $this->layout;
+        }
+
+        // 2. Check config for custom layout
+        $configLayout = config('hyro.livewire.layout');
+        if ($configLayout && view()->exists($configLayout)) {
+            return $configLayout;
+        }
+
+        // 3. Use Hyro default layout (like Filament does)
+        return 'hyro::admin.layouts.app';
+    }
+
+    /**
+     * Get resource name
+     */
+    protected function getResourceName(): string
+    {
+        $className = class_basename($this);
+        $name = str_ends_with($className, 'Manager') ? substr($className, 0, -7) : $className;
+        return Str::title(Str::snake($name, ' '));
+    }
+
+    /**
+     * Get resource name in kebab case
+     */
+    protected function getResourceNameKebab(): string
+    {
+        $className = class_basename($this);
+        $name = str_ends_with($className, 'Manager') ? substr($className, 0, -7) : $className;
+        return Str::kebab($name);
+    }
+
+    /**
+     * Get resource name plural
+     */
+    protected function getResourceNamePlural(): string
+    {
+        return Str::plural($this->getResourceName());
     }
 
     /**
@@ -99,7 +170,7 @@ trait HasCrud
         $query = $model::query();
 
         // Apply search
-        if ($this->search) {
+        if ($this->search && !empty($this->getSearchableFields())) {
             $query->where(function ($q) {
                 foreach ($this->getSearchableFields() as $field) {
                     $q->orWhere($field, 'like', '%' . $this->search . '%');
@@ -108,7 +179,9 @@ trait HasCrud
         }
 
         // Apply sorting
-        $query->orderBy($this->sortField, $this->sortDirection);
+        if ($this->sortField && in_array($this->sortField, $this->getTableColumns())) {
+            $query->orderBy($this->sortField, $this->sortDirection === 'asc' ? 'asc' : 'desc');
+        }
 
         // Apply custom filters
         $this->applyFilters($query);
@@ -124,9 +197,9 @@ trait HasCrud
     /**
      * Apply custom filters (override in component)
      */
-    protected function applyFilters($query)
+    protected function applyFilters($query): void
     {
-        //
+        // Override in child class
     }
 
     /**
@@ -137,6 +210,7 @@ trait HasCrud
         $this->resetFields();
         $this->isEditing = false;
         $this->showModal = true;
+        $this->dispatch('modal-opened', mode: 'create');
     }
 
     /**
@@ -145,7 +219,18 @@ trait HasCrud
     public function edit($id)
     {
         $model = $this->getModel();
-        $record = $model::findOrFail($id);
+        $record = $model::find($id);
+
+        if (!$record) {
+            $this->alert('error', 'Record not found.');
+            return;
+        }
+
+        // Check view permission
+        if (method_exists($this, 'canView') && !$this->canView($record)) {
+            $this->alert('error', 'You do not have permission to view this record.');
+            return;
+        }
 
         $this->modelId = $id;
         $this->isEditing = true;
@@ -153,6 +238,8 @@ trait HasCrud
         foreach ($this->getFields() as $field => $config) {
             if (isset($record->{$field})) {
                 $this->{$field} = $record->{$field};
+            } else {
+                $this->{$field} = $config['default'] ?? null;
             }
         }
 
@@ -162,6 +249,7 @@ trait HasCrud
         }
 
         $this->showModal = true;
+        $this->dispatch('modal-opened', mode: 'edit', id: $id);
     }
 
     /**
@@ -169,7 +257,7 @@ trait HasCrud
      */
     public function save()
     {
-        $this->validate($this->getRules());
+        $this->validate($this->rules());
 
         $model = $this->getModel();
         $data = $this->getFormData();
@@ -179,38 +267,81 @@ trait HasCrud
             $data = $this->beforeSave($data);
         }
 
-        if ($this->isEditing) {
-            $record = $model::findOrFail($this->modelId);
+        try {
+            if ($this->isEditing) {
+                $record = $model::find($this->modelId);
 
-            // Check permissions
-            if (method_exists($this, 'canUpdate') && !$this->canUpdate($record)) {
-                $this->alert('error', 'You do not have permission to update this record.');
-                return;
+                if (!$record) {
+                    $this->alert('error', 'Record not found.');
+                    return;
+                }
+
+                // Check permissions
+                if (method_exists($this, 'canUpdate') && !$this->canUpdate($record)) {
+                    $this->alert('error', 'You do not have permission to update this record.');
+                    return;
+                }
+
+                // Handle file cleanup for updates
+                $this->handleFileUpdates($record, $data);
+
+                $record->update($data);
+
+                // After update hook
+                if (method_exists($this, 'afterUpdate')) {
+                    $this->afterUpdate($record);
+                }
+
+                $this->alert('success', $this->getResourceName() . ' updated successfully!');
+                $this->dispatch('record-updated', id: $record->id);
+            } else {
+                // Check permissions
+                if (method_exists($this, 'canCreate') && !$this->canCreate()) {
+                    $this->alert('error', 'You do not have permission to create records.');
+                    return;
+                }
+
+                $record = $model::create($data);
+
+                // After create hook
+                if (method_exists($this, 'afterCreate')) {
+                    $this->afterCreate($record);
+                }
+
+                $this->alert('success', $this->getResourceName() . ' created successfully!');
+                $this->dispatch('record-created', id: $record->id);
             }
 
-            $record->update($data);
+            $this->closeModal();
+            $this->resetFields();
 
-            // After update hook
-            if (method_exists($this, 'afterUpdate')) {
-                $this->afterUpdate($record);
-            }
-
-            $this->alert('success', 'Record updated successfully!');
-            $this->dispatch('recordUpdated', id: $record->id);
-        } else {
-            $record = $model::create($data);
-
-            // After create hook
-            if (method_exists($this, 'afterCreate')) {
-                $this->afterCreate($record);
-            }
-
-            $this->alert('success', 'Record created successfully!');
-            $this->dispatch('recordCreated', id: $record->id);
+        } catch (\Exception $e) {
+            Log::error('CRUD Save Error: ' . $e->getMessage());
+            $this->alert('error', 'An error occurred while saving: ' . $e->getMessage());
         }
+    }
 
-        $this->closeModal();
-        $this->resetFields();
+    /**
+     * Handle file updates - delete old files when replaced
+     */
+    protected function handleFileUpdates($record, array &$data): void
+    {
+        foreach ($this->getFields() as $field => $config) {
+            if (($config['type'] === 'file' || $config['type'] === 'image') && isset($data[$field])) {
+                // If new file uploaded and old exists, delete old
+                if ($this->{$field} && $record->{$field} && $this->{$field} !== $record->{$field}) {
+                    if (is_object($this->{$field}) && method_exists($this->{$field}, 'getRealPath')) {
+                        // New file uploaded, delete old
+                        Storage::disk($config['disk'] ?? 'public')->delete($record->{$field});
+                    }
+                }
+
+                // If field is being cleared
+                if ($data[$field] === null && $record->{$field}) {
+                    Storage::disk($config['disk'] ?? 'public')->delete($record->{$field});
+                }
+            }
+        }
     }
 
     /**
@@ -228,11 +359,22 @@ trait HasCrud
     public function delete()
     {
         $model = $this->getModel();
-        $record = $model::findOrFail($this->modelId);
+
+        // Try to find with or without trashed
+        $record = method_exists($model, 'withTrashed')
+            ? $model::withTrashed()->find($this->modelId)
+            : $model::find($this->modelId);
+
+        if (!$record) {
+            $this->alert('error', 'Record not found.');
+            $this->showDeleteModal = false;
+            return;
+        }
 
         // Check permissions
         if (method_exists($this, 'canDelete') && !$this->canDelete($record)) {
             $this->alert('error', 'You do not have permission to delete this record.');
+            $this->showDeleteModal = false;
             return;
         }
 
@@ -240,22 +382,53 @@ trait HasCrud
         if (method_exists($this, 'beforeDelete')) {
             $continue = $this->beforeDelete($record);
             if ($continue === false) {
+                $this->showDeleteModal = false;
                 return;
             }
         }
 
-        $record->delete();
+        try {
+            // Handle file cleanup
+            foreach ($this->getFields() as $field => $config) {
+                if (($config['type'] === 'file' || $config['type'] === 'image') && $record->{$field}) {
+                    Storage::disk($config['disk'] ?? 'public')->delete($record->{$field});
+                }
+            }
 
-        // After delete hook
-        if (method_exists($this, 'afterDelete')) {
-            $this->afterDelete($this->modelId);
+            if (method_exists($record, 'trashed') && $record->trashed()) {
+                $record->forceDelete();
+            } else {
+                $record->delete();
+            }
+
+            // After delete hook
+            if (method_exists($this, 'afterDelete')) {
+                $this->afterDelete($this->modelId);
+            }
+
+            $this->alert('success', $this->getResourceName() . ' deleted successfully!');
+            $this->dispatch('record-deleted', id: $this->modelId);
+
+        } catch (\Exception $e) {
+            Log::error('CRUD Delete Error: ' . $e->getMessage());
+            $this->alert('error', 'An error occurred while deleting the record.');
         }
-
-        $this->alert('success', 'Record deleted successfully!');
-        $this->dispatch('recordDeleted', id: $this->modelId);
 
         $this->showDeleteModal = false;
         $this->modelId = null;
+        $this->resetPage();
+    }
+
+    /**
+     * Confirm bulk delete
+     */
+    public function confirmBulkDelete()
+    {
+        if (empty($this->selectedRows)) {
+            $this->alert('warning', 'No records selected!');
+            return;
+        }
+        $this->showBulkDeleteModal = true;
     }
 
     /**
@@ -269,23 +442,46 @@ trait HasCrud
         }
 
         $model = $this->getModel();
+        $records = $model::whereIn('id', $this->selectedRows)->get();
 
-        // Check permissions for each record
-        if (method_exists($this, 'canDelete')) {
-            $records = $model::whereIn('id', $this->selectedRows)->get();
-            foreach ($records as $record) {
-                if (!$this->canDelete($record)) {
-                    $this->alert('error', 'You do not have permission to delete some records.');
-                    return;
+        $deletedCount = 0;
+        $failedCount = 0;
+
+        foreach ($records as $record) {
+            // Check permissions for each record
+            if (method_exists($this, 'canDelete') && !$this->canDelete($record)) {
+                $failedCount++;
+                continue;
+            }
+
+            try {
+                // Handle file cleanup
+                foreach ($this->getFields() as $field => $config) {
+                    if (($config['type'] === 'file' || $config['type'] === 'image') && $record->{$field}) {
+                        Storage::disk($config['disk'] ?? 'public')->delete($record->{$field});
+                    }
                 }
+
+                $record->delete();
+                $deletedCount++;
+            } catch (\Exception $e) {
+                $failedCount++;
+                Log::error('Bulk Delete Error for ID ' . $record->id . ': ' . $e->getMessage());
             }
         }
 
-        $count = $model::whereIn('id', $this->selectedRows)->delete();
+        if ($deletedCount > 0) {
+            $this->alert('success', "{$deletedCount} records deleted successfully!");
+        }
 
-        $this->alert('success', "{$count} records deleted!");
+        if ($failedCount > 0) {
+            $this->alert('warning', "{$failedCount} records could not be deleted due to permissions or errors.");
+        }
+
         $this->selectedRows = [];
         $this->selectAll = false;
+        $this->showBulkDeleteModal = false;
+        $this->dispatch('bulk-deleted', count: $deletedCount);
     }
 
     /**
@@ -293,6 +489,10 @@ trait HasCrud
      */
     public function sortBy($field)
     {
+        if (!in_array($field, $this->getTableColumns())) {
+            return;
+        }
+
         if ($this->sortField === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
@@ -320,14 +520,16 @@ trait HasCrud
     {
         $this->showModal = false;
         $this->showDeleteModal = false;
+        $this->showBulkDeleteModal = false;
         $this->resetFields();
         $this->resetValidation();
+        $this->dispatch('modal-closed');
     }
 
     /**
      * Reset form fields
      */
-    protected function resetFields()
+    public function resetFields()
     {
         $this->modelId = null;
         $this->isEditing = false;
@@ -335,6 +537,14 @@ trait HasCrud
         foreach ($this->getFields() as $field => $config) {
             $this->{$field} = $config['default'] ?? null;
         }
+
+        // Clean up temporary uploads
+        foreach ($this->temporaryFiles as $file) {
+            if (method_exists($file, 'delete')) {
+                $file->delete();
+            }
+        }
+        $this->temporaryFiles = [];
 
         // Reset additional fields
         if (method_exists($this, 'resetAdditionalFields')) {
@@ -345,7 +555,7 @@ trait HasCrud
     /**
      * Get validation rules
      */
-    protected function getRules(): array
+    protected function rules(): array
     {
         $rules = [];
 
@@ -355,18 +565,35 @@ trait HasCrud
 
                 // Handle unique rule for updates
                 if ($this->isEditing && is_string($fieldRules) && Str::contains($fieldRules, 'unique:')) {
-                    $table = $this->getTableName();
-                    $fieldRules = preg_replace(
-                        '/unique:([^,|]+)/',
-                        "unique:$1,{$field},{$this->modelId}",
-                        $fieldRules
-                    );
+                    $fieldRules = $this->handleUniqueRule($fieldRules, $field);
                 }
 
                 $rules[$field] = $fieldRules;
             }
         }
 
+        // Merge with component-specific rules
+        if (method_exists($this, 'additionalRules')) {
+            $rules = array_merge($rules, $this->additionalRules());
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Handle unique validation rule for updates
+     */
+    protected function handleUniqueRule(string $rules, string $field): string
+    {
+        // Parse unique:table,column format and add ignore clause
+        if (preg_match('/unique:([^,]+)(?:,([^|]+))?/', $rules, $matches)) {
+            $table = $matches[1];
+            $column = $matches[2] ?? $field;
+            $ignoreId = $this->modelId ?? 'NULL';
+
+            $replacement = "unique:{$table},{$column},{$ignoreId}";
+            $rules = preg_replace('/unique:[^|]+/', $replacement, $rules);
+        }
         return $rules;
     }
 
@@ -385,14 +612,6 @@ trait HasCrud
     }
 
     /**
-     * Get table name
-     */
-    protected function getTableName(): string
-    {
-        return (new ($this->getModel()))->getTable();
-    }
-
-    /**
      * Get form data
      */
     protected function getFormData(): array
@@ -400,11 +619,22 @@ trait HasCrud
         $data = [];
 
         foreach ($this->getFields() as $field => $config) {
-            if ($config['type'] === 'file' && $this->{$field}) {
-                $data[$field] = $this->{$field}->store(
-                    $config['storage_path'] ?? 'uploads',
-                    $config['disk'] ?? 'public'
-                );
+            if (!isset($this->{$field})) {
+                $data[$field] = $config['default'] ?? null;
+                continue;
+            }
+
+            // Handle file uploads
+            if (($config['type'] === 'file' || $config['type'] === 'image') && $this->{$field}) {
+                if (is_object($this->{$field}) && method_exists($this->{$field}, 'store')) {
+                    $data[$field] = $this->{$field}->store(
+                        $config['storage_path'] ?? $this->getResourceNameKebab(),
+                        $config['disk'] ?? 'public'
+                    );
+                } else {
+                    // Keep existing path if not a new upload
+                    $data[$field] = $this->{$field};
+                }
             } else {
                 $data[$field] = $this->{$field};
             }
@@ -419,7 +649,7 @@ trait HasCrud
     protected function getViewName(): string
     {
         $componentName = class_basename($this);
-        return 'hyro::livewire.admin.' . Str::kebab($componentName);
+        return 'livewire.admin.' . Str::kebab($componentName);
     }
 
     /**
@@ -428,20 +658,38 @@ trait HasCrud
     public function exportCsv()
     {
         $model = $this->getModel();
-        $items = $model::all();
+        $query = $model::query();
+
+        // Apply current filters to export
+        if ($this->search && !empty($this->getSearchableFields())) {
+            $query->where(function ($q) {
+                foreach ($this->getSearchableFields() as $field) {
+                    $q->orWhere($field, 'like', '%' . $this->search . '%');
+                }
+            });
+        }
+
+        $items = $query->get();
         $columns = $this->getTableColumns();
 
-        $filename = Str::slug(class_basename($model)) . '-' . now()->format('Y-m-d-His') . '.csv';
+        $filename = Str::slug($this->getResourceNamePlural()) . '-' . now()->format('Y-m-d-His') . '.csv';
+
         $handle = fopen('php://temp', 'r+');
 
         // Header
-        fputcsv($handle, $columns);
+        $headers = array_map(fn($col) => Str::title(str_replace('_', ' ', $col)), $columns);
+        fputcsv($handle, $headers);
 
         // Data
         foreach ($items as $item) {
             $row = [];
             foreach ($columns as $column) {
-                $row[] = $item->{$column};
+                $value = $item->{$column};
+                // Handle arrays/objects
+                if (is_array($value) || is_object($value)) {
+                    $value = json_encode($value);
+                }
+                $row[] = $value;
             }
             fputcsv($handle, $row);
         }
@@ -454,6 +702,7 @@ trait HasCrud
             echo $csv;
         }, $filename, [
             'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ]);
     }
 
@@ -463,6 +712,8 @@ trait HasCrud
     public function updatedSearch()
     {
         $this->resetPage();
+        $this->selectedRows = [];
+        $this->selectAll = false;
     }
 
     /**
@@ -471,18 +722,17 @@ trait HasCrud
     public function updatedPerPage()
     {
         $this->resetPage();
+        $this->selectedRows = [];
+        $this->selectAll = false;
     }
 
     /**
-     * Query string parameters
+     * Reset page when filters change
      */
-    protected function queryString(): array
+    public function updated($propertyName)
     {
-        return [
-            'search' => ['except' => ''],
-            'sortField' => ['except' => 'created_at'],
-            'sortDirection' => ['except' => 'desc'],
-            'perPage' => ['except' => 15],
-        ];
+        if (str_starts_with($propertyName, 'filter')) {
+            $this->resetPage();
+        }
     }
 }

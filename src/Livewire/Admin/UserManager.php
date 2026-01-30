@@ -79,7 +79,10 @@ class UserManager extends BaseCrudComponent
         $this->availableRoles = $roleModel::orderBy('name')->get();
     }
 
-    protected function getRules(): array
+    /**
+     * Get validation rules
+     */
+    public function getRules(): array  // CHANGED: protected to public
     {
         $rules = parent::getRules();
 

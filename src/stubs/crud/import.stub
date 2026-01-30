@@ -1,0 +1,139 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ modelClass }};
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Validators\Failure;
+use Illuminate\Support\Collection;
+
+class {{ importName }} implements 
+    ToModel, 
+    WithHeadingRow, 
+    WithValidation, 
+    WithBatchInserts, 
+    WithChunkReading,
+    SkipsOnError,
+    SkipsOnFailure
+{
+    protected $errors = [];
+    protected $failures = [];
+    protected $successCount = 0;
+    protected $skipCount = 0;
+
+    /**
+     * Transform row to model
+     */
+    public function model(array $row)
+    {
+        $this->successCount++;
+
+        return new {{ modelClass }}([
+{{ modelAttributes }}
+        ]);
+    }
+
+    /**
+     * Validation rules
+     */
+    public function rules(): array
+    {
+        return [
+{{ validationRules }}
+        ];
+    }
+
+    /**
+     * Custom validation messages
+     */
+    public function customValidationMessages()
+    {
+        return [
+{{ validationMessages }}
+        ];
+    }
+
+    /**
+     * Batch inserts
+     */
+    public function batchSize(): int
+    {
+        return 500;
+    }
+
+    /**
+     * Chunk reading
+     */
+    public function chunkSize(): int
+    {
+        return 500;
+    }
+
+    /**
+     * Handle errors
+     */
+    public function onError(\Throwable $e)
+    {
+        $this->errors[] = $e->getMessage();
+        $this->skipCount++;
+    }
+
+    /**
+     * Handle validation failures
+     */
+    public function onFailure(Failure ...$failures)
+    {
+        foreach ($failures as $failure) {
+            $this->failures[] = [
+                'row' => $failure->row(),
+                'attribute' => $failure->attribute(),
+                'errors' => $failure->errors(),
+                'values' => $failure->values(),
+            ];
+        }
+        
+        $this->skipCount++;
+    }
+
+    /**
+     * Get import summary
+     */
+    public function getSummary(): array
+    {
+        return [
+            'success' => $this->successCount,
+            'skipped' => $this->skipCount,
+            'errors' => $this->errors,
+            'failures' => $this->failures,
+        ];
+    }
+
+    /**
+     * Import from file
+     */
+    public static function fromFile(string $filePath): array
+    {
+        $import = new static();
+        
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import($import, $filePath);
+            
+            return [
+                'success' => true,
+                'summary' => $import->getSummary(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'summary' => $import->getSummary(),
+            ];
+        }
+    }
+}

@@ -28,4 +28,6 @@ class Plugin extends Facade
     {
         return 'hyro.plugins';
     }
+
+
 }
