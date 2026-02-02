@@ -121,7 +121,7 @@ class CrudRouteAutoDiscoverer
             $reflection = new \ReflectionClass($className);
 
             // Must extend BaseCrudComponent
-            if (!$reflection->isSubclassOf(\Marufsharia\Hyro\Livewire\BaseCrudComponent::class)) {
+            if (!$reflection->isSubclassOf(\HyroPlugins\PhoneBook\Livewire\BaseCrudComponent::class)) {
                 return false;
             }
 
@@ -285,13 +285,13 @@ PHP;
         })->name('dashboard');
 
         // Core Management Routes
-        Route::get('/users', \Marufsharia\Hyro\Livewire\Admin\UserManager::class)
+        Route::get('/users', \HyroPlugins\PhoneBook\Livewire\Admin\UserManager::class)
             ->name('users');
 
-        Route::get('/roles', \Marufsharia\Hyro\Livewire\Admin\RoleManager::class)
+        Route::get('/roles', \HyroPlugins\PhoneBook\Livewire\Admin\RoleManager::class)
             ->name('roles');
 
-        Route::get('/privileges', \Marufsharia\Hyro\Livewire\Admin\PrivilegeManager::class)
+        Route::get('/privileges', \HyroPlugins\PhoneBook\Livewire\Admin\PrivilegeManager::class)
             ->name('privileges');
 
 PHP;

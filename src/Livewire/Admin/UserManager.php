@@ -1,8 +1,8 @@
 <?php
 
-namespace Marufsharia\Hyro\Livewire\Admin;
+namespace HyroPlugins\PhoneBook\Livewire\Admin;
 
-use Marufsharia\Hyro\Livewire\BaseCrudComponent;
+use HyroPlugins\PhoneBook\Livewire\BaseCrudComponent;
 use Marufsharia\Hyro\Models\Role;
 use Illuminate\Support\Facades\Hash;
 

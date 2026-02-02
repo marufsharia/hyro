@@ -223,7 +223,7 @@ class HyroServiceProvider extends ServiceProvider
             \Marufsharia\Hyro\Console\Commands\Maintenance\CleanupCommand::class,
 
             // CRUD Generator
-            \MarufSharia\Hyro\Console\Commands\Crud\MakeCrudCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Crud\MakeCrudCommand::class,
             \Marufsharia\Hyro\Console\Commands\Crud\DiscoverCrudRoutesCommand::class,
             \Marufsharia\Hyro\Console\Commands\Crud\HyroModuleCommand::class,
 
@@ -282,9 +282,9 @@ class HyroServiceProvider extends ServiceProvider
 
         try {
             // Register Livewire components
-            \Livewire\Livewire::component('hyro.role-manager', \MarufSharia\Hyro\Livewire\Admin\RoleManager::class);
-            \Livewire\Livewire::component('hyro.user-manager', \MarufSharia\Hyro\Livewire\Admin\UserManager::class);
-            \Livewire\Livewire::component('hyro.privilege-manager', \MarufSharia\Hyro\Livewire\Admin\PrivilegeManager::class);
+            \Livewire\Livewire::component('hyro.role-manager', \HyroPlugins\PhoneBook\Livewire\Admin\RoleManager::class);
+            \Livewire\Livewire::component('hyro.user-manager', \HyroPlugins\PhoneBook\Livewire\Admin\UserManager::class);
+            \Livewire\Livewire::component('hyro.privilege-manager', \HyroPlugins\PhoneBook\Livewire\Admin\PrivilegeManager::class);
         } catch (\Exception $e) {
             // Silently fail if Livewire components can't be registered
             if ($this->app->runningInConsole()) {

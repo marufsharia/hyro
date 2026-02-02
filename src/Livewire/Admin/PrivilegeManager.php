@@ -1,8 +1,8 @@
 <?php
 
-namespace MarufSharia\Hyro\Livewire\Admin;
+namespace HyroPlugins\PhoneBook\Livewire\Admin;
 
-use MarufSharia\Hyro\Livewire\BaseCrudComponent;
+use HyroPlugins\PhoneBook\Livewire\BaseCrudComponent;
 use Marufsharia\Hyro\Models\Privilege;
 use Illuminate\Support\Str;
 

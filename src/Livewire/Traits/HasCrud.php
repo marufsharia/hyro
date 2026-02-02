@@ -1,6 +1,6 @@
 <?php
 
-namespace MarufSharia\Hyro\Livewire\Traits;
+namespace HyroPlugins\PhoneBook\Livewire\Traits;
 
 use Illuminate\Support\Str;
 use Livewire\WithPagination;

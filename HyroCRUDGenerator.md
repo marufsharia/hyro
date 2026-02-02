@@ -341,7 +341,7 @@ This creates a fully functional product management system with:
 namespace App\Livewire\Admin;
 
 use App\Models\Post;
-use Marufsharia\Hyro\Livewire\BaseCrudComponent;
+use HyroPlugins\PhoneBook\Livewire\BaseCrudComponent;
 
 class PostManager extends BaseCrudComponent
 {
