@@ -430,11 +430,20 @@ curl -X DELETE http://your-domain.com/api/hyro/users/1/roles/admin \
 ### User Management
 
 ```bash
-# Create user
+# Create user (interactive)
 php artisan hyro:user:create
+
+# Create user with options
+php artisan hyro:user:create --name="John Doe" --email="john@example.com" --password="secret123"
 
 # Create admin user
 php artisan hyro:user:create --admin
+
+# Create user with specific role
+php artisan hyro:user:create --role="moderator"
+
+# Create admin user with all options
+php artisan hyro:user:create --name="Admin User" --email="admin@example.com" --password="secret123" --admin
 
 # List users
 php artisan hyro:user:list
@@ -444,6 +453,29 @@ php artisan hyro:user:suspend
 
 # Unsuspend user
 php artisan hyro:user:unsuspend
+```
+
+**User Creation Command Options:**
+- `--name[=NAME]` - The name of the user
+- `--email[=EMAIL]` - The email of the user
+- `--password[=PASSWORD]` - The password for the user
+- `--admin` - Create user as admin (assigns Administrator role)
+- `--role[=ROLE]` - Assign specific role to user
+
+**Examples:**
+
+```bash
+# Interactive mode (prompts for all fields)
+php artisan hyro:user:create
+
+# Quick admin creation
+php artisan hyro:user:create --admin
+
+# Create moderator
+php artisan hyro:user:create --name="Jane Doe" --email="jane@example.com" --password="pass123" --role="moderator"
+
+# Create user with minimal info (will prompt for missing fields)
+php artisan hyro:user:create --email="user@example.com"
 ```
 
 ### Role Management

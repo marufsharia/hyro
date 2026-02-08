@@ -21,32 +21,26 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         RoleAssigned::class => [
-            TokenSynchronizationListener::class,
             AuditLogListener::class,
             NotificationListener::class,
         ],
         RoleRevoked::class => [
-            TokenSynchronizationListener::class,
             AuditLogListener::class,
             NotificationListener::class,
         ],
         PrivilegeGranted::class => [
-            TokenSynchronizationListener::class,
             AuditLogListener::class,
             NotificationListener::class,
         ],
         PrivilegeRevoked::class => [
-            TokenSynchronizationListener::class,
             AuditLogListener::class,
             NotificationListener::class,
         ],
         UserSuspended::class => [
-            TokenSynchronizationListener::class,
             AuditLogListener::class,
             NotificationListener::class,
         ],
         UserUnsuspended::class => [
-            TokenSynchronizationListener::class,
             AuditLogListener::class,
             NotificationListener::class,
         ],
@@ -56,7 +50,7 @@ class EventServiceProvider extends ServiceProvider
      * The subscriber classes to register.
      */
     protected $subscribe = [
-        TokenSynchronizationListener::class,
+        // TokenSynchronizationListener is registered conditionally in boot()
     ];
 
     /**
@@ -68,43 +62,7 @@ class EventServiceProvider extends ServiceProvider
 
         // Conditionally register token synchronization listeners
         if (config('hyro.tokens.synchronization.enabled', true)) {
-            $this->registerTokenSynchronization();
+            $this->app['events']->subscribe(TokenSynchronizationListener::class);
         }
-    }
-
-    /**
-     * Register token synchronization event listeners.
-     */
-    protected function registerTokenSynchronization(): void
-    {
-        $this->app['events']->listen(
-            RoleAssigned::class,
-            [TokenSynchronizationListener::class, 'handleRoleAssigned']
-        );
-
-        $this->app['events']->listen(
-            RoleRevoked::class,
-            [TokenSynchronizationListener::class, 'handleRoleRevoked']
-        );
-
-        $this->app['events']->listen(
-            PrivilegeGranted::class,
-            [TokenSynchronizationListener::class, 'handlePrivilegeGranted']
-        );
-
-        $this->app['events']->listen(
-            PrivilegeRevoked::class,
-            [TokenSynchronizationListener::class, 'handlePrivilegeRevoked']
-        );
-
-        $this->app['events']->listen(
-            UserSuspended::class,
-            [TokenSynchronizationListener::class, 'handleUserSuspended']
-        );
-
-        $this->app['events']->listen(
-            UserUnsuspended::class,
-            [TokenSynchronizationListener::class, 'handleUserUnsuspended']
-        );
     }
 }

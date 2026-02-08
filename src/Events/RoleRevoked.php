@@ -2,7 +2,7 @@
 
 namespace Marufsharia\Hyro\Events;
 
-use Marufsharia\Hyro\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Marufsharia\Hyro\Models\Role;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -12,9 +12,9 @@ class RoleRevoked
     use Dispatchable, SerializesModels;
 
     /**
-     * The users instance.
+     * The user instance.
      */
-    public User $user;
+    public Authenticatable $user;
 
     /**
      * The role instance.
@@ -22,9 +22,9 @@ class RoleRevoked
     public Role $role;
 
     /**
-     * The users who performed the revocation.
+     * The user who performed the revocation.
      */
-    public ?User $revoker;
+    public ?Authenticatable $revoker;
 
     /**
      * Additional metadata.
@@ -34,7 +34,7 @@ class RoleRevoked
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, Role $role, ?User $revoker = null, array $metadata = [])
+    public function __construct(Authenticatable $user, Role $role, ?Authenticatable $revoker = null, array $metadata = [])
     {
         $this->user = $user;
         $this->role = $role;

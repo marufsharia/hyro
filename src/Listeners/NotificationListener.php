@@ -15,6 +15,18 @@ use Marufsharia\Hyro\Notifications\UserUnsuspendedNotification;
 class NotificationListener
 {
     /**
+     * Handle the event.
+     */
+    public function handle($event): void
+    {
+        $method = 'handle' . class_basename($event);
+        
+        if (method_exists($this, $method)) {
+            $this->$method($event);
+        }
+    }
+
+    /**
      * Handle the RoleAssigned event.
      */
     public function handleRoleAssigned(RoleAssigned $event): void
@@ -74,18 +86,5 @@ class NotificationListener
         if ($admins->isNotEmpty()) {
             Notification::send($admins, new AdminUserSuspendedNotification($event));
         }
-    }
-
-    /**
-     * Subscribe to events.
-     */
-    public function subscribe($events): array
-    {
-        return [
-            RoleAssigned::class => 'handleRoleAssigned',
-            RoleRevoked::class => 'handleRoleRevoked',
-            UserSuspended::class => 'handleUserSuspended',
-            UserUnsuspended::class => 'handleUserUnsuspended',
-        ];
     }
 }

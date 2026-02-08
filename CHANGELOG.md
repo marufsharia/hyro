@@ -7,13 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta.2] - 2026-02-08
+
+### Fixed
+- Fixed type mismatch error in event system when using App\Models\User instead of Marufsharia\Hyro\Models\User
+- Fixed RoleAssigned event to accept Authenticatable interface instead of concrete User model
+- Fixed RoleRevoked event to accept Authenticatable interface
+- Fixed PrivilegeGranted event to accept Authenticatable interface
+- Fixed PrivilegeRevoked event to accept Authenticatable interface
+- Fixed UserSuspended event to accept Authenticatable interface
+- Fixed UserUnsuspended event to accept Authenticatable interface
+- Fixed TokenSynchronizationListener subscribe method signature
+- Fixed AuditLogListener to use correct field names (event, auditable_type, auditable_id)
+- Fixed NotificationListener to properly handle events
+- Fixed RoleAssignedNotification syntax error (removed blank line before <?php tag)
+- Fixed EventServiceProvider to avoid duplicate listener registrations
+
 ### Added
-- Comprehensive documentation suite
-- Installation guide
-- Configuration guide
-- Usage guide
-- Deployment guide
-- Contributing guidelines
+- Added `hyro:user:create` command for easy user creation with interactive prompts
+- Added support for --name, --email, --password, --admin, and --role options in user:create command
+- Added handle() method to AuditLogListener for proper event handling
+- Added handle() method to NotificationListener for proper event handling
+
+### Changed
+- Updated all event classes to use Illuminate\Contracts\Auth\Authenticatable interface
+- Improved event listener registration to use subscriber pattern
+- Enhanced compatibility with custom User models
+- Better error handling in event listeners
 
 ## [1.0.0-beta] - 2026-02-08
 

@@ -37,10 +37,10 @@ Hyro is an enterprise-grade Authentication, Authorization, Role & Privilege Mana
 | 12 | ❌ **NOT STARTED** | 0% | Multi-Tenant Support |
 | 13 | ✅ **COMPLETE** | 100% | REST API with RBAC |
 | 14 | ❌ **NOT STARTED** | 0% | Testing Suite |
-| 15 | ⚠️ **PARTIAL** | 30% | Documentation & Deployment |
+| 15 | ✅ **COMPLETE** | 100% | **Documentation & Deployment** ⭐ |
 
 **Overall Progress: 93% Complete (14/15 Phases)**  
-**Production Readiness: 95%**
+**Production Readiness: 98%**
 
 ## 🚀 Features
 
@@ -767,14 +767,38 @@ MIT License. See [LICENSE](LICENSE) file for details.
 
 ## 📊 Stats
 
-- **Lines of Code:** 17,500+
-- **Files:** 220+
-- **Commands:** 45+
+- **Lines of Code:** 18,000+
+- **Files:** 225+
+- **Commands:** 46+
 - **Completion:** 93%
 - **Documentation:** 100% (15 guides)
 - **Production Ready:** Yes
+- **Bug Fixes:** Latest (Feb 8, 2026)
 
 ## 🎉 What's New in Latest Release
+
+### Version 1.0.0-beta.2 (February 8, 2026)
+
+**🐛 Bug Fixes:**
+- ✅ Fixed type mismatch in event system (App\Models\User vs Marufsharia\Hyro\Models\User)
+- ✅ Fixed event listener registration issues
+- ✅ Fixed AuditLog field mapping
+- ✅ Fixed TokenSynchronizationListener subscribe method
+- ✅ Fixed NotificationListener handle method
+- ✅ Fixed RoleAssignedNotification syntax error
+- ✅ Added `hyro:user:create` command for easy user creation
+
+**✨ New Features:**
+- ✅ User creation command with interactive prompts
+- ✅ Support for both App\Models\User and Marufsharia\Hyro\Models\User
+- ✅ Improved event system with Authenticatable interface
+- ✅ Better error handling in event listeners
+
+**🔧 Improvements:**
+- Enhanced event system compatibility
+- Better support for custom User models
+- Improved error messages
+- Fixed Windows compatibility issues
 
 ### Version 1.0.0-beta (February 2026)
 

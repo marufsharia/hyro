@@ -2,9 +2,9 @@
 
 namespace Marufsharia\Hyro\Events;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Marufsharia\Hyro\Models\Role;
 use Marufsharia\Hyro\Models\Privilege;
-use Marufsharia\Hyro\Models\User;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -23,9 +23,9 @@ class PrivilegeRevoked
     public Privilege $privilege;
 
     /**
-     * The users who performed the revocation.
+     * The user who performed the revocation.
      */
-    public ?User $revoker;
+    public ?Authenticatable $revoker;
 
     /**
      * Additional metadata.
@@ -35,7 +35,7 @@ class PrivilegeRevoked
     /**
      * Create a new event instance.
      */
-    public function __construct(Role $role, Privilege $privilege, ?User $revoker = null, array $metadata = [])
+    public function __construct(Role $role, Privilege $privilege, ?Authenticatable $revoker = null, array $metadata = [])
     {
         $this->role = $role;
         $this->privilege = $privilege;

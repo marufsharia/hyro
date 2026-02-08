@@ -285,17 +285,38 @@ class TokenSynchronizationListener
     }
 
     /**
-     * Handle multiple events via event subscriber.
+     * Register the listeners for the subscriber.
      */
-    public function subscribe($events): array
+    public function subscribe($events): void
     {
-        return [
-            RoleAssigned::class => 'handleRoleAssigned',
-            RoleRevoked::class => 'handleRoleRevoked',
-            PrivilegeGranted::class => 'handlePrivilegeGranted',
-            PrivilegeRevoked::class => 'handlePrivilegeRevoked',
-            UserSuspended::class => 'handleUserSuspended',
-            UserUnsuspended::class => 'handleUserUnsuspended',
-        ];
+        $events->listen(
+            RoleAssigned::class,
+            [TokenSynchronizationListener::class, 'handleRoleAssigned']
+        );
+
+        $events->listen(
+            RoleRevoked::class,
+            [TokenSynchronizationListener::class, 'handleRoleRevoked']
+        );
+
+        $events->listen(
+            PrivilegeGranted::class,
+            [TokenSynchronizationListener::class, 'handlePrivilegeGranted']
+        );
+
+        $events->listen(
+            PrivilegeRevoked::class,
+            [TokenSynchronizationListener::class, 'handlePrivilegeRevoked']
+        );
+
+        $events->listen(
+            UserSuspended::class,
+            [TokenSynchronizationListener::class, 'handleUserSuspended']
+        );
+
+        $events->listen(
+            UserUnsuspended::class,
+            [TokenSynchronizationListener::class, 'handleUserUnsuspended']
+        );
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Marufsharia\Hyro\Events;
 
-use Marufsharia\Hyro\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Marufsharia\Hyro\Models\Role;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -12,9 +12,9 @@ class RoleAssigned
     use Dispatchable, SerializesModels;
 
     /**
-     * The users instance.
+     * The user instance.
      */
-    public User $user;
+    public Authenticatable $user;
 
     /**
      * The role instance.
@@ -22,9 +22,9 @@ class RoleAssigned
     public Role $role;
 
     /**
-     * The users who performed the assignment.
+     * The user who performed the assignment.
      */
-    public ?User $assigner;
+    public ?Authenticatable $assigner;
 
     /**
      * Additional metadata.
@@ -34,7 +34,7 @@ class RoleAssigned
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, Role $role, ?User $assigner = null, array $metadata = [])
+    public function __construct(Authenticatable $user, Role $role, ?Authenticatable $assigner = null, array $metadata = [])
     {
         $this->user = $user;
         $this->role = $role;

@@ -2,9 +2,9 @@
 
 namespace Marufsharia\Hyro\Events;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Marufsharia\Hyro\Models\Role;
 use Marufsharia\Hyro\Models\Privilege;
-use Marufsharia\Hyro\Models\User;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -23,9 +23,9 @@ class PrivilegeGranted
     public Privilege $privilege;
 
     /**
-     * The users who performed the grant.
+     * The user who performed the grant.
      */
-    public ?User $granter;
+    public ?Authenticatable $granter;
 
     /**
      * Additional metadata.
@@ -35,7 +35,7 @@ class PrivilegeGranted
     /**
      * Create a new event instance.
      */
-    public function __construct(Role $role, Privilege $privilege, ?User $granter = null, array $metadata = [])
+    public function __construct(Role $role, Privilege $privilege, ?Authenticatable $granter = null, array $metadata = [])
     {
         $this->role = $role;
         $this->privilege = $privilege;

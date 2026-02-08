@@ -16,7 +16,17 @@ use Illuminate\Support\Facades\Auth;
 
 class AuditLogListener
 {
-
+    /**
+     * Handle the event.
+     */
+    public function handle($event): void
+    {
+        $method = 'handle' . class_basename($event);
+        
+        if (method_exists($this, $method)) {
+            $this->$method($event);
+        }
+    }
 
     /**
      * Handle the RoleCreated event.
@@ -24,10 +34,11 @@ class AuditLogListener
     public function handleRoleCreated(RoleCreated $event): void
     {
         AuditLog::create([
-            'action' => 'role_created',
-            'target_type' => get_class($event->role),
-            'target_id' => $event->role->id,
-            'details' => [
+            'event' => 'role_created',
+            'auditable_type' => get_class($event->role),
+            'auditable_id' => $event->role->id,
+            'user_id' => Auth::id() ?? $event->creator?->id,
+            'new_values' => [
                 'creator_id' => $event->creator?->id,
                 'creator_type' => $event->creator ? get_class($event->creator) : null,
                 'via' => $event->metadata['via'] ?? 'manual',
@@ -35,7 +46,6 @@ class AuditLogListener
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'performed_by' => Auth::id() ?? $event->creator?->id,
         ]);
     }
 
@@ -46,20 +56,19 @@ class AuditLogListener
     public function handleRoleUpdated(RoleUpdated $event): void
     {
         AuditLog::create([
-            'action' => 'role_updated',
-            'target_type' => get_class($event->role),
-            'target_id' => $event->role->id,
-            'details' => [
+            'event' => 'role_updated',
+            'auditable_type' => get_class($event->role),
+            'auditable_id' => $event->role->id,
+            'user_id' => Auth::id() ?? $event->updater?->id,
+            'old_values' => $event->original,
+            'new_values' => array_merge($event->role->getChanges(), [
                 'updater_id' => $event->updater?->id,
                 'updater_type' => $event->updater ? get_class($event->updater) : null,
-                'original' => $event->original,
-                'changes' => $event->role->getChanges(),
                 'via' => $event->metadata['via'] ?? 'manual',
                 'reason' => $event->metadata['reason'] ?? null,
-            ],
+            ]),
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'performed_by' => Auth::id() ?? $event->updater?->id,
         ]);
     }
 
@@ -69,20 +78,22 @@ class AuditLogListener
     public function handleRoleDeleted(RoleDeleted $event): void
     {
         AuditLog::create([
-            'action' => 'role_deleted',
-            'target_type' => get_class($event->role),
-            'target_id' => $event->role->id,
-            'details' => [
+            'event' => 'role_deleted',
+            'auditable_type' => get_class($event->role),
+            'auditable_id' => $event->role->id,
+            'user_id' => Auth::id() ?? $event->deleter?->id,
+            'old_values' => [
+                'role_name' => $event->role->name,
+                'role_slug' => $event->role->slug,
+            ],
+            'new_values' => [
                 'deleter_id' => $event->deleter?->id,
                 'deleter_type' => $event->deleter ? get_class($event->deleter) : null,
                 'via' => $event->metadata['via'] ?? 'manual',
                 'reason' => $event->metadata['reason'] ?? null,
-                'role_name' => $event->role->name,
-                'role_slug' => $event->role->slug,
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'performed_by' => Auth::id() ?? $event->deleter?->id,
         ]);
     }
 
@@ -93,11 +104,11 @@ class AuditLogListener
     public function handleRoleAssigned(RoleAssigned $event): void
     {
         AuditLog::create([
-            'action' => 'role_assigned',
+            'event' => 'role_assigned',
+            'auditable_type' => get_class($event->role),
+            'auditable_id' => $event->role->id,
             'user_id' => $event->user->id,
-            'target_type' => get_class($event->role),
-            'target_id' => $event->role->id,
-            'details' => [
+            'new_values' => [
                 'assigner_id' => $event->assigner?->id,
                 'assigner_type' => $event->assigner ? get_class($event->assigner) : null,
                 'via' => $event->metadata['via'] ?? 'manual',
@@ -105,7 +116,6 @@ class AuditLogListener
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'performed_by' => Auth::id() ?? $event->assigner?->id,
         ]);
     }
 
@@ -116,11 +126,11 @@ class AuditLogListener
     {
 
         AuditLog::create([
-            'action' => 'role_revoked',
+            'event' => 'role_revoked',
+            'auditable_type' => get_class($event->role),
+            'auditable_id' => $event->role->id,
             'user_id' => $event->user->id,
-            'target_type' => get_class($event->role),
-            'target_id' => $event->role->id,
-            'details' => [
+            'new_values' => [
                 'revoker_id' => $event->revoker?->id,
                 'revoker_type' => $event->revoker ? get_class($event->revoker) : null,
                 'via' => $event->metadata['via'] ?? 'manual',
@@ -128,7 +138,6 @@ class AuditLogListener
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'performed_by' => Auth::id() ?? $event->revoker?->id,
         ]);
     }
 
@@ -138,10 +147,11 @@ class AuditLogListener
     public function handlePrivilegeGranted(PrivilegeGranted $event): void
     {
         AuditLog::create([
-            'action' => 'privilege_granted',
-            'target_type' => get_class($event->role),
-            'target_id' => $event->role->id,
-            'details' => [
+            'event' => 'privilege_granted',
+            'auditable_type' => get_class($event->role),
+            'auditable_id' => $event->role->id,
+            'user_id' => Auth::id() ?? $event->granter?->id,
+            'new_values' => [
                 'privilege_id' => $event->privilege->id,
                 'privilege_name' => $event->privilege->name,
                 'scope' => $event->privilege->scope,
@@ -152,7 +162,6 @@ class AuditLogListener
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'performed_by' => Auth::id() ?? $event->granter?->id,
         ]);
     }
 
@@ -162,10 +171,11 @@ class AuditLogListener
     public function handlePrivilegeRevoked(PrivilegeRevoked $event): void
     {
         AuditLog::create([
-            'action' => 'privilege_revoked',
-            'target_type' => get_class($event->role),
-            'target_id' => $event->role->id,
-            'details' => [
+            'event' => 'privilege_revoked',
+            'auditable_type' => get_class($event->role),
+            'auditable_id' => $event->role->id,
+            'user_id' => Auth::id() ?? $event->revoker?->id,
+            'new_values' => [
                 'privilege_id' => $event->privilege->id,
                 'privilege_name' => $event->privilege->name,
                 'scope' => $event->privilege->scope,
@@ -176,7 +186,6 @@ class AuditLogListener
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'performed_by' => Auth::id() ?? $event->revoker?->id,
         ]);
     }
 
@@ -186,9 +195,9 @@ class AuditLogListener
     public function handleUserSuspended(UserSuspended $event): void
     {
         AuditLog::create([
-            'action' => 'user_suspended',
+            'event' => 'user_suspended',
             'user_id' => $event->user->id,
-            'details' => [
+            'new_values' => [
                 'suspender_id' => $event->suspender?->id,
                 'suspender_type' => $event->suspender ? get_class($event->suspender) : null,
                 'duration_days' => $event->metadata['duration_days'],
@@ -197,7 +206,6 @@ class AuditLogListener
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'performed_by' => Auth::id() ?? $event->suspender?->id,
         ]);
     }
 
@@ -207,9 +215,9 @@ class AuditLogListener
     public function handleUserUnsuspended(UserUnsuspended $event): void
     {
         AuditLog::create([
-            'action' => 'user_unsuspended',
+            'event' => 'user_unsuspended',
             'user_id' => $event->user->id,
-            'details' => [
+            'new_values' => [
                 'unsuspender_id' => $event->unsuspender?->id,
                 'unsuspender_type' => $event->unsuspender ? get_class($event->unsuspender) : null,
                 'reason' => $event->metadata['reason'],
@@ -218,22 +226,6 @@ class AuditLogListener
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'performed_by' => Auth::id() ?? $event->unsuspender?->id,
         ]);
-    }
-
-    /**
-     * Subscribe to events.
-     */
-    public function subscribe($events): array
-    {
-        return [
-            RoleAssigned::class => 'handleRoleAssigned',
-            RoleRevoked::class => 'handleRoleRevoked',
-            PrivilegeGranted::class => 'handlePrivilegeGranted',
-            PrivilegeRevoked::class => 'handlePrivilegeRevoked',
-            UserSuspended::class => 'handleUserSuspended',
-            UserUnsuspended::class => 'handleUserUnsuspended',
-        ];
     }
 }

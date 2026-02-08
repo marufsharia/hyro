@@ -2,7 +2,7 @@
 
 namespace Marufsharia\Hyro\Events;
 
-use Marufsharia\Hyro\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -11,14 +11,14 @@ class UserUnsuspended
     use Dispatchable, SerializesModels;
 
     /**
-     * The users instance.
+     * The user instance.
      */
-    public User $user;
+    public Authenticatable $user;
 
     /**
-     * The users who performed the unsuspension.
+     * The user who performed the unsuspension.
      */
-    public ?User $unsuspender;
+    public ?Authenticatable $unsuspender;
 
     /**
      * Additional metadata.
@@ -28,7 +28,7 @@ class UserUnsuspended
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, ?User $unsuspender = null, array $metadata = [])
+    public function __construct(Authenticatable $user, ?Authenticatable $unsuspender = null, array $metadata = [])
     {
         $this->user = $user;
         $this->unsuspender = $unsuspender;
