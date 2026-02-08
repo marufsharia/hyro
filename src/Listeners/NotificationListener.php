@@ -64,9 +64,16 @@ class NotificationListener
      */
     protected function notifyAdminsAboutSuspension(UserSuspended $event): void
     {
-        // Get admin users (implementation depends on your admin role definition)
-        // Example: $admins = User::whereHas('roles', fn($q) => $q->where('slug', 'admin'))->get();
-        // Notification::send($admins, new AdminUserSuspendedNotification($event));
+        $userModel = config('hyro.models.users', \App\Models\User::class);
+        
+        // Get admin users
+        $admins = $userModel::whereHas('roles', function ($query) {
+            $query->whereIn('slug', ['super-admin', 'admin', 'administrator']);
+        })->get();
+
+        if ($admins->isNotEmpty()) {
+            Notification::send($admins, new AdminUserSuspendedNotification($event));
+        }
     }
 
     /**

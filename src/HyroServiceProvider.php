@@ -178,6 +178,7 @@ class HyroServiceProvider extends ServiceProvider
         if (config('hyro.admin.enabled', false)) {
             $this->loadRoutesFrom(__DIR__ . '/../routes/admin.php');
             $this->loadRoutesFrom(__DIR__ . '/../routes/auth.php');
+            $this->loadRoutesFrom(__DIR__ . '/../routes/notifications.php');
             $this->loadViewsFrom(__DIR__ . '/../resources/views', 'hyro');
         }
     }
@@ -285,6 +286,11 @@ class HyroServiceProvider extends ServiceProvider
             \Livewire\Livewire::component('hyro.role-manager', \HyroPlugins\PhoneBook\Livewire\Admin\RoleManager::class);
             \Livewire\Livewire::component('hyro.user-manager', \HyroPlugins\PhoneBook\Livewire\Admin\UserManager::class);
             \Livewire\Livewire::component('hyro.privilege-manager', \HyroPlugins\PhoneBook\Livewire\Admin\PrivilegeManager::class);
+            
+            // Register notification components
+            \Livewire\Livewire::component('hyro.notification-center', \Marufsharia\Hyro\Livewire\NotificationCenter::class);
+            \Livewire\Livewire::component('hyro.notification-bell', \Marufsharia\Hyro\Livewire\NotificationBell::class);
+            \Livewire\Livewire::component('hyro.notification-preferences', \Marufsharia\Hyro\Livewire\NotificationPreferences::class);
         } catch (\Exception $e) {
             // Silently fail if Livewire components can't be registered
             if ($this->app->runningInConsole()) {

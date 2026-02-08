@@ -274,8 +274,51 @@ return [
     |--------------------------------------------------------------------------
     */
     'notifications' => [
-        'enabled' => true,
+        'enabled' => env('HYRO_NOTIFICATIONS_ENABLED', true),
         'channels' => ['database', 'mail'],
+        
+        // Notification preferences per event type
+        'role_assigned' => [
+            'enabled' => env('HYRO_NOTIFY_ROLE_ASSIGNED', true),
+            'channels' => ['database', 'mail'],
+        ],
+        'role_revoked' => [
+            'enabled' => env('HYRO_NOTIFY_ROLE_REVOKED', true),
+            'channels' => ['database', 'mail'],
+        ],
+        'privilege_granted' => [
+            'enabled' => env('HYRO_NOTIFY_PRIVILEGE_GRANTED', true),
+            'channels' => ['database'], // Email only for important privileges
+        ],
+        'privilege_revoked' => [
+            'enabled' => env('HYRO_NOTIFY_PRIVILEGE_REVOKED', true),
+            'channels' => ['database'],
+        ],
+        'user_suspended' => [
+            'enabled' => env('HYRO_NOTIFY_USER_SUSPENDED', true),
+            'channels' => ['database', 'mail'],
+        ],
+        'user_unsuspended' => [
+            'enabled' => env('HYRO_NOTIFY_USER_UNSUSPENDED', true),
+            'channels' => ['database', 'mail'],
+        ],
+        'admin_user_suspended' => [
+            'enabled' => env('HYRO_NOTIFY_ADMIN_USER_SUSPENDED', true),
+            'channels' => ['database', 'mail'],
+        ],
+        
+        // Queue configuration
+        'queue' => [
+            'enabled' => env('HYRO_NOTIFICATIONS_QUEUE', true),
+            'connection' => env('HYRO_NOTIFICATIONS_QUEUE_CONNECTION', 'default'),
+            'queue' => env('HYRO_NOTIFICATIONS_QUEUE_NAME', 'notifications'),
+        ],
+        
+        // Real-time notifications (requires broadcasting)
+        'real_time' => [
+            'enabled' => env('HYRO_NOTIFICATIONS_REALTIME', false),
+            'driver' => env('BROADCAST_DRIVER', 'pusher'),
+        ],
     ],
 
     /*
