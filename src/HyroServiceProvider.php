@@ -238,6 +238,13 @@ class HyroServiceProvider extends ServiceProvider
             \Marufsharia\Hyro\Console\Commands\Plugin\PluginMarketplaceCommand::class,
             \Marufsharia\Hyro\Console\Commands\Plugin\PluginUpgradeCommand::class,
             \Marufsharia\Hyro\Console\Commands\Plugin\PluginInstallRemoteCommand::class,
+
+            // Database Commands
+            \Marufsharia\Hyro\Console\Commands\Database\BackupCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Database\RestoreCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Database\OptimizeCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Database\CleanupCommand::class,
+            \Marufsharia\Hyro\Console\Commands\Database\StatusCommand::class,
         ]);
     }
 

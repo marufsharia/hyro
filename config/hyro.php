@@ -334,4 +334,42 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Database Management
+    |--------------------------------------------------------------------------
+    */
+    'database' => [
+        'backup' => [
+            'enabled' => env('HYRO_DB_BACKUP_ENABLED', true),
+            'disk' => env('HYRO_DB_BACKUP_DISK', 'local'),
+            'compress' => env('HYRO_DB_BACKUP_COMPRESS', true),
+            'encrypt' => env('HYRO_DB_BACKUP_ENCRYPT', false),
+            'encryption_key' => env('HYRO_DB_BACKUP_KEY'),
+            'retention_days' => env('HYRO_DB_BACKUP_RETENTION', 30),
+            
+            // Automatic backup schedule
+            'schedule' => [
+                'enabled' => env('HYRO_DB_BACKUP_SCHEDULE', false),
+                'frequency' => env('HYRO_DB_BACKUP_FREQUENCY', 'daily'), // daily, weekly, monthly
+                'time' => env('HYRO_DB_BACKUP_TIME', '02:00'),
+            ],
+        ],
+        
+        'optimization' => [
+            'enabled' => env('HYRO_DB_OPTIMIZE_ENABLED', true),
+            
+            // Automatic optimization schedule
+            'schedule' => [
+                'enabled' => env('HYRO_DB_OPTIMIZE_SCHEDULE', false),
+                'frequency' => env('HYRO_DB_OPTIMIZE_FREQUENCY', 'weekly'),
+            ],
+        ],
+        
+        'monitoring' => [
+            'enabled' => env('HYRO_DB_MONITORING_ENABLED', true),
+            'slow_query_threshold' => env('HYRO_DB_SLOW_QUERY_THRESHOLD', 1000), // milliseconds
+        ],
+    ],
+
 ];

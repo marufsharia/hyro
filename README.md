@@ -33,14 +33,14 @@ Hyro is an enterprise-grade Authentication, Authorization, Role & Privilege Mana
 | 8 | ✅ **COMPLETE** | 100% | **Notifications System** ⭐ |
 | 9 | ✅ **COMPLETE** | 100% | Plugin Management |
 | 10 | ✅ **COMPLETE** | 100% | CRUD Generator |
-| 11 | ❌ **NOT STARTED** | 0% | Database Management Tools |
+| 11 | ✅ **COMPLETE** | 100% | **Database Management Tools** ⭐ |
 | 12 | ❌ **NOT STARTED** | 0% | Multi-Tenant Support |
 | 13 | ✅ **COMPLETE** | 100% | REST API with RBAC |
 | 14 | ❌ **NOT STARTED** | 0% | Testing Suite |
 | 15 | ⚠️ **PARTIAL** | 30% | Documentation & Deployment |
 
-**Overall Progress: 80% Complete (12/15 Phases)**  
-**Production Readiness: 80%**
+**Overall Progress: 87% Complete (13/15 Phases)**  
+**Production Readiness: 85%**
 
 ## 🚀 Features
 
@@ -95,12 +95,13 @@ Hyro is an enterprise-grade Authentication, Authorization, Role & Privilege Mana
 - API versioning support
 
 #### **CLI Commands**
-- 40+ Artisan commands
+- 45+ Artisan commands
 - User management commands
 - Role and privilege management
 - Plugin management
 - CRUD generation
-- Database operations
+- Database backup and restore
+- Database optimization
 - Emergency access commands
 
 #### **Admin UI**
@@ -331,6 +332,15 @@ php artisan hyro:emergency:grant-access   # Grant emergency access
 php artisan hyro:emergency:revoke-access  # Revoke emergency access
 ```
 
+### Database Management
+```bash
+php artisan hyro:db:backup                # Create database backup
+php artisan hyro:db:restore               # Restore from backup
+php artisan hyro:db:optimize              # Optimize database
+php artisan hyro:db:cleanup               # Clean old backups
+php artisan hyro:db:status                # Check database status
+```
+
 
 
 ## 🔔 Notification System
@@ -371,6 +381,46 @@ $user->notify(new RoleAssignedNotification($event));
 ```
 
 **See [NOTIFICATIONS.md](NOTIFICATIONS.md) for complete documentation.**
+
+## 🗄️ Database Management
+
+### Backup Database
+
+```bash
+# Create backup
+php artisan hyro:db:backup
+
+# Encrypted backup
+php artisan hyro:db:backup --encrypt
+
+# Backup to S3
+php artisan hyro:db:backup --disk=s3
+```
+
+### Restore Database
+
+```bash
+# List backups
+php artisan hyro:db:restore --list
+
+# Interactive restore
+php artisan hyro:db:restore
+
+# Restore specific backup
+php artisan hyro:db:restore backups/backup.sql.gz
+```
+
+### Optimize Database
+
+```bash
+# Optimize all tables
+php artisan hyro:db:optimize
+
+# Show analysis
+php artisan hyro:db:optimize --analyze
+```
+
+**See [DATABASE_MANAGEMENT.md](DATABASE_MANAGEMENT.md) for complete documentation.**
 
 
 
@@ -558,7 +608,9 @@ marufsharia/hyro/
 ## 📚 Documentation
 
 - **[NOTIFICATIONS.md](NOTIFICATIONS.md)** - Complete notification system guide
+- **[DATABASE_MANAGEMENT.md](DATABASE_MANAGEMENT.md)** - Database management tools guide
 - **[PHASE_8_COMPLETION_SUMMARY.md](PHASE_8_COMPLETION_SUMMARY.md)** - Phase 8 implementation details
+- **[PHASE_11_COMPLETION_SUMMARY.md](PHASE_11_COMPLETION_SUMMARY.md)** - Phase 11 implementation details
 - **[QUICK_START_NOTIFICATIONS.md](QUICK_START_NOTIFICATIONS.md)** - Quick start for notifications
 - **[Enhanced.md](Enhanced.md)** - Roadmap and future enhancements
 - **[HyroCRUDGenerator.md](HyroCRUDGenerator.md)** - CRUD generator guide
@@ -626,7 +678,7 @@ Please report security vulnerabilities to: marufsharia@gmail.com
 
 ## 🚀 Roadmap
 
-### ✅ Completed (80%)
+### ✅ Completed (87%)
 - Core authorization system
 - Database schema with partitioning
 - Models and traits
@@ -634,16 +686,16 @@ Please report security vulnerabilities to: marufsharia@gmail.com
 - Livewire components
 - Admin dashboard
 - Audit logging
-- **Notification system** ⭐
+- Notification system
 - Plugin management
 - CRUD generator
 - REST API
+- **Database management tools** ⭐
 
 ### 🔄 In Progress
 - Documentation expansion (30%)
 
 ### 📋 Planned
-- Database management tools (Phase 11)
 - Multi-tenant support (Phase 12)
 - Comprehensive testing suite (Phase 14)
 - Complete documentation (Phase 15)
@@ -707,10 +759,10 @@ MIT License. See [LICENSE](LICENSE) file for details.
 
 ## 📊 Stats
 
-- **Lines of Code:** 15,000+
-- **Files:** 200+
-- **Commands:** 40+
-- **Completion:** 80%
+- **Lines of Code:** 17,500+
+- **Files:** 210+
+- **Commands:** 45+
+- **Completion:** 87%
 - **Production Ready:** Yes (with testing recommended)
 
 ## 🎉 What's New in Latest Release
@@ -725,10 +777,17 @@ MIT License. See [LICENSE](LICENSE) file for details.
 - ✅ Multi-channel support (Email, Database, Push, SMS)
 - ✅ Queue integration for performance
 - ✅ Admin alerts for important events
+- ✅ **Database backup and restore system** ⭐
+- ✅ **Database optimization tools** ⭐
+- ✅ **Database health monitoring** ⭐
+- ✅ **Automatic backup cleanup** ⭐
+- ✅ **Encryption and compression support** ⭐
 
 **📚 Documentation:**
 - Added comprehensive NOTIFICATIONS.md
+- Added DATABASE_MANAGEMENT.md
 - Added PHASE_8_COMPLETION_SUMMARY.md
+- Added PHASE_11_COMPLETION_SUMMARY.md
 - Added QUICK_START_NOTIFICATIONS.md
 - Updated README with complete feature list
 
@@ -737,6 +796,7 @@ MIT License. See [LICENSE](LICENSE) file for details.
 - Improved error handling
 - Better cache invalidation
 - Optimized database queries
+- Added 5 new database management commands
 
 ---
 
