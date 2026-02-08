@@ -81,21 +81,151 @@ class DatabaseBackupService
         $username = $config['username'];
         $password = $config['password'];
         
-        $command = sprintf(
-            'mysqldump --host=%s --port=%s --user=%s --password=%s %s > %s',
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($username),
-            escapeshellarg($password),
-            escapeshellarg($database),
-            escapeshellarg($path)
-        );
+        // Try to find mysqldump in common locations
+        $mysqldump = $this->findMysqldump();
+        
+        if (!$mysqldump) {
+            // Fallback to PHP-based backup
+            return $this->backupMysqlPhp($config, $path);
+        }
+        
+        // Build command based on OS
+        if (PHP_OS_FAMILY === 'Windows') {
+            $command = sprintf(
+                '"%s" --host=%s --port=%s --user=%s --password=%s %s > "%s" 2>&1',
+                $mysqldump,
+                $host,
+                $port,
+                $username,
+                $password,
+                $database,
+                $path
+            );
+        } else {
+            $command = sprintf(
+                '%s --host=%s --port=%s --user=%s --password=%s %s > %s',
+                escapeshellarg($mysqldump),
+                escapeshellarg($host),
+                escapeshellarg($port),
+                escapeshellarg($username),
+                escapeshellarg($password),
+                escapeshellarg($database),
+                escapeshellarg($path)
+            );
+        }
         
         exec($command, $output, $returnCode);
         
-        if ($returnCode !== 0) {
-            throw new Exception('MySQL backup failed');
+        if ($returnCode !== 0 || !file_exists($path) || filesize($path) === 0) {
+            // Fallback to PHP-based backup
+            return $this->backupMysqlPhp($config, $path);
         }
+        
+        return $path;
+    }
+    
+    /**
+     * Find mysqldump executable.
+     */
+    protected function findMysqldump(): ?string
+    {
+        // Check if mysqldump is in PATH
+        if (PHP_OS_FAMILY === 'Windows') {
+            exec('where mysqldump 2>nul', $output, $returnCode);
+        } else {
+            exec('which mysqldump 2>/dev/null', $output, $returnCode);
+        }
+        
+        if ($returnCode === 0 && !empty($output)) {
+            return trim($output[0]);
+        }
+        
+        // Check common installation paths
+        $commonPaths = [
+            // Windows paths
+            'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe',
+            'C:\Program Files\MySQL\MySQL Server 5.7\bin\mysqldump.exe',
+            'C:\xampp\mysql\bin\mysqldump.exe',
+            'C:\wamp64\bin\mysql\mysql8.0.27\bin\mysqldump.exe',
+            'C:\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysqldump.exe',
+            // Linux/Mac paths
+            '/usr/bin/mysqldump',
+            '/usr/local/bin/mysqldump',
+            '/usr/local/mysql/bin/mysqldump',
+        ];
+        
+        foreach ($commonPaths as $path) {
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Backup MySQL database using PHP (fallback method).
+     */
+    protected function backupMysqlPhp(array $config, string $path): string
+    {
+        $database = $config['database'];
+        
+        $handle = fopen($path, 'w');
+        
+        if (!$handle) {
+            throw new Exception('Could not create backup file');
+        }
+        
+        // Write header
+        fwrite($handle, "-- MySQL Backup\n");
+        fwrite($handle, "-- Generated: " . date('Y-m-d H:i:s') . "\n");
+        fwrite($handle, "-- Database: {$database}\n\n");
+        fwrite($handle, "SET FOREIGN_KEY_CHECKS=0;\n\n");
+        
+        // Get all tables
+        $tables = DB::connection($config['connection'] ?? 'mysql')
+            ->select('SHOW TABLES');
+        
+        foreach ($tables as $table) {
+            $tableName = array_values((array) $table)[0];
+            
+            // Get table structure
+            $createTable = DB::connection($config['connection'] ?? 'mysql')
+                ->select("SHOW CREATE TABLE `{$tableName}`");
+            
+            fwrite($handle, "-- Table: {$tableName}\n");
+            fwrite($handle, "DROP TABLE IF EXISTS `{$tableName}`;\n");
+            fwrite($handle, $createTable[0]->{'Create Table'} . ";\n\n");
+            
+            // Get table data
+            $rows = DB::connection($config['connection'] ?? 'mysql')
+                ->table($tableName)
+                ->get();
+            
+            if ($rows->isNotEmpty()) {
+                fwrite($handle, "-- Data for table: {$tableName}\n");
+                
+                foreach ($rows as $row) {
+                    $values = array_map(function ($value) {
+                        if ($value === null) {
+                            return 'NULL';
+                        }
+                        return "'" . addslashes($value) . "'";
+                    }, (array) $row);
+                    
+                    $columns = array_keys((array) $row);
+                    $columnList = '`' . implode('`, `', $columns) . '`';
+                    $valueList = implode(', ', $values);
+                    
+                    fwrite($handle, "INSERT INTO `{$tableName}` ({$columnList}) VALUES ({$valueList});\n");
+                }
+                
+                fwrite($handle, "\n");
+            }
+        }
+        
+        fwrite($handle, "SET FOREIGN_KEY_CHECKS=1;\n");
+        fclose($handle);
         
         return $path;
     }

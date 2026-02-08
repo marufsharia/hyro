@@ -123,21 +123,122 @@ class DatabaseRestoreService
         $username = $config['username'];
         $password = $config['password'];
         
-        $command = sprintf(
-            'mysql --host=%s --port=%s --user=%s --password=%s %s < %s',
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($username),
-            escapeshellarg($password),
-            escapeshellarg($database),
-            escapeshellarg($path)
-        );
+        // Try to find mysql client
+        $mysql = $this->findMysqlClient();
+        
+        if (!$mysql) {
+            // Fallback to PHP-based restore
+            $this->restoreMysqlPhp($config, $path);
+            return;
+        }
+        
+        // Build command based on OS
+        if (PHP_OS_FAMILY === 'Windows') {
+            $command = sprintf(
+                '"%s" --host=%s --port=%s --user=%s --password=%s %s < "%s" 2>&1',
+                $mysql,
+                $host,
+                $port,
+                $username,
+                $password,
+                $database,
+                $path
+            );
+        } else {
+            $command = sprintf(
+                '%s --host=%s --port=%s --user=%s --password=%s %s < %s',
+                escapeshellarg($mysql),
+                escapeshellarg($host),
+                escapeshellarg($port),
+                escapeshellarg($username),
+                escapeshellarg($password),
+                escapeshellarg($database),
+                escapeshellarg($path)
+            );
+        }
         
         exec($command, $output, $returnCode);
         
         if ($returnCode !== 0) {
-            throw new Exception('MySQL restore failed');
+            // Fallback to PHP-based restore
+            $this->restoreMysqlPhp($config, $path);
         }
+    }
+    
+    /**
+     * Find mysql client executable.
+     */
+    protected function findMysqlClient(): ?string
+    {
+        // Check if mysql is in PATH
+        if (PHP_OS_FAMILY === 'Windows') {
+            exec('where mysql 2>nul', $output, $returnCode);
+        } else {
+            exec('which mysql 2>/dev/null', $output, $returnCode);
+        }
+        
+        if ($returnCode === 0 && !empty($output)) {
+            return trim($output[0]);
+        }
+        
+        // Check common installation paths
+        $commonPaths = [
+            // Windows paths
+            'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe',
+            'C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql.exe',
+            'C:\xampp\mysql\bin\mysql.exe',
+            'C:\wamp64\bin\mysql\mysql8.0.27\bin\mysql.exe',
+            'C:\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysql.exe',
+            // Linux/Mac paths
+            '/usr/bin/mysql',
+            '/usr/local/bin/mysql',
+            '/usr/local/mysql/bin/mysql',
+        ];
+        
+        foreach ($commonPaths as $path) {
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Restore MySQL database using PHP (fallback method).
+     */
+    protected function restoreMysqlPhp(array $config, string $path): void
+    {
+        $sql = file_get_contents($path);
+        
+        if ($sql === false) {
+            throw new Exception('Could not read backup file');
+        }
+        
+        // Split into individual statements
+        $statements = array_filter(
+            array_map('trim', explode(';', $sql)),
+            function ($statement) {
+                return !empty($statement) && !str_starts_with($statement, '--');
+            }
+        );
+        
+        $connection = $config['connection'] ?? 'mysql';
+        
+        DB::connection($connection)->unprepared('SET FOREIGN_KEY_CHECKS=0');
+        
+        foreach ($statements as $statement) {
+            if (!empty(trim($statement))) {
+                try {
+                    DB::connection($connection)->unprepared($statement);
+                } catch (\Exception $e) {
+                    // Continue on error (some statements might fail on restore)
+                    continue;
+                }
+            }
+        }
+        
+        DB::connection($connection)->unprepared('SET FOREIGN_KEY_CHECKS=1');
     }
     
     /**

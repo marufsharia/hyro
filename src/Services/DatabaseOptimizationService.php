@@ -347,7 +347,16 @@ class DatabaseOptimizationService
      */
     protected function getAllTables(string $connection): array
     {
-        return Schema::connection($connection)->getTables();
+        $tables = Schema::connection($connection)->getTables();
+        
+        // Extract table names from the result
+        return collect($tables)->map(function ($table) {
+            // Handle different formats returned by different drivers
+            if (is_array($table)) {
+                return $table['name'] ?? $table['tablename'] ?? $table['table_name'] ?? null;
+            }
+            return $table->name ?? $table->tablename ?? $table->table_name ?? null;
+        })->filter()->toArray();
     }
     
     /**
