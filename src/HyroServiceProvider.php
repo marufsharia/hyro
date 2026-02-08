@@ -190,6 +190,7 @@ class HyroServiceProvider extends ServiceProvider
     {
         $this->commands([
             // User Commands
+            \Marufsharia\Hyro\Console\Commands\User\CreateUserCommand::class,
             \Marufsharia\Hyro\Console\Commands\User\HyroListUsersCommand::class,
             \Marufsharia\Hyro\Console\Commands\User\AssignRoleCommand::class,
             \Marufsharia\Hyro\Console\Commands\User\SuspendCommand::class,
