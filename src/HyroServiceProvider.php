@@ -122,16 +122,36 @@ class HyroServiceProvider extends ServiceProvider
             __DIR__ . '/../config/hyro.php' => config_path('hyro.php'),
         ], 'hyro-config');
 
-        // Migrations
+        // Migrations - Publish to hyro subdirectory for better organization
         $this->publishes([
-            __DIR__ . '/../database/migrations' => database_path('migrations'),
+            __DIR__ . '/../database/migrations' => database_path('migrations/hyro'),
         ], 'hyro-migrations');
 
         // Events and listeners
         $this->publishes([
-            __DIR__ . '/../Events/' => app_path('Events/Hyro'),
-            __DIR__ . '/../Listeners/' => app_path('Listeners/Hyro'),
+            __DIR__ . '/../src/Events' => app_path('Events/Hyro'),
+            __DIR__ . '/../src/Listeners' => app_path('Listeners/Hyro'),
         ], 'hyro-events');
+
+        // Providers (for customization)
+        $this->publishes([
+            __DIR__ . '/../src/Providers' => app_path('Providers/Hyro'),
+        ], 'hyro-providers');
+
+        // Services (for customization)
+        $this->publishes([
+            __DIR__ . '/../src/Services' => app_path('Services/Hyro'),
+        ], 'hyro-services');
+
+        // Middleware (for customization)
+        $this->publishes([
+            __DIR__ . '/../src/Http/Middleware' => app_path('Http/Middleware/Hyro'),
+        ], 'hyro-middleware');
+
+        // Models (for customization)
+        $this->publishes([
+            __DIR__ . '/../src/Models' => app_path('Models/Hyro'),
+        ], 'hyro-models');
 
         // Views
         $this->publishes([
@@ -149,9 +169,9 @@ class HyroServiceProvider extends ServiceProvider
             __DIR__ . '/../public/images' => public_path('vendor/hyro/images'),
         ], 'hyro-assets');
 
-        // crud generator stub
+        // CRUD generator stubs
         $this->publishes([
-            __DIR__.'/../stubs/crud' => resource_path('stubs/hyro/crud'),
+            __DIR__.'/../src/stubs/crud' => resource_path('stubs/hyro/crud'),
         ], 'hyro-crud-stubs');
 
         // Routes (for customization)
@@ -168,10 +188,13 @@ class HyroServiceProvider extends ServiceProvider
      */
     private function loadConditionalResources(): void
     {
-        // Migrations
+        // Smart migration loading
         if (config('hyro.database.migrations.autoload', true)) {
-            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+            $this->loadSmartMigrations();
         }
+
+        // Smart translation loading
+        $this->loadSmartTranslations();
 
         // Routes
         if (config('hyro.api.enabled', false)) {
@@ -186,6 +209,54 @@ class HyroServiceProvider extends ServiceProvider
             
             // Smart view loading: Load from published views if they exist, otherwise from package
             $this->loadSmartViews();
+        }
+    }
+
+    /**
+     * Load migrations from published location if exists, otherwise from package.
+     * Supports both locations to allow custom migrations alongside package migrations.
+     *
+     * @return void
+     */
+    private function loadSmartMigrations(): void
+    {
+        $publishedMigrations = database_path('migrations/hyro');
+        $packageMigrations = __DIR__ . '/../database/migrations';
+
+        // Load package migrations (always available)
+        if (File::exists($packageMigrations)) {
+            $this->loadMigrationsFrom($packageMigrations);
+        }
+
+        // Also load published migrations if they exist (for custom migrations)
+        if (File::exists($publishedMigrations)) {
+            $this->loadMigrationsFrom($publishedMigrations);
+        }
+    }
+
+    /**
+     * Load translations from published location if exists, otherwise from package.
+     * Supports multiple translation paths for flexibility.
+     *
+     * @return void
+     */
+    private function loadSmartTranslations(): void
+    {
+        $publishedLang = resource_path('lang/vendor/hyro');
+        $packageLang = __DIR__ . '/../resources/lang';
+
+        // Load translations with priority: published first, then package
+        if (File::exists($publishedLang)) {
+            // Load published translations first (higher priority)
+            $this->loadTranslationsFrom($publishedLang, 'hyro');
+            
+            // Also load package translations as fallback
+            if (File::exists($packageLang)) {
+                $this->loadTranslationsFrom($packageLang, 'hyro');
+            }
+        } elseif (File::exists($packageLang)) {
+            // Load only package translations (default)
+            $this->loadTranslationsFrom($packageLang, 'hyro');
         }
     }
 

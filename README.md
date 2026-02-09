@@ -125,6 +125,27 @@ Hyro is an enterprise-grade Authentication, Authorization, Role & Privilege Mana
 - Development and production modes
 - Automatic cache busting
 
+#### **Smart Migration Loading** ⭐ NEW
+- Package migrations always load (core tables)
+- Published migrations also load (custom modifications)
+- Add custom migrations alongside package migrations
+- Modify published migrations without affecting package
+- Both locations supported
+
+#### **Smart Translation Loading** ⭐ NEW
+- Translations load from package by default
+- Publish translations to customize or add languages
+- Partial customization supported
+- Automatic fallback for missing keys
+- Multi-language support
+
+#### **Complete Resource Publishing** ⭐ NEW
+- Publish events, providers, services for advanced customization
+- Publish middleware for custom authentication logic
+- Publish models for extending functionality
+- All resources support smart loading
+- Reference-based publishing for advanced users
+
 #### **Admin UI**
 - Beautiful Tailwind CSS interface
 - Livewire 3.x components
@@ -161,19 +182,31 @@ composer require marufsharia/hyro
 ### Publish Configuration
 
 ```bash
+# Core resources
 php artisan vendor:publish --tag=hyro-config
 php artisan vendor:publish --tag=hyro-migrations
 php artisan vendor:publish --tag=hyro-assets     # Required for CSS/JS
-php artisan vendor:publish --tag=hyro-routes     # Optional: Only if you want to customize routes
-php artisan vendor:publish --tag=hyro-views      # Optional: Only if you want to customize views
+
+# Customization (Optional)
+php artisan vendor:publish --tag=hyro-routes     # Only if you want to customize routes
+php artisan vendor:publish --tag=hyro-views      # Only if you want to customize views
+php artisan vendor:publish --tag=hyro-translations # Only if you want to customize translations
+
+# Advanced (For Reference)
+php artisan vendor:publish --tag=hyro-events
+php artisan vendor:publish --tag=hyro-providers
+php artisan vendor:publish --tag=hyro-services
+php artisan vendor:publish --tag=hyro-middleware
+php artisan vendor:publish --tag=hyro-models
 ```
 
-> **Smart Resource Loading:** Hyro uses a smart loading system:
-> - **Routes** load from package by default, published routes take precedence
-> - **Views** load from package by default, published views override package views
-> - **Assets** should be published for production use
+> **Smart Resource Loading:** Hyro uses a comprehensive smart loading system for all resources:
+> - **Routes, Views, Translations:** Load from package by default, published resources take precedence
+> - **Migrations:** Load from both package and published locations
+> - **Assets:** Should be published for production use
+> - **Events, Providers, Services, Middleware, Models:** Publish for reference or advanced customization
 > 
-> See [SMART_RESOURCE_LOADING.md](docs/SMART_RESOURCE_LOADING.md) for details.
+> See [COMPLETE_SMART_LOADING_GUIDE.md](docs/COMPLETE_SMART_LOADING_GUIDE.md) for details.
 
 ### Run Migrations
 

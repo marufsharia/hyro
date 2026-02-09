@@ -46,19 +46,42 @@ composer require marufsharia/hyro
 php artisan vendor:publish --provider="Marufsharia\Hyro\HyroServiceProvider"
 
 # Or publish specific resources
-php artisan vendor:publish --tag=hyro-config
-php artisan vendor:publish --tag=hyro-migrations
-php artisan vendor:publish --tag=hyro-views      # Optional: Only if you want to customize views
-php artisan vendor:publish --tag=hyro-assets     # Required: For CSS/JS to work
-php artisan vendor:publish --tag=hyro-lang
-php artisan vendor:publish --tag=hyro-routes     # Optional: Only if you want to customize routes
+
+# Core Resources (Commonly Used)
+php artisan vendor:publish --tag=hyro-config       # Configuration file
+php artisan vendor:publish --tag=hyro-migrations   # Database migrations
+php artisan vendor:publish --tag=hyro-views        # Optional: Only if you want to customize views
+php artisan vendor:publish --tag=hyro-assets       # Required: For CSS/JS to work
+php artisan vendor:publish --tag=hyro-routes       # Optional: Only if you want to customize routes
+
+# Localization
+php artisan vendor:publish --tag=hyro-translations # Optional: Language files
+
+# Advanced Customization (For Reference)
+php artisan vendor:publish --tag=hyro-events       # Events & Listeners
+php artisan vendor:publish --tag=hyro-providers    # Service Providers
+php artisan vendor:publish --tag=hyro-services     # Services
+php artisan vendor:publish --tag=hyro-middleware   # Middleware
+php artisan vendor:publish --tag=hyro-models       # Models
+
+# Development
+php artisan vendor:publish --tag=hyro-crud-stubs   # CRUD generator stubs
 ```
 
 > **Note on Smart Resource Loading:**
-> - **Routes:** Load from package by default. Only publish if you need to customize them.
-> - **Views:** Load from package by default. Publish to customize admin UI, auth pages, etc.
-> - **Assets:** Should be published for CSS/JS to work correctly in production.
-> - Once published to their respective locations, they take precedence over package resources.
+> 
+> Hyro uses an intelligent resource loading system:
+> 
+> - **Routes:** Load from package by default. Publish to customize.
+> - **Views:** Load from package by default. Publish to customize UI.
+> - **Assets:** Should be published for production (required).
+> - **Migrations:** Load from both package and published locations.
+> - **Translations:** Load from package by default. Publish to customize or add languages.
+> - **Events/Providers/Services/Middleware/Models:** Publish for reference or advanced customization.
+> 
+> Once published, resources take precedence over package resources (except migrations which load from both).
+> 
+> See [COMPLETE_SMART_LOADING_GUIDE.md](docs/COMPLETE_SMART_LOADING_GUIDE.md) for comprehensive details.
 
 ### Step 3: Configure Environment
 
