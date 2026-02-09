@@ -1,9 +1,231 @@
-// Hyro Package JavaScript - ES Module Version
+// Hyro Package JavaScript - ES Module Version with Alpine.js 3 & Livewire 4
 import Alpine from 'alpinejs';
+import collapse from '@alpinejs/collapse';
+import focus from '@alpinejs/focus';
+import intersect from '@alpinejs/intersect';
 
+// Register Alpine plugins
+Alpine.plugin(collapse);
+Alpine.plugin(focus);
+Alpine.plugin(intersect);
+
+// Make Alpine available globally
 window.Alpine = Alpine;
+
+// Alpine.js Data Components
+Alpine.data('sidebar', () => ({
+    open: localStorage.getItem('sidebar-open') === 'true',
+    toggle() {
+        this.open = !this.open;
+        localStorage.setItem('sidebar-open', this.open);
+    }
+}));
+
+Alpine.data('dropdown', () => ({
+    open: false,
+    toggle() {
+        this.open = !this.open;
+    },
+    close() {
+        this.open = false;
+    }
+}));
+
+Alpine.data('modal', () => ({
+    show: false,
+    open() {
+        this.show = true;
+        document.body.style.overflow = 'hidden';
+    },
+    close() {
+        this.show = false;
+        document.body.style.overflow = '';
+    }
+}));
+
+Alpine.data('tabs', (defaultTab = 0) => ({
+    activeTab: defaultTab,
+    setTab(index) {
+        this.activeTab = index;
+    }
+}));
+
+Alpine.data('toast', () => ({
+    show: false,
+    message: '',
+    type: 'info',
+    showToast(message, type = 'info') {
+        this.message = message;
+        this.type = type;
+        this.show = true;
+        setTimeout(() => {
+            this.show = false;
+        }, 5000);
+    }
+}));
+
+// Start Alpine
 Alpine.start();
+
 export class Hyro {
+    constructor() {
+        this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        this.init();
+    }
+
+    init() {
+        this.initForms();
+        this.initNotifications();
+        this.initTooltips();
+        this.bindGlobalEvents();
+    }
+
+    bindGlobalEvents() {
+        // Handle click events on data attributes
+        document.addEventListener('click', (e) => {
+            // Confirm dialogs
+            if (e.target.dataset.hyroConfirm) {
+                e.preventDefault();
+                this.handleConfirm(e.target);
+            }
+        });
+    }
+
+    handleConfirm(element) {
+        const message = element.dataset.hyroConfirmMessage ||
+            element.getAttribute('title') ||
+            element.textContent.trim() ||
+            'Are you sure?';
+
+        const form = element.closest('form');
+
+        this.confirm(message).then((confirmed) => {
+            if (confirmed && form) {
+                form.submit();
+            }
+        });
+    }
+
+    // Form Handling
+    initForms() {
+        // AJAX Form Submission
+        document.querySelectorAll('.hyro-ajax-form').forEach((form) => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const submitBtn = form.querySelector('[type="submit"]');
+                const originalText = submitBtn.textContent;
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...';
+
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch(form.action, {
+                        method: form.method,
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': this.csrfToken,
+                            'Accept': 'application/json',
+                        },
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        this.showNotification(data.message || 'Success!', 'success');
+
+                        if (form.dataset.redirect) {
+                            setTimeout(() => {
+                                window.location.href = form.dataset.redirect;
+                            }, 1500);
+                        }
+
+                        if (form.dataset.reset === 'true') {
+                            form.reset();
+                        }
+                    } else {
+                        this.showNotification(data.message || 'An error occurred', 'error');
+                        this.displayFormErrors(form, data.errors || {});
+                    }
+                } catch (error) {
+                    this.showNotification('Network error occurred', 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            });
+        });
+    }
+
+    displayFormErrors(form, errors) {
+        // Clear previous errors
+        form.querySelectorAll('.text-red-500').forEach((el) => el.remove());
+        form.querySelectorAll('.border-red-500').forEach((el) => el.classList.remove('border-red-500'));
+
+        // Add new errors
+        Object.entries(errors).forEach(([field, messages]) => {
+            const input = form.querySelector(`[name="${field}"]`);
+            if (input) {
+                input.classList.add('border-red-500');
+                const errorDiv = document.createElement('p');
+                errorDiv.className = 'text-red-500 text-sm mt-1';
+                errorDiv.textContent = Array.isArray(messages) ? messages[0] : messages;
+                input.parentNode.appendChild(errorDiv);
+            }
+        });
+    }
+
+    // Notification System
+    initNotifications() {
+        // Auto-remove existing notifications
+        document.querySelectorAll('[data-auto-dismiss]').forEach((alert) => {
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        });
+    }
+
+    showNotification(message, type = 'info') {
+        // Dispatch custom event for Alpine to handle
+        window.dispatchEvent(new CustomEvent('notify', {
+            detail: { message, type }
+        }));
+    }
+
+    // Tooltips
+    initTooltips() {
+        // Tooltips are handled by Alpine.js directives
+    }
+
+    // Utility Functions
+    async confirm(message) {
+        return window.confirm(message);
+    }
+
+    // Debounce function
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.Hyro = new Hyro();
+});
+
+// Export for ES module usage
+export default Hyro;
+
     constructor() {
         this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         this.init();

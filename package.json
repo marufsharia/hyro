@@ -1,15 +1,15 @@
 {
     "name": "hyro",
     "version": "1.0.0",
-    "description": "> **Namespace:** `MarufSharia\\Hyro` > **Author:** Maruf Sharia > **Status:** Phase 1 Complete - Foundation Ready",
+    "description": "Enterprise-grade Authentication, Authorization, Role & Privilege Management System for Laravel 12+",
     "main": "tailwind.config.js",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/marufsharia/hyro.git"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "keywords": ["laravel", "authentication", "authorization", "rbac", "livewire"],
+    "author": "Maruf Sharia",
+    "license": "MIT",
     "bugs": {
         "url": "https://github.com/marufsharia/hyro/issues"
     },
@@ -23,6 +23,7 @@
     "devDependencies": {
         "@alpinejs/collapse": "^3.15.5",
         "@alpinejs/focus": "^3.15.5",
+        "@alpinejs/intersect": "^3.15.5",
         "@tailwindcss/vite": "^4.0.0",
         "alpinejs": "^3.15.5",
         "axios": "^1.11.0",

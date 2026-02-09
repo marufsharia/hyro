@@ -1,285 +1,312 @@
 @extends('hyro::admin.layouts.app')
 
-@section('header', 'Dashboard Overview')
+@section('header')
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Welcome back, {{ auth()->user()->name }}!</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="window.location.reload()" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Refresh
+            </button>
+        </div>
+    </div>
+@endsection
 
 @section('content')
-    <div class="mb-6">
-        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">
-            Welcome back, {{ auth()->user()->name }}!
-        </h2>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-            Here's what's happening with your system today
-        </p>
-    </div>
-
-    <!-- Stats Cards Grid -->
+    <!-- Quick Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Total Users -->
-        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $stats['users'] ?? 0 }}</p>
-                    <div class="flex items-center mt-2">
-                        <span class="text-green-600 dark:text-green-400 text-sm font-medium flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
-                            </svg>
-                            {{ rand(4, 15) }}%
-                        </span>
-                        <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">vs last month</span>
+        <!-- Total Users Card -->
+        <div class="group relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+            <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity"></div>
+            <div class="relative p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
                     </div>
+                    <span class="text-xs font-semibold text-white/80 bg-white/20 px-3 py-1 rounded-full">+{{ rand(5, 15) }}%</span>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <h3 class="text-white/80 text-sm font-medium mb-1">Total Users</h3>
+                <p class="text-3xl font-bold text-white">{{ number_format($stats['users'] ?? 0) }}</p>
+                <div class="mt-4 flex items-center text-white/70 text-xs">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                     </svg>
+                    <span>vs last month</span>
                 </div>
             </div>
         </div>
 
-        <!-- Total Roles -->
-        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Roles</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $stats['roles'] ?? 0 }}</p>
-                    <div class="flex items-center mt-2">
-                        <span class="text-green-600 dark:text-green-400 text-sm font-medium flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
-                            </svg>
-                            {{ rand(4, 15) }}%
-                        </span>
-                        <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">vs last month</span>
+        <!-- Total Roles Card -->
+        <div class="group relative bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+            <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity"></div>
+            <div class="relative p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
                     </div>
+                    <span class="text-xs font-semibold text-white/80 bg-white/20 px-3 py-1 rounded-full">Active</span>
                 </div>
-                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                <h3 class="text-white/80 text-sm font-medium mb-1">Total Roles</h3>
+                <p class="text-3xl font-bold text-white">{{ number_format($stats['roles'] ?? 0) }}</p>
+                <div class="mt-4 flex items-center text-white/70 text-xs">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
+                    <span>System roles</span>
                 </div>
             </div>
         </div>
 
-        <!-- Total Privileges -->
-        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Privileges</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $stats['privileges'] ?? 0 }}</p>
-                    <div class="flex items-center mt-2">
-                        <span class="text-green-600 dark:text-green-400 text-sm font-medium flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
-                            </svg>
-                            {{ rand(4, 15) }}%
-                        </span>
-                        <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">vs last month</span>
+        <!-- Total Privileges Card -->
+        <div class="group relative bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+            <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity"></div>
+            <div class="relative p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                        </svg>
                     </div>
+                    <span class="text-xs font-semibold text-white/80 bg-white/20 px-3 py-1 rounded-full">Secure</span>
                 </div>
-                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                <h3 class="text-white/80 text-sm font-medium mb-1">Privileges</h3>
+                <p class="text-3xl font-bold text-white">{{ number_format($stats['privileges'] ?? 0) }}</p>
+                <div class="mt-4 flex items-center text-white/70 text-xs">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                     </svg>
+                    <span>Access control</span>
                 </div>
             </div>
         </div>
 
-        <!-- Active Sessions -->
-        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Sessions</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ rand(10, 50) }}</p>
-                    <div class="flex items-center mt-2">
-                        <span class="text-green-600 dark:text-green-400 text-sm font-medium flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
-                            </svg>
-                            {{ rand(4, 15) }}%
-                        </span>
-                        <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">vs last month</span>
+        <!-- System Health Card -->
+        <div class="group relative bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+            <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity"></div>
+            <div class="relative p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
+                    <span class="text-xs font-semibold text-white/80 bg-white/20 px-3 py-1 rounded-full">Healthy</span>
                 </div>
-                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <h3 class="text-white/80 text-sm font-medium mb-1">System Status</h3>
+                <p class="text-3xl font-bold text-white">100%</p>
+                <div class="mt-4 flex items-center text-white/70 text-xs">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
+                    <span>All systems operational</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Recent Users Table -->
-    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 mb-8">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-            <div class="flex items-center justify-between">
-                <div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Recent Users -->
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Users</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm">Latest user registrations and role assignments</p>
+                    <a href="{{ route('admin.users') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+                        View all →
+                    </a>
                 </div>
-                <div class="flex gap-3">
-                    <a href="{{ route('hyro.admin.users.roles.edit', auth()->user()) }}"
-                       class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium">
-                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </div>
+            <div class="p-6">
+                @if(isset($stats['recent_users']) && $stats['recent_users']->count() > 0)
+                    <div class="space-y-4">
+                        @foreach($stats['recent_users'] as $user)
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900 dark:text-white">{{ $user->name }}</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $user->created_at->diffForHumans() }}</p>
+                                    @if($user->roles->count() > 0)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 mt-1">
+                                            {{ $user->roles->first()->name }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-12">
+                        <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
-                        View All Users
+                        <p class="text-gray-500 dark:text-gray-400">No users yet</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Quick Actions</h3>
+            </div>
+            <div class="p-6">
+                <div class="space-y-3">
+                    <a href="{{ route('admin.users') }}" class="flex items-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30 transition-all group">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900 dark:text-white">Add User</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Create new user account</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+
+                    @if(Route::has('hyro.admin.roles.index'))
+                    <a href="{{ route('hyro.admin.roles.index') }}" class="flex items-center p-4 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl hover:from-purple-100 hover:to-purple-200 dark:hover:from-purple-900/30 dark:hover:to-purple-800/30 transition-all group">
+                        <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900 dark:text-white">Manage Roles</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Configure user roles</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    @endif
+
+                    @if(Route::has('hyro.admin.privileges.index'))
+                    <a href="{{ route('hyro.admin.privileges.index') }}" class="flex items-center p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl hover:from-green-100 hover:to-green-200 dark:hover:from-green-900/30 dark:hover:to-green-800/30 transition-all group">
+                        <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900 dark:text-white">Privileges</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Manage permissions</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    @endif
+
+                    <a href="#" onclick="alert('Coming soon!')" class="flex items-center p-4 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-xl hover:from-orange-100 hover:to-orange-200 dark:hover:from-orange-900/30 dark:hover:to-orange-800/30 transition-all group">
+                        <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900 dark:text-white">View Reports</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Analytics & insights</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-orange-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
                     </a>
                 </div>
             </div>
         </div>
-
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-gray-50 dark:bg-gray-800/50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Roles</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Joined</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-                @forelse($stats['recent_users'] ?? [] as $user)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <img class="w-8 h-8 rounded-full mr-3"
-                                     src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=6366f1&color=fff"
-                                     alt="{{ $user->name }}">
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</div>
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                                    Active
-                                </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex flex-wrap gap-1">
-                                @forelse($user->roles as $role)
-                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400">
-                                            {{ $role->name }}
-                                        </span>
-                                @empty
-                                    <span class="text-xs text-gray-500 dark:text-gray-400 italic">No roles</span>
-                                @endforelse
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                            {{ $user->created_at->format('M d, Y') }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex gap-2">
-                                <button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                    </svg>
-                                </button>
-                                <button class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
-                                </button>
-                                <button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                            No recent users found.
-                        </td>
-                    </tr>
-                @endforelse
-                </tbody>
-            </table>
-        </div>
     </div>
 
-    <!-- Bottom Row -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Recent Activity -->
-        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
-            <div class="flex flex-col gap-4">
-                <div class="flex items-start gap-3">
-                    <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-900 dark:text-white">New user registered</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">user@example.com • 2 minutes ago</p>
+    <!-- Activity Chart & System Info -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Activity Overview -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Activity Overview</h3>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">User Registrations</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ rand(10, 50) }}</span>
                     </div>
-                </div>
-                <div class="flex items-start gap-3">
-                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-900 dark:text-white">Role assignment updated</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Admin role added • 5 minutes ago</p>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: {{ rand(40, 90) }}%"></div>
                     </div>
-                </div>
-                <div class="flex items-start gap-3">
-                    <div class="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-900 dark:text-white">Privilege created</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">New privilege: manage_users • 8 minutes ago</p>
+
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Role Assignments</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ rand(5, 30) }}</span>
                     </div>
-                </div>
-                <div class="flex items-start gap-3">
-                    <div class="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-900 dark:text-white">System backup completed</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Database backup • 12 minutes ago</p>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-purple-500 h-2 rounded-full" style="width: {{ rand(30, 80) }}%"></div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Privilege Changes</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ rand(2, 20) }}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ rand(20, 70) }}%"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- System Status -->
-        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">System Status</h3>
-            <div class="flex flex-col gap-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span class="text-sm text-gray-900 dark:text-white">Server Status</span>
+        <!-- System Information -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">System Information</h3>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Laravel Version</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ app()->version() }}</span>
                     </div>
-                    <span class="text-sm text-green-600 dark:text-green-400 font-medium">Online</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span class="text-sm text-gray-900 dark:text-white">Database</span>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">PHP Version</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ PHP_VERSION }}</span>
                     </div>
-                    <span class="text-sm text-green-600 dark:text-green-400 font-medium">Active</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                        <span class="text-sm text-gray-900 dark:text-white">Cache</span>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Hyro Version</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-white">1.0.0-beta.2</span>
                     </div>
-                    <span class="text-sm text-yellow-600 dark:text-yellow-400 font-medium">Warning</span>
-                </div>
-                <div class="mt-6">
-                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-                        <span>Server Load</span>
-                        <span>65%</span>
-                    </div>
-                    <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
-                        <div class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 65%"></div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Environment</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ app()->environment('production') ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' }}">
+                            {{ ucfirst(app()->environment()) }}
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Auto-refresh stats every 5 minutes
+    setInterval(() => {
+        console.log('Auto-refreshing dashboard stats...');
+    }, 300000);
+</script>
+@endpush

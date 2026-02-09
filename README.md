@@ -607,21 +607,25 @@ marufsharia/hyro/
 
 ## 📚 Documentation
 
-- **[INSTALLATION.md](INSTALLATION.md)** - Complete installation guide
-- **[CONFIGURATION.md](CONFIGURATION.md)** - Configuration reference
-- **[USAGE.md](USAGE.md)** - Usage examples and patterns
-- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment guide
-- **[API.md](API.md)** - REST API documentation
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history
-- **[NOTIFICATIONS.md](NOTIFICATIONS.md)** - Notification system guide
-- **[DATABASE_MANAGEMENT.md](DATABASE_MANAGEMENT.md)** - Database tools guide
-- **[HyroCRUDGenerator.md](HyroCRUDGenerator.md)** - CRUD generator guide
-- **[PHASE_8_COMPLETION_SUMMARY.md](PHASE_8_COMPLETION_SUMMARY.md)** - Phase 8 details
-- **[PHASE_11_COMPLETION_SUMMARY.md](PHASE_11_COMPLETION_SUMMARY.md)** - Phase 11 details
-- **[PHASE_15_COMPLETION_SUMMARY.md](PHASE_15_COMPLETION_SUMMARY.md)** - Phase 15 details
-- **[QUICK_START_NOTIFICATIONS.md](QUICK_START_NOTIFICATIONS.md)** - Quick start
-- **[Enhanced.md](Enhanced.md)** - Roadmap and enhancements
+All documentation has been moved to the `docs/` folder for better organization:
+
+- **[docs/INSTALLATION.md](docs/INSTALLATION.md)** - Complete installation guide
+- **[docs/CONFIGURATION.md](docs/CONFIGURATION.md)** - Configuration reference
+- **[docs/USAGE.md](docs/USAGE.md)** - Usage examples and patterns
+- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Production deployment guide
+- **[docs/API.md](docs/API.md)** - REST API documentation
+- **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)** - Contribution guidelines
+- **[docs/CHANGELOG.md](docs/CHANGELOG.md)** - Version history
+- **[docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)** - Notification system guide
+- **[docs/DATABASE_MANAGEMENT.md](docs/DATABASE_MANAGEMENT.md)** - Database tools guide
+- **[docs/HyroCRUDGenerator.md](docs/HyroCRUDGenerator.md)** - CRUD generator guide
+- **[docs/PHASE_8_COMPLETION_SUMMARY.md](docs/PHASE_8_COMPLETION_SUMMARY.md)** - Phase 8 details
+- **[docs/PHASE_11_COMPLETION_SUMMARY.md](docs/PHASE_11_COMPLETION_SUMMARY.md)** - Phase 11 details
+- **[docs/PHASE_15_COMPLETION_SUMMARY.md](docs/PHASE_15_COMPLETION_SUMMARY.md)** - Phase 15 details
+- **[docs/QUICK_START_NOTIFICATIONS.md](docs/QUICK_START_NOTIFICATIONS.md)** - Quick start
+- **[docs/Enhanced.md](docs/Enhanced.md)** - Roadmap and enhancements
+- **[docs/ADMIN_REDESIGN_SUMMARY.md](docs/ADMIN_REDESIGN_SUMMARY.md)** - Admin UI redesign details
+- **[docs/BUGFIX_SUMMARY_2026-02-08.md](docs/BUGFIX_SUMMARY_2026-02-08.md)** - Bug fix summary
 
 ### API Documentation
 
