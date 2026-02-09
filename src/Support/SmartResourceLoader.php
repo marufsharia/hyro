@@ -167,6 +167,16 @@ class SmartResourceLoader
     }
 
     /**
+     * Check if CRUD routes are registered.
+     *
+     * @return bool
+     */
+    public static function areCrudRoutesRegistered(): bool
+    {
+        return File::exists(base_path('routes/hyro/crud.php'));
+    }
+
+    /**
      * Get publication status for all resources.
      *
      * @return array
@@ -177,6 +187,7 @@ class SmartResourceLoader
             'migrations' => self::areMigrationsPublished(),
             'views' => self::areViewsPublished(),
             'routes' => self::areRoutesPublished(),
+            'crud_routes' => self::areCrudRoutesRegistered(),
             'translations' => self::areTranslationsPublished(),
             'events' => self::areEventsPublished(),
             'providers' => self::areProvidersPublished(),

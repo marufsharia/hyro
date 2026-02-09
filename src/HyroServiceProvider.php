@@ -45,6 +45,7 @@ class HyroServiceProvider extends ServiceProvider
         $this->app->singleton(GateRegistrar::class);
         $this->app->singleton(TokenSynchronizationService::class);
         $this->app->singleton(\Marufsharia\Hyro\Blade\HyroBladeHelper::class);
+        $this->app->singleton(\Marufsharia\Hyro\Services\SmartCrudRouteManager::class);
 
         // Register Plugin Manager
         $this->app->singleton('hyro.plugins', function ($app) {
@@ -91,14 +92,26 @@ class HyroServiceProvider extends ServiceProvider
             $this->app->register(BladeDirectivesServiceProvider::class);
         }
 
-        //crud route
-        $routeFile = base_path("routes/hyro-admin.php");
-
-        if (File::exists($routeFile)) {
-            $this->loadRoutesFrom($routeFile);
-        }
+        // Smart CRUD route loading - always from application root
+        $this->loadSmartCrudRoutes();
+        
         // Boot plugins
         $this->bootPlugins();
+    }
+
+    /**
+     * Load CRUD routes from application root.
+     * CRUD routes are always loaded from routes/hyro/crud.php in the application.
+     *
+     * @return void
+     */
+    private function loadSmartCrudRoutes(): void
+    {
+        $crudRouteFile = base_path('routes/hyro/crud.php');
+
+        if (File::exists($crudRouteFile)) {
+            $this->loadRoutesFrom($crudRouteFile);
+        }
     }
 
     /**

@@ -157,9 +157,9 @@ class MakeCrudCommand extends Command
             $this->components->task('Generating import service', fn() => $this->generateImportService());
         }
 
-//        if ($this->config['route']) {
-//            $this->components->task('Registering route', fn() => $this->registerRoute());
-//        }
+        // Always register CRUD route
+        $this->components->task('Registering CRUD route', fn() => $this->registerCrudRoute());
+
         if ($this->config['menu']) {
             $this->components->task(
                 "Adding sidebar menu entry",
@@ -785,6 +785,37 @@ class MakeCrudCommand extends Command
     protected function registerSidebarMenu(): bool
     {
         $this->info("Sidebar auto-updated from ModuleManager.");
+        return true;
+    }
+
+    /**
+     * Register CRUD route using SmartCrudRouteManager.
+     *
+     * @return bool
+     */
+    protected function registerCrudRoute(): bool
+    {
+        $routeManager = app(\Marufsharia\Hyro\Services\SmartCrudRouteManager::class);
+
+        $componentClass = "App\\Livewire\\Admin\\" . Str::studly($this->name) . "Manager";
+        $permission = Str::kebab($this->name);
+
+        $success = $routeManager->addRoute(
+            $this->name,
+            $componentClass,
+            [
+                'permission' => $permission,
+                'middleware' => [], // Uses default from route file
+            ]
+        );
+
+        if ($success) {
+            $routeName = Str::kebab(Str::plural($this->name));
+            $this->info("✓ Route registered: hyro.admin.{$routeName}");
+        } else {
+            $this->warn("Route already exists or could not be registered");
+        }
+
         return true;
     }
 
