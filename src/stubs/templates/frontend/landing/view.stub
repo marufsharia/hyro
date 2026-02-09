@@ -1,0 +1,176 @@
+<div class="min-h-screen bg-white dark:bg-gray-900">
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-cyan-500 to-teal-400">
+        <div class="absolute inset-0 bg-grid-white/10"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+            <div class="text-center">
+                <h1 class="text-6xl font-extrabold text-white mb-6 animate-fade-in">
+                    {{ $resourceNamePlural }}
+                </h1>
+                <p class="text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                    Discover amazing features and solutions
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div class="relative w-full sm:w-96">
+                        <input
+                            wire:model.live.debounce.300ms="search"
+                            type="text"
+                            placeholder="Search..."
+                            class="w-full pl-12 pr-4 py-4 rounded-full border-0 bg-white/90 backdrop-blur text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-white/50 shadow-2xl">
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    
+                    @auth
+                    <button
+                        wire:click="create"
+                        class="px-8 py-4 bg-white text-blue-600 rounded-full font-bold shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all">
+                        Get Started
+                    </button>
+                    @endauth
+                </div>
+            </div>
+        </div>
+        
+        <!-- Wave Divider -->
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="currentColor" class="text-white dark:text-gray-900"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @forelse($items as $item)
+            <div class="group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
+                <!-- Icon/Image -->
+                @if(isset($item->image) && $item->image)
+                <div class="mb-6 h-48 rounded-2xl overflow-hidden">
+                    <img src="{{ Storage::disk('public')->url($item->image) }}" 
+                         alt="{{ $item->title ?? 'Feature' }}"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                @else
+                <div class="mb-6 w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                @endif
+
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                    {{ $item->title ?? $item->name ?? 'Feature #' . $item->id }}
+                </h3>
+                
+                @if(isset($item->description))
+                <p class="text-gray-600 dark:text-gray-300 mb-6 line-clamp-3">
+                    {{ $item->description }}
+                </p>
+                @endif
+
+                <div class="flex items-center justify-between">
+                    <button
+                        wire:click="view({{ $item->id }})"
+                        class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
+                        Learn More
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </button>
+                    
+                    @if(auth()->check() && auth()->id() === $item->user_id)
+                    <div class="flex gap-2">
+                        <button
+                            wire:click="edit({{ $item->id }})"
+                            class="p-2 text-gray-400 hover:text-blue-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
+                        <button
+                            wire:click="confirmDelete({{ $item->id }})"
+                            class="p-2 text-gray-400 hover:text-red-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- Decorative Element -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-full blur-3xl -z-10"></div>
+            </div>
+            @empty
+            <div class="col-span-full text-center py-20">
+                <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900 rounded-full mb-6">
+                    <svg class="w-12 h-12 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No items yet</h3>
+                <p class="text-gray-600 dark:text-gray-400">Be the first to add something amazing!</p>
+            </div>
+            @endforelse
+        </div>
+
+        <!-- Pagination -->
+        @if($items->hasPages())
+        <div class="mt-16">
+            {{ $items->links() }}
+        </div>
+        @endif
+    </div>
+
+    <!-- CTA Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-cyan-500 py-20">
+        <div class="max-w-4xl mx-auto text-center px-4">
+            <h2 class="text-4xl font-bold text-white mb-6">Ready to get started?</h2>
+            <p class="text-xl text-blue-100 mb-8">Join thousands of satisfied users today</p>
+            @auth
+            <button
+                wire:click="create"
+                class="px-10 py-4 bg-white text-blue-600 rounded-full font-bold text-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all">
+                Create Now
+            </button>
+            @endauth
+        </div>
+    </div>
+
+    <!-- Modal -->
+    @if($showModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" wire:click="closeModal"></div>
+            
+            <div class="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-3xl w-full p-8">
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+                    {{ $editMode ? 'Edit' : 'Create' }} Item
+                </h3>
+
+                <form wire:submit.prevent="save" class="space-y-6">
+{{ formFields }}
+
+                    <div class="flex justify-end gap-3 pt-6">
+                        <button
+                            type="button"
+                            wire:click="closeModal"
+                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white rounded-xl font-semibold shadow-lg transition-all">
+                            {{ $editMode ? 'Update' : 'Create' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>

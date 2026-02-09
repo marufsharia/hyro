@@ -115,6 +115,16 @@ PHP;
         $routePath = $options['path'] ?? $routeName;
         $middleware = $options['middleware'] ?? [];
         $permission = $options['permission'] ?? Str::kebab($resourceName);
+        $isFrontend = $options['frontend'] ?? false;
+        $requiresAuth = $options['auth'] ?? true;
+
+        // For frontend routes, check if path is available
+        if ($isFrontend) {
+            if ($this->isRoutePathTaken($routePath)) {
+                // Generate alternative path
+                $routePath = $this->generateAvailableRoutePath($routePath);
+            }
+        }
 
         // Generate route definition
         $routeDefinition = $this->generateRouteDefinition(
@@ -122,7 +132,9 @@ PHP;
             $componentClass,
             $routeName,
             $middleware,
-            $permission
+            $permission,
+            $isFrontend,
+            $requiresAuth
         );
 
         // Read current content
@@ -133,12 +145,18 @@ PHP;
             return false; // Route already exists
         }
 
-        // Add route before the closing brace
-        $content = str_replace(
-            '// {{ routes }}',
-            $routeDefinition . "\n        // {{ routes }}",
-            $content
-        );
+        // Add route to appropriate section
+        if ($isFrontend) {
+            // Add to frontend section
+            $content = $this->addFrontendRoute($content, $routeDefinition);
+        } else {
+            // Add to admin section (existing behavior)
+            $content = str_replace(
+                '// {{ routes }}',
+                $routeDefinition . "\n        // {{ routes }}",
+                $content
+            );
+        }
 
         // Write back
         File::put($this->routeFilePath, $content);
@@ -154,6 +172,8 @@ PHP;
      * @param string $name
      * @param array $middleware
      * @param string $permission
+     * @param bool $isFrontend
+     * @param bool $requiresAuth
      * @return string
      */
     protected function generateRouteDefinition(
@@ -161,7 +181,9 @@ PHP;
         string $componentClass,
         string $name,
         array $middleware = [],
-        string $permission = ''
+        string $permission = '',
+        bool $isFrontend = false,
+        bool $requiresAuth = true
     ): string {
         $middlewareStr = !empty($middleware) 
             ? "->middleware(['" . implode("', '", $middleware) . "'])" 
@@ -170,10 +192,13 @@ PHP;
         $permissionComment = $permission 
             ? " // Permission: {$permission}" 
             : '';
+        
+        $typeComment = $isFrontend ? ' [Frontend]' : ' [Admin]';
+        $authComment = !$requiresAuth ? ' [No Auth]' : '';
 
         return <<<PHP
 
-        // {$name} CRUD{$permissionComment}
+        // {$name} CRUD{$typeComment}{$authComment}{$permissionComment}
         Route::get('{$path}', {$componentClass}::class)
             ->name('{$name}'){$middlewareStr};
 PHP;
@@ -292,7 +317,17 @@ PHP;
             return null;
         }
 
-        $backupPath = $this->routeFilePath . '.backup.' . date('Y-m-d_His');
+        // Create backup directory in storage/app/private/routes
+        $backupDir = storage_path('app/private/routes');
+        if (!File::exists($backupDir)) {
+            File::makeDirectory($backupDir, 0755, true);
+        }
+
+        // Generate backup filename with timestamp
+        $backupFilename = 'crud_routes_backup_' . date('Y-m-d_His') . '.php';
+        $backupPath = $backupDir . '/' . $backupFilename;
+
+        // Copy route file to backup location
         File::copy($this->routeFilePath, $backupPath);
 
         return $backupPath;
@@ -314,5 +349,153 @@ PHP;
         File::copy($backupPath, $this->routeFilePath);
 
         return true;
+    }
+
+    /**
+     * List all available backups.
+     *
+     * @return array
+     */
+    public function listBackups(): array
+    {
+        $backupDir = storage_path('app/private/routes');
+        
+        if (!File::exists($backupDir)) {
+            return [];
+        }
+
+        $backups = [];
+        $files = File::files($backupDir);
+
+        foreach ($files as $file) {
+            if (str_ends_with($file->getFilename(), '.php')) {
+                $backups[] = [
+                    'path' => $file->getPathname(),
+                    'filename' => $file->getFilename(),
+                    'size' => $file->getSize(),
+                    'modified' => $file->getMTime(),
+                    'modified_human' => date('Y-m-d H:i:s', $file->getMTime()),
+                ];
+            }
+        }
+
+        // Sort by modified time (newest first)
+        usort($backups, function($a, $b) {
+            return $b['modified'] - $a['modified'];
+        });
+
+        return $backups;
+    }
+
+    /**
+     * Delete old backups, keeping only the specified number of recent backups.
+     *
+     * @param int $keep Number of backups to keep
+     * @return int Number of backups deleted
+     */
+    public function cleanOldBackups(int $keep = 10): int
+    {
+        $backups = $this->listBackups();
+        
+        if (count($backups) <= $keep) {
+            return 0;
+        }
+
+        $toDelete = array_slice($backups, $keep);
+        $deleted = 0;
+
+        foreach ($toDelete as $backup) {
+            if (File::delete($backup['path'])) {
+                $deleted++;
+            }
+        }
+
+        return $deleted;
+    }
+
+    /**
+     * Check if a route path is already taken.
+     *
+     * @param string $path
+     * @return bool
+     */
+    protected function isRoutePathTaken(string $path): bool
+    {
+        if (!$this->routeFileExists()) {
+            return false;
+        }
+
+        $content = File::get($this->routeFilePath);
+        return str_contains($content, "Route::get('{$path}'");
+    }
+
+    /**
+     * Generate an available route path by appending a number.
+     *
+     * @param string $basePath
+     * @return string
+     */
+    protected function generateAvailableRoutePath(string $basePath): string
+    {
+        $counter = 1;
+        $newPath = $basePath;
+
+        while ($this->isRoutePathTaken($newPath)) {
+            $newPath = $basePath . '-' . $counter;
+            $counter++;
+        }
+
+        return $newPath;
+    }
+
+    /**
+     * Add a frontend route to the route file.
+     *
+     * @param string $content
+     * @param string $routeDefinition
+     * @return string
+     */
+    protected function addFrontendRoute(string $content, string $routeDefinition): string
+    {
+        // Check if frontend section exists
+        if (!str_contains($content, '// {{ frontend_routes }}')) {
+            // Add frontend section before admin section
+            $frontendSection = <<<'PHP'
+
+/*
+|--------------------------------------------------------------------------
+| Frontend CRUD Routes
+|--------------------------------------------------------------------------
+|
+| These routes are for frontend-facing CRUD interfaces.
+| They are registered at the root level (not under admin prefix).
+|
+*/
+
+Route::middleware(['web'])
+    ->name('frontend.')
+    ->group(function () {
+        // Frontend CRUD routes will be auto-generated below
+        // {{ frontend_routes }}
+    });
+
+PHP;
+            
+            // Insert before admin section
+            $content = str_replace(
+                'Route::prefix(config(\'hyro.admin.route.prefix\', \'admin/hyro\'))',
+                $frontendSection . "\nRoute::prefix(config('hyro.admin.route.prefix', 'admin/hyro'))",
+                $content
+            );
+        }
+
+        // Add route to frontend section
+        $content = str_replace(
+            '// {{ frontend_routes }}',
+            $routeDefinition . "\n        // {{ frontend_routes }}",
+            $content
+        );
+
+        return $content;
     }
 }

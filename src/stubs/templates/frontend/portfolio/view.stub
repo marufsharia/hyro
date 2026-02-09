@@ -1,0 +1,114 @@
+<div class="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-gray-900 dark:via-rose-900/10 dark:to-purple-900/10">
+    <!-- Hero -->
+    <div class="text-center py-20 px-4">
+        <h1 class="text-6xl font-extrabold bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            {{ $resourceNamePlural }}
+        </h1>
+        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">Creative works and projects</p>
+        
+        <div class="max-w-2xl mx-auto flex gap-4">
+            <input
+                wire:model.live.debounce.300ms="search"
+                type="text"
+                placeholder="Search portfolio..."
+                class="flex-1 px-6 py-4 rounded-full border-2 border-rose-200 dark:border-rose-800 bg-white/80 dark:bg-gray-800/80 backdrop-blur focus:border-rose-500 focus:ring-4 focus:ring-rose-200 dark:focus:ring-rose-900">
+            @auth
+            <button
+                wire:click="create"
+                class="px-8 py-4 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white rounded-full font-bold shadow-lg shadow-rose-500/50 transition-all">
+                + Add Work
+            </button>
+            @endauth
+        </div>
+    </div>
+
+    <!-- Masonry Grid -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+            @forelse($items as $item)
+            <div class="break-inside-avoid group">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                    @if(isset($item->image) && $item->image)
+                    <div class="relative overflow-hidden">
+                        <img src="{{ Storage::disk('public')->url($item->image) }}" 
+                             alt="{{ $item->title ?? 'Work' }}"
+                             class="w-full h-auto group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                            <button
+                                wire:click="view({{ $item->id }})"
+                                class="px-4 py-2 bg-white/90 backdrop-blur text-gray-900 rounded-lg font-semibold">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                    @endif
+                    
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                            {{ $item->title ?? $item->name ?? 'Project #' . $item->id }}
+                        </h3>
+                        
+                        @if(isset($item->description))
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">
+                            {{ Str::limit($item->description, 100) }}
+                        </p>
+                        @endif
+
+                        @if(isset($item->category))
+                        <span class="inline-block px-3 py-1 bg-rose-100 dark:bg-rose-900 text-rose-600 dark:text-rose-300 rounded-full text-sm font-semibold">
+                            {{ $item->category }}
+                        </span>
+                        @endif
+
+                        @if(auth()->check() && auth()->id() === $item->user_id)
+                        <div class="flex gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <button wire:click="edit({{ $item->id }})" class="flex-1 px-3 py-2 bg-rose-100 dark:bg-rose-900 hover:bg-rose-200 dark:hover:bg-rose-800 text-rose-700 dark:text-rose-300 rounded-lg text-sm font-medium">
+                                Edit
+                            </button>
+                            <button wire:click="confirmDelete({{ $item->id }})" class="flex-1 px-3 py-2 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 text-red-700 dark:text-red-300 rounded-lg text-sm font-medium">
+                                Delete
+                            </button>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="col-span-full text-center py-20">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">No works yet</h3>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Start showcasing your creative projects!</p>
+            </div>
+            @endforelse
+        </div>
+
+        @if($items->hasPages())
+        <div class="mt-12">
+            {{ $items->links() }}
+        </div>
+        @endif
+    </div>
+
+    @if($showModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" wire:click="closeModal"></div>
+            <div class="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-3xl w-full p-8">
+                <h3 class="text-3xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent mb-6">
+                    {{ $editMode ? 'Edit' : 'Add' }} Work
+                </h3>
+                <form wire:submit.prevent="save" class="space-y-6">
+{{ formFields }}
+                    <div class="flex justify-end gap-3 pt-6">
+                        <button type="button" wire:click="closeModal" class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white rounded-xl font-semibold shadow-lg">
+                            {{ $editMode ? 'Update' : 'Add' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>

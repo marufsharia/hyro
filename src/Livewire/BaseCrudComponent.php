@@ -3,7 +3,7 @@
 namespace Marufsharia\Hyro\Livewire;
 
 use Livewire\Component;
-use HyroPlugins\PhoneBook\Livewire\Traits\HasCrud;
+use Marufsharia\Hyro\Livewire\Traits\HasCrud;
 
 /**
  * Base Component for CRUD Operations

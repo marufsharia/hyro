@@ -12,6 +12,9 @@ Welcome to the Hyro documentation! This index will help you find the information
 
 - **[USAGE.md](USAGE.md)** - Comprehensive usage examples and patterns
 - **[HyroCRUDGenerator.md](HyroCRUDGenerator.md)** - CRUD generator documentation
+- **[CRUD_TEMPLATE_SYSTEM.md](CRUD_TEMPLATE_SYSTEM.md)** - CRUD template system guide
+- **[FRONTEND_TEMPLATES_GUIDE.md](FRONTEND_TEMPLATES_GUIDE.md)** - Frontend template guide
+- **[ROUTE_BACKUP_GUIDE.md](ROUTE_BACKUP_GUIDE.md)** - Route backup and restore guide
 - **[NOTIFICATIONS.md](NOTIFICATIONS.md)** - Notification system guide
 - **[DATABASE_MANAGEMENT.md](DATABASE_MANAGEMENT.md)** - Database backup, restore, and optimization
 
@@ -65,6 +68,12 @@ php artisan hyro:role:create
 # Privilege Management
 php artisan hyro:privilege:list
 php artisan hyro:privilege:create
+
+# CRUD Route Backup
+php artisan hyro:route-backup list
+php artisan hyro:route-backup backup
+php artisan hyro:route-backup restore
+php artisan hyro:route-backup clean
 
 # Database Management
 php artisan hyro:db:backup

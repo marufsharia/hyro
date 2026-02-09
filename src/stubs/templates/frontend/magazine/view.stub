@@ -1,0 +1,120 @@
+<div class="min-h-screen bg-white dark:bg-gray-900">
+    <!-- Magazine Header -->
+    <div class="border-b-4 border-amber-500 bg-gray-900 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-5xl font-serif font-bold mb-2">{{ $resourceNamePlural }}</h1>
+            <p class="text-amber-400 text-lg">{{ now()->format('l, F j, Y') }}</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Search -->
+        <div class="mb-12 flex gap-4">
+            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search articles..." class="flex-1 px-6 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-amber-500 focus:ring-4 focus:ring-amber-200">
+            @auth
+            <button wire:click="create" class="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold">
+                + Publish
+            </button>
+            @endauth
+        </div>
+
+        <!-- Magazine Layout -->
+        <div class="grid lg:grid-cols-12 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-8 space-y-12">
+                @forelse($items as $index => $item)
+                <article class="border-b-2 border-gray-200 dark:border-gray-700 pb-12">
+                    @if($index === 0)
+                    <!-- Feature Article -->
+                    @if(isset($item->image) && $item->image)
+                    <img src="{{ Storage::disk('public')->url($item->image) }}" alt="{{ $item->title ?? 'Article' }}" class="w-full h-96 object-cover rounded-lg mb-6">
+                    @endif
+                    <h2 class="text-4xl font-serif font-bold text-gray-900 dark:text-white mb-4">
+                        {{ $item->title ?? $item->name ?? 'Feature Article' }}
+                    </h2>
+                    @else
+                    <div class="flex gap-6">
+                        @if(isset($item->image) && $item->image)
+                        <img src="{{ Storage::disk('public')->url($item->image) }}" alt="{{ $item->title ?? 'Article' }}" class="w-48 h-32 object-cover rounded-lg">
+                        @endif
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-serif font-bold text-gray-900 dark:text-white mb-2">
+                                {{ $item->title ?? $item->name ?? 'Article' }}
+                            </h3>
+                    @endif
+                    
+                    @if(isset($item->description))
+                    <p class="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+                        {{ $item->description }}
+                    </p>
+                    @endif
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                            <span class="font-semibold text-amber-600 dark:text-amber-400">{{ $item->created_at->format('M d, Y') }}</span>
+                            <span>•</span>
+                            <span>5 min read</span>
+                        </div>
+                        <button wire:click="view({{ $item->id }})" class="text-amber-600 dark:text-amber-400 hover:text-amber-700 font-semibold">
+                            Read More →
+                        </button>
+                    </div>
+
+                    @if(auth()->check() && auth()->id() === $item->user_id)
+                    <div class="flex gap-2 mt-4">
+                        <button wire:click="edit({{ $item->id }})" class="px-4 py-2 bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 rounded-lg text-sm font-medium">Edit</button>
+                        <button wire:click="confirmDelete({{ $item->id }})" class="px-4 py-2 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-lg text-sm font-medium">Delete</button>
+                    </div>
+                    @endif
+
+                    @if($index > 0)
+                        </div>
+                    </div>
+                    @endif
+                </article>
+                @empty
+                <div class="text-center py-20">
+                    <h3 class="text-2xl font-serif font-bold text-gray-900 dark:text-white">No articles published</h3>
+                </div>
+                @endforelse
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-4 space-y-8">
+                <div class="bg-amber-50 dark:bg-amber-900/20 p-6 rounded-lg">
+                    <h3 class="text-xl font-serif font-bold text-gray-900 dark:text-white mb-4">Latest Issues</h3>
+                    <div class="space-y-3">
+                        @foreach($items->take(5) as $item)
+                        <div class="cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 p-2 rounded" wire:click="view({{ $item->id }})">
+                            <h4 class="font-semibold text-sm text-gray-900 dark:text-white line-clamp-2">{{ $item->title ?? $item->name }}</h4>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ $item->created_at->format('M d') }}</p>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if($items->hasPages())
+        <div class="mt-12">{{ $items->links() }}</div>
+        @endif
+    </div>
+
+    @if($showModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" wire:click="closeModal"></div>
+            <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full p-8">
+                <h3 class="text-3xl font-serif font-bold text-gray-900 dark:text-white mb-6">{{ $editMode ? 'Edit' : 'Publish' }} Article</h3>
+                <form wire:submit.prevent="save" class="space-y-6">
+{{ formFields }}
+                    <div class="flex justify-end gap-3 pt-6">
+                        <button type="button" wire:click="closeModal" class="px-6 py-3 border-2 border-gray-300 rounded-lg font-medium">Cancel</button>
+                        <button type="submit" class="px-8 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold">{{ $editMode ? 'Update' : 'Publish' }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>

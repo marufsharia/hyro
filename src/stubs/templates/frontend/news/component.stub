@@ -1,0 +1,86 @@
+<?php
+
+namespace {{ namespace }};
+
+use Marufsharia\Hyro\Livewire\BaseCrudComponent;
+use {{ modelClass }};
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+
+class {{ componentName }} extends BaseCrudComponent
+{
+{{ properties }}
+
+    public $breakingNews = null;
+
+    public function mount()
+    {
+        parent::mount();
+        $this->loadBreakingNews();
+    }
+
+    protected function loadBreakingNews()
+    {
+        $this->breakingNews = \{{ modelClass }}::latest()->first();
+    }
+
+    /**
+     * Get the model class for CRUD operations
+     */
+    protected function getModel(): string
+    {
+        return \{{ modelClass }}::class;
+    }
+
+    /**
+     * Get the model fields for form generation
+     */
+    protected function getFields(): array
+    {
+        return [
+{{ fields }}
+        ];
+    }
+
+    /**
+     * Get searchable fields
+     */
+    protected function getSearchableFields(): array
+    {
+        return [{{ searchableFields }}];
+    }
+
+    /**
+     * Get table columns to display
+     */
+    protected function getTableColumns(): array
+    {
+        return [{{ tableColumns }}];
+    }
+
+{{ relations }}
+
+{{ filters }}
+
+    /**
+     * Check if user can update record
+     */
+    protected function canUpdate($record): bool
+    {
+        return auth()->check() && auth()->id() === $record->user_id;
+    }
+
+    /**
+     * Check if user can delete record
+     */
+    protected function canDelete($record): bool
+    {
+        return auth()->check() && auth()->id() === $record->user_id;
+    }
+
+{{ exportMethods }}
+
+{{ importMethods }}
+
+{{ customMethods }}
+}

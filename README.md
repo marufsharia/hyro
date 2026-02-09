@@ -85,6 +85,10 @@ Hyro is an enterprise-grade Authentication, Authorization, Role & Privilege Mana
 - Dynamic form rendering
 - File upload support
 - Search, pagination, and sorting
+- **10 Frontend templates** (blog, landing, news, ecommerce, portfolio, etc.) ⭐ NEW
+- **Template system** with customization support ⭐ NEW
+- **Automatic route backup** before changes ⭐ NEW
+- Frontend and admin route support
 
 #### **REST API**
 - RESTful endpoints with RBAC
@@ -389,6 +393,14 @@ php artisan hyro:discover-routes          # Auto-discover routes
 php artisan hyro:module                   # Register module
 ```
 
+### Route Backup Management
+```bash
+php artisan hyro:route-backup list        # List all backups
+php artisan hyro:route-backup backup      # Create backup
+php artisan hyro:route-backup restore     # Restore from backup
+php artisan hyro:route-backup clean       # Clean old backups
+```
+
 ### Emergency Access
 ```bash
 php artisan hyro:emergency:create-admin   # Create emergency admin
@@ -522,15 +534,60 @@ php artisan hyro:plugin:list
 ### Generate CRUD
 
 ```bash
+# Basic CRUD (admin interface)
 php artisan hyro:make-crud Post --fields="title:string,content:text,published:boolean"
+
+# Frontend CRUD with template
+php artisan hyro:make-crud Product --frontend=true --template=frontend.ecommerce --fields="name:string,price:decimal,image:image"
+
+# Available frontend templates
+php artisan hyro:make-crud Story --frontend=true --template=frontend.blog
+php artisan hyro:make-crud Page --frontend=true --template=frontend.landing
+php artisan hyro:make-crud Article --frontend=true --template=frontend.news
+php artisan hyro:make-crud Item --frontend=true --template=frontend.ecommerce
+php artisan hyro:make-crud Work --frontend=true --template=frontend.portfolio
+php artisan hyro:make-crud Magazine --frontend=true --template=frontend.magazine
+php artisan hyro:make-crud Photo --frontend=true --template=frontend.gallery
+php artisan hyro:make-crud Business --frontend=true --template=frontend.directory
+php artisan hyro:make-crud Data --frontend=true --template=frontend.dashboard
+php artisan hyro:make-crud Content --frontend=true --template=frontend.minimal
 ```
 
 This generates:
 - Livewire component
-- Blade view
+- Blade view (with chosen template)
 - Migration
 - Model
-- Routes
+- Routes (admin or frontend)
+- **Automatic route backup** before changes
+
+### Route Backup Management
+
+```bash
+# List all backups
+php artisan hyro:route-backup list
+
+# Create manual backup
+php artisan hyro:route-backup backup
+
+# Restore from backup (interactive)
+php artisan hyro:route-backup restore
+
+# Restore specific backup
+php artisan hyro:route-backup restore --file=crud_routes_backup_2026-02-09_035717.php
+
+# Clean old backups (keep last 10)
+php artisan hyro:route-backup clean --keep=10
+```
+
+**Features:**
+- Automatic backup on every CRUD generation
+- Backups stored in `storage/app/private/routes/`
+- Keeps last 10 backups by default
+- Easy restore with interactive selection
+- Automatic cleanup of old backups
+
+**See [CRUD_TEMPLATE_SYSTEM.md](docs/CRUD_TEMPLATE_SYSTEM.md), [FRONTEND_TEMPLATES_GUIDE.md](docs/FRONTEND_TEMPLATES_GUIDE.md), and [ROUTE_BACKUP_GUIDE.md](docs/ROUTE_BACKUP_GUIDE.md) for complete documentation.**
 
 ### Auto-discover Routes
 
@@ -683,6 +740,9 @@ All documentation has been moved to the `docs/` folder for better organization:
 - **[docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md)** - Notification system guide
 - **[docs/DATABASE_MANAGEMENT.md](docs/DATABASE_MANAGEMENT.md)** - Database tools guide
 - **[docs/HyroCRUDGenerator.md](docs/HyroCRUDGenerator.md)** - CRUD generator guide
+- **[docs/CRUD_TEMPLATE_SYSTEM.md](docs/CRUD_TEMPLATE_SYSTEM.md)** - CRUD template system ⭐
+- **[docs/FRONTEND_TEMPLATES_GUIDE.md](docs/FRONTEND_TEMPLATES_GUIDE.md)** - Frontend templates ⭐
+- **[docs/ROUTE_BACKUP_GUIDE.md](docs/ROUTE_BACKUP_GUIDE.md)** - Route backup system ⭐
 - **[docs/PHASE_8_COMPLETION_SUMMARY.md](docs/PHASE_8_COMPLETION_SUMMARY.md)** - Phase 8 details
 - **[docs/PHASE_11_COMPLETION_SUMMARY.md](docs/PHASE_11_COMPLETION_SUMMARY.md)** - Phase 11 details
 - **[docs/PHASE_15_COMPLETION_SUMMARY.md](docs/PHASE_15_COMPLETION_SUMMARY.md)** - Phase 15 details
@@ -835,15 +895,41 @@ MIT License. See [LICENSE](LICENSE) file for details.
 
 ## 📊 Stats
 
-- **Lines of Code:** 18,000+
-- **Files:** 225+
-- **Commands:** 46+
+- **Lines of Code:** 20,000+
+- **Files:** 250+
+- **Commands:** 50+
+- **Templates:** 10 frontend templates
 - **Completion:** 93%
-- **Documentation:** 100% (15 guides)
+- **Documentation:** 100% (18 guides)
 - **Production Ready:** Yes
-- **Bug Fixes:** Latest (Feb 8, 2026)
+- **Latest Release:** v1.0.0-beta.3 (Feb 9, 2026)
 
 ## 🎉 What's New in Latest Release
+
+### Version 1.0.0-beta.3 (February 9, 2026)
+
+**✨ New Features:**
+- ✅ **10 Frontend CRUD Templates** - Blog, Landing, News, E-commerce, Portfolio, Magazine, Gallery, Directory, Dashboard, Minimal
+- ✅ **CRUD Template System** - Customizable templates with `--frontend` and `--template` options
+- ✅ **Automatic Route Backup** - Backups created before every CRUD generation
+- ✅ **Route Backup Management** - List, backup, restore, and clean commands
+- ✅ **Frontend Route Support** - Generate frontend-facing CRUD interfaces
+- ✅ **Template Customization** - Publish and customize templates
+- ✅ **Conflict Detection** - Smart route path conflict resolution
+
+**🔧 Improvements:**
+- Enhanced CRUD generator with template support
+- Improved route management with backup system
+- Better frontend/admin route separation
+- Automatic cleanup of old backups (keeps last 10)
+- Secure backup storage in `storage/app/private/routes/`
+
+**📚 Documentation:**
+- Added CRUD_TEMPLATE_SYSTEM.md
+- Added FRONTEND_TEMPLATES_GUIDE.md
+- Added ROUTE_BACKUP_GUIDE.md
+- Updated INDEX.md with new guides
+- Updated README with new features
 
 ### Version 1.0.0-beta.2 (February 8, 2026)
 

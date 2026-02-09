@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta.3] - 2026-02-09
+
+### Added
+- Added 10 frontend CRUD templates (blog, landing, news, ecommerce, portfolio, magazine, gallery, directory, dashboard, minimal)
+- Added CRUD template system with `--frontend` and `--template` options
+- Added automatic route backup system before CRUD generation
+- Added `hyro:route-backup` command with list, backup, restore, and clean actions
+- Added frontend route support in SmartCrudRouteManager
+- Added route conflict detection and resolution
+- Added CRUD_TEMPLATE_SYSTEM.md documentation
+- Added FRONTEND_TEMPLATES_GUIDE.md documentation
+- Added ROUTE_BACKUP_GUIDE.md documentation
+- Added template README with usage examples
+
+### Changed
+- Enhanced MakeCrudCommand to support frontend templates
+- Updated SmartCrudRouteManager with backup functionality
+- Improved route registration with automatic backups
+- Updated documentation index with new guides
+- Enhanced README with template and backup features
+
+### Fixed
+- Fixed namespace issues in BaseCrudComponent and HasCrud trait
+- Fixed route references in admin dashboard and layout views
+- Fixed incorrect route names (admin.* to hyro.admin.*)
+- Added Route::has() checks to prevent undefined route errors
+
 ## [1.0.0-beta.2] - 2026-02-08
 
 ### Fixed

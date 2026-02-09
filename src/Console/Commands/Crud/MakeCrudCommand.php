@@ -29,6 +29,9 @@ class MakeCrudCommand extends Command
                             {--route : Auto-register route}
                             {--menu : Add to sidebar menu}
                             {--module : Manage CRUD Module}
+                            {--frontend=false : Generate frontend route (default: false)}
+                            {--auth=true : Require authentication (default: true)}
+                            {--template=admin.template1 : Template to use (admin.template1, admin.template2, frontend.template1, etc.)}
                             {--force : Overwrite existing files}';
 
     protected $description = 'Generate production-ready CRUD with Livewire, Tailwind CSS, Alpine.js';
@@ -93,6 +96,16 @@ class MakeCrudCommand extends Command
         $this->config['route'] = $this->option('route');
         $this->config['menu'] = $this->option('menu');
         $this->config['module'] = $this->option('module');
+        
+        // New template system options
+        $this->config['frontend'] = filter_var($this->option('frontend'), FILTER_VALIDATE_BOOLEAN);
+        $this->config['auth'] = filter_var($this->option('auth'), FILTER_VALIDATE_BOOLEAN);
+        $this->config['template'] = $this->option('template') ?: 'admin.template1';
+        
+        // Parse template (format: admin.template1 or frontend.template1)
+        $templateParts = explode('.', $this->config['template']);
+        $this->config['template_type'] = $templateParts[0] ?? 'admin'; // admin or frontend
+        $this->config['template_name'] = $templateParts[1] ?? 'template1';
     }
 
     protected function validate()
@@ -393,6 +406,11 @@ class MakeCrudCommand extends Command
 
     protected function getStubContent(string $stubName): string
     {
+        // For component and view stubs, use template system
+        if (in_array($stubName, ['component', 'view'])) {
+            return $this->getTemplateStubContent($stubName);
+        }
+
         // 1️⃣ Published stub location (user customized)
         $publishedStubPath = resource_path("stubs/hyro/crud/{$stubName}.stub");
 
@@ -413,6 +431,46 @@ class MakeCrudCommand extends Command
 
         // ❌ If none found
         throw new \Exception("Stub file not found: {$stubName}.stub");
+    }
+
+    /**
+     * Get stub content from template directory
+     */
+    protected function getTemplateStubContent(string $stubName): string
+    {
+        $templateType = $this->config['template_type']; // admin or frontend
+        $templateName = $this->config['template_name']; // template1, template2, etc.
+
+        // 1️⃣ Published template stub (user customized)
+        $publishedTemplatePath = resource_path("stubs/hyro/templates/{$templateType}/{$templateName}/{$stubName}.stub");
+
+        // 2️⃣ Package template stub
+        $packageTemplatePath = __DIR__ . "/../../../stubs/templates/{$templateType}/{$templateName}/{$stubName}.stub";
+
+        // 3️⃣ Fallback to default stub (backward compatibility)
+        $defaultStubPath = __DIR__ . "/../../../stubs/crud/{$stubName}.stub";
+
+        // ✅ Use published template if exists
+        if (File::exists($publishedTemplatePath)) {
+            Log::info("Using published template stub: " . $publishedTemplatePath);
+            return File::get($publishedTemplatePath);
+        }
+
+        // ✅ Use package template if exists
+        if (File::exists($packageTemplatePath)) {
+            Log::info("Using package template stub: " . $packageTemplatePath);
+            return File::get($packageTemplatePath);
+        }
+
+        // ✅ Fallback to default stub
+        if (File::exists($defaultStubPath)) {
+            Log::info("Using default stub (template not found): " . $defaultStubPath);
+            $this->warnings[] = "Template {$templateType}.{$templateName} not found, using default stub";
+            return File::get($defaultStubPath);
+        }
+
+        // ❌ If none found
+        throw new \Exception("Stub file not found: {$stubName}.stub (template: {$templateType}.{$templateName})");
     }
 
 
@@ -797,21 +855,46 @@ class MakeCrudCommand extends Command
     {
         $routeManager = app(\Marufsharia\Hyro\Services\SmartCrudRouteManager::class);
 
+        // Create backup before modifying routes
+        $backupPath = $routeManager->backup();
+        if ($backupPath) {
+            $this->line("   📦 Backup created: " . basename($backupPath));
+        }
+
         $componentClass = "App\\Livewire\\Admin\\" . Str::studly($this->name) . "Manager";
         $permission = Str::kebab($this->name);
+        
+        // Determine if this is a frontend or admin route
+        $isFrontend = $this->config['frontend'];
+        $requiresAuth = $this->config['auth'];
+
+        // Build middleware array
+        $middleware = [];
+        if ($requiresAuth) {
+            $middleware[] = 'auth';
+        }
 
         $success = $routeManager->addRoute(
             $this->name,
             $componentClass,
             [
                 'permission' => $permission,
-                'middleware' => [], // Uses default from route file
+                'middleware' => $middleware,
+                'frontend' => $isFrontend,
+                'auth' => $requiresAuth,
             ]
         );
 
         if ($success) {
             $routeName = Str::kebab(Str::plural($this->name));
-            $this->info("✓ Route registered: hyro.admin.{$routeName}");
+            $routeType = $isFrontend ? 'frontend' : 'admin';
+            $this->info("✓ Route registered: {$routeType}.{$routeName}");
+            
+            // Clean old backups (keep last 10)
+            $deleted = $routeManager->cleanOldBackups(10);
+            if ($deleted > 0) {
+                $this->line("   🗑️  Cleaned {$deleted} old backup(s)");
+            }
         } else {
             $this->warn("Route already exists or could not be registered");
         }

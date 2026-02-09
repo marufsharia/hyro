@@ -1,0 +1,207 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- Top Bar -->
+    <div class="bg-emerald-600 text-white py-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-sm text-center">Free shipping on orders over $50 🚚</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                    🛍️ {{ $resourceNamePlural }}
+                </h1>
+                
+                <div class="flex items-center gap-4">
+                    @auth
+                    <button
+                        wire:click="create"
+                        class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors">
+                        + Add Product
+                    </button>
+                    @endauth
+                    <button class="relative p-2 text-gray-600 dark:text-gray-300 hover:text-emerald-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-emerald-600 text-white text-xs rounded-full flex items-center justify-center">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Filters & Search -->
+        <div class="mb-8 flex flex-col lg:flex-row gap-4">
+            <div class="flex-1">
+                <input
+                    wire:model.live.debounce.300ms="search"
+                    type="text"
+                    placeholder="Search products..."
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500">
+            </div>
+            
+            <select
+                wire:model.live="sortBy"
+                class="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500">
+                <option value="latest">Latest</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+                <option value="popular">Most Popular</option>
+            </select>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @forelse($items as $item)
+            <div class="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <!-- Product Image -->
+                <div class="relative h-64 bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                    @if(isset($item->image) && $item->image)
+                    <img src="{{ Storage::disk('public')->url($item->image) }}" 
+                         alt="{{ $item->name ?? 'Product' }}"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    @else
+                    <div class="w-full h-full flex items-center justify-center">
+                        <svg class="w-20 h-20 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                    </div>
+                    @endif
+                    
+                    <!-- Quick Actions -->
+                    <div class="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-emerald-50 dark:hover:bg-emerald-900 transition-colors">
+                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </button>
+                        <button
+                            wire:click="view({{ $item->id }})"
+                            class="p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-emerald-50 dark:hover:bg-emerald-900 transition-colors">
+                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Badge -->
+                    @if(isset($item->is_new) && $item->is_new)
+                    <div class="absolute top-2 left-2">
+                        <span class="px-3 py-1 bg-emerald-600 text-white text-xs font-bold rounded-full">NEW</span>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- Product Info -->
+                <div class="p-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                        {{ $item->name ?? $item->title ?? 'Product #' . $item->id }}
+                    </h3>
+                    
+                    @if(isset($item->description))
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                        {{ $item->description }}
+                    </p>
+                    @endif
+
+                    <!-- Rating -->
+                    <div class="flex items-center gap-1 mb-3">
+                        @for($i = 0; $i < 5; $i++)
+                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        @endfor
+                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">(4.5)</span>
+                    </div>
+
+                    <!-- Price & Actions -->
+                    <div class="flex items-center justify-between">
+                        <div>
+                            @if(isset($item->price))
+                            <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                                ${{ number_format($item->price, 2) }}
+                            </p>
+                            @endif
+                        </div>
+                        
+                        <button class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Owner Actions -->
+                    @if(auth()->check() && auth()->id() === $item->user_id)
+                    <div class="flex gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <button
+                            wire:click="edit({{ $item->id }})"
+                            class="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-colors">
+                            Edit
+                        </button>
+                        <button
+                            wire:click="confirmDelete({{ $item->id }})"
+                            class="flex-1 px-3 py-2 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 text-red-700 dark:text-red-300 rounded-lg text-sm font-medium transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @empty
+            <div class="col-span-full text-center py-20">
+                <svg class="mx-auto h-24 w-24 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+                <h3 class="mt-4 text-2xl font-bold text-gray-900 dark:text-white">No products available</h3>
+                <p class="mt-2 text-gray-600 dark:text-gray-400">Check back soon for new items!</p>
+            </div>
+            @endforelse
+        </div>
+
+        <!-- Pagination -->
+        @if($items->hasPages())
+        <div class="mt-12">
+            {{ $items->links() }}
+        </div>
+        @endif
+    </div>
+
+    <!-- Modal -->
+    @if($showModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" wire:click="closeModal"></div>
+            
+            <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full p-8">
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+                    {{ $editMode ? 'Edit' : 'Add' }} Product
+                </h3>
+
+                <form wire:submit.prevent="save" class="space-y-6">
+{{ formFields }}
+
+                    <div class="flex justify-end gap-3 pt-6">
+                        <button
+                            type="button"
+                            wire:click="closeModal"
+                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold shadow-lg transition-all">
+                            {{ $editMode ? 'Update' : 'Add' }} Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>

@@ -1,0 +1,209 @@
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-indigo-900/10">
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="text-center">
+                <h1 class="text-5xl font-bold mb-4">{{ $resourceNamePlural }}</h1>
+                <p class="text-xl text-purple-100">Discover stories, thinking, and expertise</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Search & Filter Bar -->
+        <div class="mb-12" x-data="{ showFilters: false }">
+            <div class="flex flex-col lg:flex-row gap-4 items-center">
+                <div class="flex-1 w-full">
+                    <div class="relative">
+                        <input
+                            wire:model.live.debounce.300ms="search"
+                            type="text"
+                            placeholder="Search articles..."
+                            class="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-purple-200 dark:border-purple-800 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-purple-500 focus:ring-4 focus:ring-purple-200 dark:focus:ring-purple-900 transition-all">
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                @auth
+                <button
+                    wire:click="create"
+                    class="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-2xl font-semibold shadow-lg shadow-purple-500/50 transition-all transform hover:scale-105">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Write Article
+                    </span>
+                </button>
+                @endauth
+            </div>
+        </div>
+
+        <!-- Featured Article -->
+        @if($items->isNotEmpty())
+        <div class="mb-16">
+            <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
+                <div class="grid lg:grid-cols-2 gap-0">
+                    @if(isset($items->first()->image) && $items->first()->image)
+                    <div class="h-96 lg:h-auto">
+                        <img src="{{ Storage::disk('public')->url($items->first()->image) }}" 
+                             alt="{{ $items->first()->title ?? 'Featured' }}"
+                             class="w-full h-full object-cover">
+                    </div>
+                    @endif
+                    <div class="p-12 flex flex-col justify-center">
+                        <span class="inline-block px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-full text-sm font-semibold mb-4 w-fit">
+                            Featured
+                        </span>
+                        <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                            {{ $items->first()->title ?? $items->first()->name ?? 'Featured Article' }}
+                        </h2>
+                        @if(isset($items->first()->description))
+                        <p class="text-lg text-gray-600 dark:text-gray-300 mb-6 line-clamp-3">
+                            {{ $items->first()->description }}
+                        </p>
+                        @endif
+                        <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-6">
+                            <span>{{ $items->first()->created_at->format('M d, Y') }}</span>
+                            <span>•</span>
+                            <span>5 min read</span>
+                        </div>
+                        <button
+                            wire:click="view({{ $items->first()->id }})"
+                            class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-colors w-fit">
+                            Read More →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Articles Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @foreach($items->skip(1) as $item)
+            <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                @if(isset($item->image) && $item->image)
+                <div class="h-56 overflow-hidden">
+                    <img src="{{ Storage::disk('public')->url($item->image) }}" 
+                         alt="{{ $item->title ?? 'Article' }}"
+                         class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                </div>
+                @endif
+                
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        @if(isset($item->category))
+                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-full text-xs font-semibold">
+                            {{ $item->category }}
+                        </span>
+                        @endif
+                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                            {{ $item->created_at->diffForHumans() }}
+                        </span>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
+                        {{ $item->title ?? $item->name ?? 'Article #' . $item->id }}
+                    </h3>
+                    
+                    @if(isset($item->description))
+                    <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                        {{ $item->description }}
+                    </p>
+                    @endif
+
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <button
+                            wire:click="view({{ $item->id }})"
+                            class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium">
+                            Read More →
+                        </button>
+                        
+                        @if(auth()->check() && auth()->id() === $item->user_id)
+                        <div class="flex gap-2">
+                            <button
+                                wire:click="edit({{ $item->id }})"
+                                class="p-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </button>
+                            <button
+                                wire:click="confirmDelete({{ $item->id }})"
+                                class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </article>
+            @endforeach
+        </div>
+
+        <!-- Empty State -->
+        @if($items->isEmpty())
+        <div class="text-center py-20">
+            <svg class="mx-auto h-24 w-24 text-purple-300 dark:text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+            </svg>
+            <h3 class="mt-6 text-2xl font-bold text-gray-900 dark:text-white">No articles yet</h3>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">Start writing your first article!</p>
+        </div>
+        @endif
+
+        <!-- Pagination -->
+        @if($items->hasPages())
+        <div class="mt-12">
+            {{ $items->links() }}
+        </div>
+        @endif
+    </div>
+
+    <!-- Modal -->
+    @if($showModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" x-data x-init="document.body.style.overflow = 'hidden'" x-destroy="document.body.style.overflow = 'auto'">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" wire:click="closeModal"></div>
+            
+            <div class="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-3xl w-full p-8 max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white">
+                        {{ $editMode ? 'Edit' : 'Create' }} Article
+                    </h3>
+                    <button
+                        wire:click="closeModal"
+                        class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <form wire:submit.prevent="save" class="space-y-6">
+{{ formFields }}
+
+                    <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <button
+                            type="button"
+                            wire:click="closeModal"
+                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl font-semibold shadow-lg shadow-purple-500/50 transition-all">
+                            {{ $editMode ? 'Update' : 'Publish' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>

@@ -1,0 +1,143 @@
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <!-- Directory Header -->
+    <div class="bg-gradient-to-r from-teal-600 to-cyan-600 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-5xl font-bold mb-4">📋 {{ $resourceNamePlural }}</h1>
+            <p class="text-xl text-teal-100">Browse and discover listings</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Search & Filter -->
+        <div class="mb-8 flex flex-col md:flex-row gap-4">
+            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search directory..." class="flex-1 px-6 py-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-teal-500">
+            @auth
+            <button wire:click="create" class="px-8 py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold whitespace-nowrap">
+                + Add Listing
+            </button>
+            @endauth
+        </div>
+
+        <!-- Directory List -->
+        <div class="space-y-4">
+            @forelse($items as $item)
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow p-6">
+                <div class="flex gap-6">
+                    <!-- Logo/Image -->
+                    <div class="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                        @if(isset($item->image) && $item->image)
+                        <img src="{{ Storage::disk('public')->url($item->image) }}" alt="{{ $item->name ?? 'Listing' }}" class="w-full h-full object-cover">
+                        @else
+                        <div class="w-full h-full flex items-center justify-center">
+                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                        </div>
+                        @endif
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                                    {{ $item->name ?? $item->title ?? 'Listing #' . $item->id }}
+                                </h3>
+                                @if(isset($item->category))
+                                <span class="inline-block px-3 py-1 bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 rounded-full text-sm font-semibold">
+                                    {{ $item->category }}
+                                </span>
+                                @endif
+                            </div>
+                            
+                            @if(auth()->check() && auth()->id() === $item->user_id)
+                            <div class="flex gap-2">
+                                <button wire:click="edit({{ $item->id }})" class="p-2 text-gray-600 dark:text-gray-400 hover:text-teal-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </button>
+                                <button wire:click="confirmDelete({{ $item->id }})" class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            @endif
+                        </div>
+
+                        @if(isset($item->description))
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">
+                            {{ Str::limit($item->description, 200) }}
+                        </p>
+                        @endif
+
+                        <!-- Meta Info -->
+                        <div class="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+                            @if(isset($item->location))
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                {{ $item->location }}
+                            </span>
+                            @endif
+                            @if(isset($item->phone))
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                </svg>
+                                {{ $item->phone }}
+                            </span>
+                            @endif
+                            @if(isset($item->website))
+                            <a href="{{ $item->website }}" target="_blank" class="flex items-center gap-1 text-teal-600 dark:text-teal-400 hover:underline">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                                </svg>
+                                Website
+                            </a>
+                            @endif
+                        </div>
+
+                        <button wire:click="view({{ $item->id }})" class="mt-4 px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="text-center py-20 bg-white dark:bg-gray-800 rounded-xl">
+                <svg class="mx-auto h-20 w-20 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h3 class="mt-4 text-2xl font-bold text-gray-900 dark:text-white">No listings yet</h3>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Be the first to add a listing!</p>
+            </div>
+            @endforelse
+        </div>
+
+        @if($items->hasPages())
+        <div class="mt-12">{{ $items->links() }}</div>
+        @endif
+    </div>
+
+    @if($showModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" wire:click="closeModal"></div>
+            <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full p-8">
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">{{ $editMode ? 'Edit' : 'Add' }} Listing</h3>
+                <form wire:submit.prevent="save" class="space-y-6">
+{{ formFields }}
+                    <div class="flex justify-end gap-3 pt-6">
+                        <button type="button" wire:click="closeModal" class="px-6 py-3 border-2 border-gray-300 rounded-lg font-medium">Cancel</button>
+                        <button type="submit" class="px-8 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold">{{ $editMode ? 'Update' : 'Add' }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>

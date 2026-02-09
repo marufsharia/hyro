@@ -384,6 +384,7 @@ class HyroServiceProvider extends ServiceProvider
             \Marufsharia\Hyro\Console\Commands\Crud\MakeCrudCommand::class,
             \Marufsharia\Hyro\Console\Commands\Crud\DiscoverCrudRoutesCommand::class,
             \Marufsharia\Hyro\Console\Commands\Crud\HyroModuleCommand::class,
+            \Marufsharia\Hyro\Console\Commands\RouteBackupCommand::class,
 
             // Plugin Commands
             \Marufsharia\Hyro\Console\Commands\Plugin\PluginListCommand::class,

@@ -1,0 +1,135 @@
+<div class="p-6">
+    <!-- Compact Header -->
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $resourceNamePlural }}</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Manage {{ strtolower($resourceNamePlural) }}</p>
+        </div>
+
+        <button
+            wire:click="create"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Create New
+        </button>
+    </div>
+
+    <!-- Compact Search & Filters -->
+    <div class="mb-4 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex gap-3">
+            <div class="flex-1">
+                <input
+                    wire:model.live.debounce.300ms="search"
+                    type="text"
+                    placeholder="Search..."
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <select
+                wire:model.live="perPage"
+                class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Compact Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-900">
+                <tr>
+                    <th class="w-10 px-4 py-3">
+                        <input
+                            type="checkbox"
+                            wire:model.live="selectAll"
+                            class="rounded border-gray-300 dark:border-gray-600">
+                    </th>
+{{ tableHeaders }}
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                @forelse($items as $item)
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="px-4 py-3">
+                        <input
+                            type="checkbox"
+                            wire:model.live="selectedRows"
+                            value="{{ $item->id }}"
+                            class="rounded border-gray-300 dark:border-gray-600">
+                    </td>
+{{ tableColumns }}
+                    <td class="px-4 py-3 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <button
+                                wire:click="edit({{ $item->id }})"
+                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </button>
+                            <button
+                                wire:click="confirmDelete({{ $item->id }})"
+                                class="text-red-600 hover:text-red-800 dark:text-red-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="{{ columnCount }}" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                        No records found
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+            {{ $items->links() }}
+        </div>
+    </div>
+
+    <!-- Modal for Create/Edit -->
+    @if($showModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black opacity-50" wire:click="closeModal"></div>
+            
+            <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {{ $editMode ? 'Edit' : 'Create' }} {{ $resourceName }}
+                </h3>
+
+                <form wire:submit.prevent="save">
+{{ formFields }}
+
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button
+                            type="button"
+                            wire:click="closeModal"
+                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                            {{ $editMode ? 'Update' : 'Create' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>
