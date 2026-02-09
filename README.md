@@ -104,6 +104,13 @@ Hyro is an enterprise-grade Authentication, Authorization, Role & Privilege Mana
 - Database optimization
 - Emergency access commands
 
+#### **Smart Route Loading** ⭐ NEW
+- Routes load from package by default
+- Publish routes for customization without modifying vendor files
+- Automatic fallback to package routes
+- Supports admin, auth, notification, and API routes
+- Update-safe customizations
+
 #### **Admin UI**
 - Beautiful Tailwind CSS interface
 - Livewire 3.x components
@@ -142,7 +149,10 @@ composer require marufsharia/hyro
 ```bash
 php artisan vendor:publish --tag=hyro-config
 php artisan vendor:publish --tag=hyro-migrations
+php artisan vendor:publish --tag=hyro-routes  # Optional: Only if you want to customize routes
 ```
+
+> **Note:** Routes load from the package by default. Only publish routes if you need to customize them.
 
 ### Run Migrations
 
