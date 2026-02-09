@@ -51,7 +51,10 @@ php artisan vendor:publish --tag=hyro-migrations
 php artisan vendor:publish --tag=hyro-views
 php artisan vendor:publish --tag=hyro-assets
 php artisan vendor:publish --tag=hyro-lang
+php artisan vendor:publish --tag=hyro-routes  # Optional: Only if you want to customize routes
 ```
+
+> **Note on Routes:** By default, Hyro loads routes from the package. You only need to publish routes if you want to customize them. Once published to `routes/hyro/`, those routes will take precedence over the package routes.
 
 ### Step 3: Configure Environment
 

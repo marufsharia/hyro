@@ -158,6 +158,14 @@ class HyroServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../stubs/crud' => resource_path('stubs/hyro/crud'),
         ], 'hyro-crud-stubs');
+
+        // Routes (for customization)
+        $this->publishes([
+            __DIR__ . '/../routes/admin.php' => base_path('routes/hyro/admin.php'),
+            __DIR__ . '/../routes/auth.php' => base_path('routes/hyro/auth.php'),
+            __DIR__ . '/../routes/notifications.php' => base_path('routes/hyro/notifications.php'),
+            __DIR__ . '/../routes/api.php' => base_path('routes/hyro/api.php'),
+        ], 'hyro-routes');
     }
 
     /**
@@ -172,14 +180,36 @@ class HyroServiceProvider extends ServiceProvider
 
         // Routes
         if (config('hyro.api.enabled', false)) {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+            $this->loadSmartRoutes('api.php');
         }
 
         if (config('hyro.admin.enabled', false)) {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/admin.php');
-            $this->loadRoutesFrom(__DIR__ . '/../routes/auth.php');
-            $this->loadRoutesFrom(__DIR__ . '/../routes/notifications.php');
+            // Smart route loading: Load from published routes if they exist, otherwise from package
+            $this->loadSmartRoutes('admin.php');
+            $this->loadSmartRoutes('auth.php');
+            $this->loadSmartRoutes('notifications.php');
+            
             $this->loadViewsFrom(__DIR__ . '/../resources/views', 'hyro');
+        }
+    }
+
+    /**
+     * Load routes from published location if exists, otherwise from package.
+     *
+     * @param string $routeFile
+     * @return void
+     */
+    private function loadSmartRoutes(string $routeFile): void
+    {
+        $publishedRoute = base_path("routes/hyro/{$routeFile}");
+        $packageRoute = __DIR__ . "/../routes/{$routeFile}";
+
+        if (File::exists($publishedRoute)) {
+            // Load from published routes (user has customized them)
+            $this->loadRoutesFrom($publishedRoute);
+        } elseif (File::exists($packageRoute)) {
+            // Load from package routes (default)
+            $this->loadRoutesFrom($packageRoute);
         }
     }
 

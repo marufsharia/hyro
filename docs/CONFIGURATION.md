@@ -503,3 +503,123 @@ php artisan hyro:config:validate
 **Configuration Complete!** ⚙️
 
 Your Hyro package is now properly configured.
+
+
+---
+
+## 🛣️ Route Customization
+
+### Smart Route Loading
+
+Hyro uses a smart route loading system that allows you to customize routes without modifying the package files.
+
+**How it works:**
+
+1. **Default Behavior:** Routes load from the package (`vendor/marufsharia/hyro/routes/`)
+2. **Custom Routes:** If you publish routes to `routes/hyro/`, those take precedence
+
+### Publishing Routes
+
+To customize Hyro routes, publish them to your application:
+
+```bash
+php artisan vendor:publish --tag=hyro-routes
+```
+
+This will create the following files in your `routes/hyro/` directory:
+
+- `admin.php` - Admin panel routes (dashboard, roles, privileges, users)
+- `auth.php` - Authentication routes (login, register, password reset)
+- `notifications.php` - Notification routes (notification center, preferences)
+- `api.php` - API routes (if API is enabled)
+
+### Customizing Routes
+
+Once published, you can modify the routes in `routes/hyro/` directory:
+
+**Example: Adding custom middleware to admin routes**
+
+```php
+// routes/hyro/admin.php
+
+Route::prefix(config('hyro.admin.route.prefix'))
+    ->middleware(['web', 'auth', 'custom-middleware']) // Add your middleware
+    ->name('hyro.admin.')
+    ->group(function () {
+        // Your custom routes or modifications
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        
+        // Add custom admin routes
+        Route::get('/custom-page', [CustomController::class, 'index'])->name('custom');
+    });
+```
+
+**Example: Customizing authentication routes**
+
+```php
+// routes/hyro/auth.php
+
+Route::prefix(config('hyro.admin.route.prefix'))
+    ->middleware('web')
+    ->name('hyro.')
+    ->group(function () {
+        // Customize login route
+        Route::get('/login', [CustomAuthController::class, 'showLoginForm'])
+            ->name('login');
+            
+        // Add 2FA routes
+        Route::post('/2fa/verify', [TwoFactorController::class, 'verify'])
+            ->name('2fa.verify');
+    });
+```
+
+### Route Loading Priority
+
+The route loading follows this priority:
+
+1. **Published Routes** (`routes/hyro/*.php`) - Highest priority
+2. **Package Routes** (`vendor/marufsharia/hyro/routes/*.php`) - Default fallback
+
+### Reverting to Package Routes
+
+To revert to package routes, simply delete the published route files:
+
+```bash
+rm -rf routes/hyro/
+```
+
+Hyro will automatically fall back to loading routes from the package.
+
+### Best Practices
+
+1. **Only publish when needed:** Don't publish routes unless you need to customize them
+2. **Keep in sync:** When upgrading Hyro, check if package routes have changed
+3. **Document changes:** Comment your customizations for future reference
+4. **Test thoroughly:** Always test route changes in development before deploying
+
+### Route Configuration
+
+You can configure route prefixes and middleware in `config/hyro.php`:
+
+```php
+'admin' => [
+    'route' => [
+        'prefix' => env('HYRO_ADMIN_PREFIX', 'admin/hyro'),
+        'middleware' => ['web', 'hyro.auth'],
+    ],
+],
+
+'api' => [
+    'prefix' => env('HYRO_API_PREFIX', 'api/hyro'),
+    'middleware' => ['api', 'auth:sanctum'],
+],
+```
+
+Or via environment variables:
+
+```env
+HYRO_ADMIN_PREFIX=admin/hyro
+HYRO_API_PREFIX=api/hyro
+```
+
+---
