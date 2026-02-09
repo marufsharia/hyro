@@ -21,6 +21,7 @@ Welcome to the Hyro documentation! This index will help you find the information
 - **[API.md](API.md)** - REST API documentation
 - **[Enhanced.md](Enhanced.md)** - Roadmap and planned enhancements
 - **[SMART_ROUTE_LOADING.md](SMART_ROUTE_LOADING.md)** - Smart route loading system
+- **[SMART_RESOURCE_LOADING.md](SMART_RESOURCE_LOADING.md)** - Smart loading for routes, views, and assets
 
 ## 🚢 Deployment
 
@@ -90,7 +91,9 @@ Use your browser's search function (Ctrl+F or Cmd+F) to find specific topics wit
 - **Database Backup**: See [DATABASE_MANAGEMENT.md](DATABASE_MANAGEMENT.md)
 - **API Endpoints**: See [API.md](API.md)
 - **Configuration Options**: See [CONFIGURATION.md](CONFIGURATION.md)
-- **Route Customization**: See [SMART_ROUTE_LOADING.md](SMART_ROUTE_LOADING.md) or [CONFIGURATION.md](CONFIGURATION.md#route-customization)
+- **Route Customization**: See [SMART_RESOURCE_LOADING.md](SMART_RESOURCE_LOADING.md#smart-route-loading)
+- **View Customization**: See [SMART_RESOURCE_LOADING.md](SMART_RESOURCE_LOADING.md#smart-view-loading)
+- **Asset Customization**: See [SMART_RESOURCE_LOADING.md](SMART_RESOURCE_LOADING.md#smart-asset-loading)
 - **Deployment**: See [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ---

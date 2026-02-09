@@ -48,13 +48,17 @@ php artisan vendor:publish --provider="Marufsharia\Hyro\HyroServiceProvider"
 # Or publish specific resources
 php artisan vendor:publish --tag=hyro-config
 php artisan vendor:publish --tag=hyro-migrations
-php artisan vendor:publish --tag=hyro-views
-php artisan vendor:publish --tag=hyro-assets
+php artisan vendor:publish --tag=hyro-views      # Optional: Only if you want to customize views
+php artisan vendor:publish --tag=hyro-assets     # Required: For CSS/JS to work
 php artisan vendor:publish --tag=hyro-lang
-php artisan vendor:publish --tag=hyro-routes  # Optional: Only if you want to customize routes
+php artisan vendor:publish --tag=hyro-routes     # Optional: Only if you want to customize routes
 ```
 
-> **Note on Routes:** By default, Hyro loads routes from the package. You only need to publish routes if you want to customize them. Once published to `routes/hyro/`, those routes will take precedence over the package routes.
+> **Note on Smart Resource Loading:**
+> - **Routes:** Load from package by default. Only publish if you need to customize them.
+> - **Views:** Load from package by default. Publish to customize admin UI, auth pages, etc.
+> - **Assets:** Should be published for CSS/JS to work correctly in production.
+> - Once published to their respective locations, they take precedence over package resources.
 
 ### Step 3: Configure Environment
 

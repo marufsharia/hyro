@@ -89,11 +89,6 @@ class HyroServiceProvider extends ServiceProvider
 
         if (Config::get('hyro.admin.enabled', false)) {
             $this->app->register(BladeDirectivesServiceProvider::class);
-            $this->loadViewsFrom(__DIR__ . '/../resources/views', 'hyro');
-
-            $this->publishes([
-                __DIR__ . '/../resources/views' => resource_path('views/vendor/hyro'),
-            ], 'hyro-views');
         }
 
         //crud route
@@ -189,7 +184,8 @@ class HyroServiceProvider extends ServiceProvider
             $this->loadSmartRoutes('auth.php');
             $this->loadSmartRoutes('notifications.php');
             
-            $this->loadViewsFrom(__DIR__ . '/../resources/views', 'hyro');
+            // Smart view loading: Load from published views if they exist, otherwise from package
+            $this->loadSmartViews();
         }
     }
 
@@ -211,6 +207,52 @@ class HyroServiceProvider extends ServiceProvider
             // Load from package routes (default)
             $this->loadRoutesFrom($packageRoute);
         }
+    }
+
+    /**
+     * Load views from published location if exists, otherwise from package.
+     * Supports multiple view paths for flexibility.
+     *
+     * @return void
+     */
+    private function loadSmartViews(): void
+    {
+        $publishedViews = resource_path('views/vendor/hyro');
+        $packageViews = __DIR__ . '/../resources/views';
+
+        // Load views with priority: published first, then package
+        if (File::exists($publishedViews)) {
+            // Load published views first (higher priority)
+            $this->loadViewsFrom($publishedViews, 'hyro');
+            
+            // Also load package views as fallback for any missing views
+            if (File::exists($packageViews)) {
+                $this->loadViewsFrom($packageViews, 'hyro');
+            }
+        } elseif (File::exists($packageViews)) {
+            // Load only package views (default)
+            $this->loadViewsFrom($packageViews, 'hyro');
+        }
+    }
+
+    /**
+     * Get the path to published assets if they exist, otherwise package assets.
+     *
+     * @param string $assetPath
+     * @return string
+     */
+    public static function getAssetPath(string $assetPath = ''): string
+    {
+        $publishedAssets = public_path('vendor/hyro');
+        $packageAssets = __DIR__ . '/../public/build';
+
+        // Check if published assets exist
+        if (File::exists($publishedAssets)) {
+            return asset('vendor/hyro/' . ltrim($assetPath, '/'));
+        }
+
+        // Fallback to package assets (for development)
+        return asset('vendor/hyro/' . ltrim($assetPath, '/'));
     }
 
     /**

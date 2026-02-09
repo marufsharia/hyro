@@ -111,6 +111,20 @@ Hyro is an enterprise-grade Authentication, Authorization, Role & Privilege Mana
 - Supports admin, auth, notification, and API routes
 - Update-safe customizations
 
+#### **Smart View Loading** ⭐ NEW
+- Views load from package by default
+- Publish views to customize admin UI, auth pages, components
+- Partial customization supported (only publish what you need)
+- Automatic fallback for unpublished views
+- Update-safe customizations
+
+#### **Smart Asset Loading** ⭐ NEW
+- Intelligent asset path resolution
+- Manifest-based asset loading
+- Support for CSS, JS, and images
+- Development and production modes
+- Automatic cache busting
+
 #### **Admin UI**
 - Beautiful Tailwind CSS interface
 - Livewire 3.x components
@@ -149,10 +163,17 @@ composer require marufsharia/hyro
 ```bash
 php artisan vendor:publish --tag=hyro-config
 php artisan vendor:publish --tag=hyro-migrations
-php artisan vendor:publish --tag=hyro-routes  # Optional: Only if you want to customize routes
+php artisan vendor:publish --tag=hyro-assets     # Required for CSS/JS
+php artisan vendor:publish --tag=hyro-routes     # Optional: Only if you want to customize routes
+php artisan vendor:publish --tag=hyro-views      # Optional: Only if you want to customize views
 ```
 
-> **Note:** Routes load from the package by default. Only publish routes if you need to customize them.
+> **Smart Resource Loading:** Hyro uses a smart loading system:
+> - **Routes** load from package by default, published routes take precedence
+> - **Views** load from package by default, published views override package views
+> - **Assets** should be published for production use
+> 
+> See [SMART_RESOURCE_LOADING.md](docs/SMART_RESOURCE_LOADING.md) for details.
 
 ### Run Migrations
 

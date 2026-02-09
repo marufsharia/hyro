@@ -623,3 +623,332 @@ HYRO_API_PREFIX=api/hyro
 ```
 
 ---
+
+
+---
+
+## 🎨 View Customization
+
+### Smart View Loading
+
+Hyro uses a smart view loading system that allows you to customize views without modifying the package files.
+
+**How it works:**
+
+1. **Default Behavior:** Views load from the package (`vendor/marufsharia/hyro/resources/views/`)
+2. **Custom Views:** If you publish views to `resources/views/vendor/hyro/`, those take precedence
+3. **Fallback Support:** Unpublished views automatically load from the package
+
+### Publishing Views
+
+To customize Hyro views, publish them to your application:
+
+```bash
+php artisan vendor:publish --tag=hyro-views
+```
+
+This will create the following structure in your `resources/views/vendor/hyro/` directory:
+
+- `admin/` - Admin panel views (dashboard, users, roles, privileges)
+- `auth/` - Authentication views (login, register, password reset)
+- `components/` - Reusable Blade components
+- `notifications/` - Notification center views
+
+### Customizing Views
+
+#### Full Customization
+
+Publish all views and modify as needed:
+
+```bash
+php artisan vendor:publish --tag=hyro-views
+```
+
+Then edit any view:
+
+```blade
+{{-- resources/views/vendor/hyro/admin/dashboard/dashboard.blade.php --}}
+
+@extends('hyro::admin.layouts.app')
+
+@section('content')
+    <div class="my-custom-dashboard">
+        {{-- Your custom dashboard content --}}
+        <h1>Welcome to My Custom Dashboard</h1>
+    </div>
+@endsection
+```
+
+#### Partial Customization
+
+Only customize specific views:
+
+1. Publish all views
+2. Delete views you don't need to customize
+3. Keep only the views you want to modify
+
+Example:
+
+```bash
+# Publish all views
+php artisan vendor:publish --tag=hyro-views
+
+# Keep only dashboard and layout
+# Delete other views you don't need to customize
+```
+
+The smart view loading will use your customized views and fall back to package views for the rest.
+
+### View Namespaces
+
+All Hyro views use the `hyro::` namespace:
+
+```blade
+{{-- Extend Hyro layouts --}}
+@extends('hyro::admin.layouts.app')
+
+{{-- Include Hyro views --}}
+@include('hyro::components.alert')
+
+{{-- Use Hyro components --}}
+<x-hyro-card title="My Card">
+    Content
+</x-hyro-card>
+```
+
+### Common View Customizations
+
+#### Customize Dashboard
+
+```blade
+{{-- resources/views/vendor/hyro/admin/dashboard/dashboard.blade.php --}}
+
+@extends('hyro::admin.layouts.app')
+
+@section('content')
+    {{-- Add your custom widgets --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {{-- Custom stat cards --}}
+    </div>
+@endsection
+```
+
+#### Customize Login Page
+
+```blade
+{{-- resources/views/vendor/hyro/auth/login.blade.php --}}
+
+@extends('hyro::auth.layouts.guest')
+
+@section('content')
+    <div class="custom-login-form">
+        {{-- Your custom login form --}}
+    </div>
+@endsection
+```
+
+#### Customize Layout
+
+```blade
+{{-- resources/views/vendor/hyro/admin/layouts/app.blade.php --}}
+
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    {{-- Your custom head content --}}
+    @hyroAssets
+</head>
+<body>
+    {{-- Your custom layout --}}
+    @yield('content')
+</body>
+</html>
+```
+
+### Reverting to Package Views
+
+To revert to package views, simply delete the published views:
+
+```bash
+rm -rf resources/views/vendor/hyro/
+```
+
+### View Loading Priority
+
+The view loading follows this priority:
+
+1. **Published Views** (`resources/views/vendor/hyro/**`) - Highest priority
+2. **Package Views** (`vendor/marufsharia/hyro/resources/views/**`) - Fallback
+
+---
+
+## 🎭 Asset Customization
+
+### Smart Asset Loading
+
+Hyro uses a smart asset loading system with manifest-based asset resolution.
+
+**How it works:**
+
+1. **Published Assets:** Load from `public/vendor/hyro/`
+2. **Manifest:** Uses `manifest.json` for versioned asset URLs
+3. **Cache Busting:** Automatic via versioned filenames
+
+### Publishing Assets
+
+Assets should be published for production use:
+
+```bash
+php artisan vendor:publish --tag=hyro-assets
+```
+
+This will create:
+
+```
+public/vendor/hyro/
+├── manifest.json
+├── assets/
+│   ├── hyro-[hash].css
+│   └── hyro-[hash].js
+└── images/
+    └── (image files)
+```
+
+### Using Assets in Views
+
+#### Using Blade Directives
+
+```blade
+{{-- Load all Hyro assets (CSS + JS) --}}
+@hyroAssets
+
+{{-- Or load individually --}}
+@hyroCss
+@hyroJs
+```
+
+#### Using Helper Methods
+
+```blade
+{{-- In your layout head --}}
+<head>
+    {!! \Marufsharia\Hyro\Helpers\HyroAsset::css() !!}
+    {!! \Marufsharia\Hyro\Helpers\HyroAsset::js() !!}
+</head>
+
+{{-- Get image URL --}}
+<img src="{{ \Marufsharia\Hyro\Helpers\HyroAsset::image('logo.png') }}" alt="Logo">
+```
+
+### Customizing Assets
+
+#### Option 1: Override Styles
+
+Create your own stylesheet to override Hyro styles:
+
+```blade
+{{-- In your layout --}}
+@hyroAssets
+
+{{-- Your custom overrides --}}
+<link rel="stylesheet" href="{{ asset('css/hyro-custom.css') }}">
+```
+
+```css
+/* public/css/hyro-custom.css */
+
+/* Override Hyro button colors */
+.btn-primary {
+    background-color: #your-color;
+}
+
+/* Override dashboard card styles */
+.dashboard-card {
+    border-radius: 12px;
+}
+```
+
+#### Option 2: Modify Published Assets
+
+```bash
+# Publish assets
+php artisan vendor:publish --tag=hyro-assets
+
+# Modify the CSS file
+# Edit: public/vendor/hyro/assets/hyro-[hash].css
+```
+
+> **Warning:** Modifying published assets directly will be overwritten when you republish. Use Option 1 for persistent customizations.
+
+### Asset Configuration
+
+Configure asset paths in `config/hyro.php`:
+
+```php
+'assets' => [
+    'url' => env('HYRO_ASSET_URL', '/vendor/hyro'),
+    'path' => env('HYRO_ASSET_PATH', public_path('vendor/hyro')),
+],
+```
+
+Or via environment variables:
+
+```env
+HYRO_ASSET_URL=/vendor/hyro
+HYRO_ASSET_PATH=/path/to/public/vendor/hyro
+```
+
+### Recompiling Assets
+
+If you're developing Hyro or need to recompile assets:
+
+```bash
+cd packages/marufsharia/hyro
+npm install
+npm run build
+
+# Publish the compiled assets
+php artisan vendor:publish --tag=hyro-assets --force
+```
+
+### Asset Loading in Production
+
+For production, ensure assets are published and optimized:
+
+```bash
+# Publish assets
+php artisan vendor:publish --tag=hyro-assets
+
+# Clear view cache
+php artisan view:clear
+
+# Optimize
+php artisan optimize
+```
+
+---
+
+## 📚 Smart Resource Loading Summary
+
+| Resource | Default Location | Published Location | Priority |
+|----------|-----------------|-------------------|----------|
+| **Routes** | `vendor/.../routes/` | `routes/hyro/` | Published first |
+| **Views** | `vendor/.../resources/views/` | `resources/views/vendor/hyro/` | Published first, package fallback |
+| **Assets** | `vendor/.../public/build/` | `public/vendor/hyro/` | Published only |
+| **Config** | `vendor/.../config/` | `config/hyro.php` | Published overrides |
+
+### Best Practices
+
+1. **Selective Publishing:** Only publish resources you need to customize
+2. **Version Control:** Commit published resources to version control
+3. **Documentation:** Document your customizations
+4. **Testing:** Test after customizing
+5. **Updates:** Check for changes when updating Hyro
+
+### Complete Documentation
+
+For comprehensive documentation on smart resource loading, see:
+- [SMART_RESOURCE_LOADING.md](SMART_RESOURCE_LOADING.md) - Complete guide
+- [SMART_ROUTE_LOADING.md](SMART_ROUTE_LOADING.md) - Route-specific details
+
+---
