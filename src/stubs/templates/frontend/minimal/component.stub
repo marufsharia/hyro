@@ -11,6 +11,8 @@ class {{ componentName }} extends BaseCrudComponent
 {
 {{ properties }}
 
+{{ layoutMethod }}
+
     public $categories = [];
     public $selectedCategory = null;
 

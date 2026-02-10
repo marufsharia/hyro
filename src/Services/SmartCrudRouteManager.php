@@ -318,7 +318,7 @@ PHP;
         }
 
         // Create backup directory in storage/app/private/routes
-        $backupDir = storage_path('app/private/routes');
+        $backupDir = storage_path('app/private/hyro/routes');
         if (!File::exists($backupDir)) {
             File::makeDirectory($backupDir, 0755, true);
         }
@@ -358,7 +358,7 @@ PHP;
      */
     public function listBackups(): array
     {
-        $backupDir = storage_path('app/private/routes');
+        $backupDir = storage_path('app/private/hyro/routes');
         
         if (!File::exists($backupDir)) {
             return [];

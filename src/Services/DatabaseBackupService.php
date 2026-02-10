@@ -326,7 +326,7 @@ class DatabaseBackupService
     protected function storeBackup(string $path, string $disk): string
     {
         $filename = basename($path);
-        $storagePath = 'backups/' . $filename;
+        $storagePath = 'hyro/backups/' . $filename;
         
         Storage::disk($disk)->put($storagePath, file_get_contents($path));
         

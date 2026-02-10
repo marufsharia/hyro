@@ -21,7 +21,9 @@ class NotificationBell extends Component
      */
     public function mount()
     {
-        $this->refreshNotifications();
+        if (auth()->check()) {
+            $this->refreshNotifications();
+        }
     }
 
     /**
@@ -29,6 +31,12 @@ class NotificationBell extends Component
      */
     public function refreshNotifications()
     {
+        if (!auth()->check()) {
+            $this->unreadCount = 0;
+            $this->recentNotifications = collect([]);
+            return;
+        }
+
         $this->unreadCount = auth()->user()->unreadNotifications()->count();
         $this->recentNotifications = auth()->user()
             ->unreadNotifications()
@@ -50,6 +58,10 @@ class NotificationBell extends Component
      */
     public function markAsRead($notificationId)
     {
+        if (!auth()->check()) {
+            return;
+        }
+
         $notification = auth()->user()
             ->notifications()
             ->where('id', $notificationId)
@@ -66,6 +78,10 @@ class NotificationBell extends Component
      */
     public function markAllAsRead()
     {
+        if (!auth()->check()) {
+            return;
+        }
+
         auth()->user()->unreadNotifications->markAsRead();
         $this->refreshNotifications();
     }

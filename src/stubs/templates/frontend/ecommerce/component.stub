@@ -11,6 +11,8 @@ class {{ componentName }} extends BaseCrudComponent
 {
 {{ properties }}
 
+{{ layoutMethod }}
+
     public $sortBy = 'latest';
     public $priceRange = [0, 10000];
 

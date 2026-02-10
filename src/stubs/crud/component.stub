@@ -11,6 +11,8 @@ class {{ componentName }} extends BaseCrudComponent
 {
 {{ properties }}
 
+{{ layoutMethod }}
+
     /**
      * Get the model class for CRUD operations
      */

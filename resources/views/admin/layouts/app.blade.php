@@ -140,6 +140,7 @@
             </nav>
 
             <!-- User Profile -->
+            @auth
             <div class="p-4 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center space-x-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
@@ -159,6 +160,16 @@
                     </form>
                 </div>
             </div>
+            @else
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                <a href="{{ route('hyro.login') }}" class="flex items-center justify-center space-x-2 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                    </svg>
+                    <span class="font-medium">Login</span>
+                </a>
+            </div>
+            @endauth
         </aside>
 
         <!-- Main Content -->
@@ -264,6 +275,7 @@
 
                 <!-- Main Content -->
                 @yield('content')
+                {{$slot??''}}
             </main>
 
             <!-- Footer -->

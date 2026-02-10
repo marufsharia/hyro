@@ -98,14 +98,20 @@ class MakeCrudCommand extends Command
         $this->config['module'] = $this->option('module');
         
         // New template system options
-        $this->config['frontend'] = filter_var($this->option('frontend'), FILTER_VALIDATE_BOOLEAN);
-        $this->config['auth'] = filter_var($this->option('auth'), FILTER_VALIDATE_BOOLEAN);
+        $this->config['frontend'] = $this->option('frontend') ?? false;
+        $this->config['auth'] = $this->option('auth') ?? true;
         $this->config['template'] = $this->option('template') ?: 'admin.template1';
         
         // Parse template (format: admin.template1 or frontend.template1)
         $templateParts = explode('.', $this->config['template']);
         $this->config['template_type'] = $templateParts[0] ?? 'admin'; // admin or frontend
         $this->config['template_name'] = $templateParts[1] ?? 'template1';
+        
+        // Auto-set template_type to frontend if --frontend=true and template not explicitly set
+        if ($this->config['frontend'] && !$this->option('template')) {
+            $this->config['template_type'] = 'frontend';
+            $this->config['template'] = 'frontend.template1';
+        }
     }
 
     protected function validate()
@@ -117,10 +123,12 @@ class MakeCrudCommand extends Command
             return false;
         }
 
-        if (!$this->option('migration') && !class_exists($this->model)) {
-            $this->error("❌ Model {$this->model} does not exist!");
-            $this->line("   Run with --migration to create it automatically.");
-            return false;
+        // Auto-enable migration if model doesn't exist and fields are provided
+        if (!class_exists($this->model) && !empty($this->fields)) {
+            if (!$this->option('migration')) {
+                $this->config['migration'] = true;
+                $this->info("ℹ️  Model doesn't exist. Auto-enabling migration generation...");
+            }
         }
 
         return true;
@@ -153,6 +161,11 @@ class MakeCrudCommand extends Command
     {
         $this->info('🚀 Generating files...');
         $this->newLine();
+
+        // Publish frontend layouts if needed
+        if ($this->config['frontend']) {
+            $this->components->task('Publishing frontend layouts', fn() => $this->publishFrontendLayouts());
+        }
 
         if ($this->config['migration']) {
             $this->components->task('Creating migration', fn() => $this->generateMigration());
@@ -269,6 +282,7 @@ class MakeCrudCommand extends Command
         $stub = str_replace('{{ componentName }}', $componentName, $stub);
         $stub = str_replace('{{ modelClass }}', $this->model, $stub);
         $stub = str_replace('{{ properties }}', $this->generateProperties(), $stub);
+        $stub = str_replace('{{ layoutMethod }}', $this->generateLayoutMethod(), $stub);
         $stub = str_replace('{{ fields }}', $this->generateFieldsConfig(), $stub);
         $stub = str_replace('{{ searchableFields }}', $this->formatArrayForPhp($this->config['searchable']), $stub);
         $stub = str_replace('{{ tableColumns }}', $this->formatArrayForPhp($this->config['sortable']), $stub);
@@ -363,6 +377,71 @@ class MakeCrudCommand extends Command
     {
         // This would integrate with Hyro privilege system
         $this->warnings[] = "Privileges feature requires manual integration with Hyro privilege system";
+        return true;
+    }
+
+    protected function publishFrontendLayouts()
+    {
+        // Define source and destination paths
+        $layoutsToCopy = [
+            [
+                'source' => base_path('packages/marufsharia/hyro/resources/views/layouts/frontend.blade.php'),
+                'destination' => resource_path('views/layouts/frontend.blade.php'),
+                'name' => 'frontend.blade.php'
+            ],
+            [
+                'source' => base_path('packages/marufsharia/hyro/resources/views/layouts/partials/frontend-nav.blade.php'),
+                'destination' => resource_path('views/layouts/partials/frontend-nav.blade.php'),
+                'name' => 'frontend-nav.blade.php'
+            ],
+            [
+                'source' => base_path('packages/marufsharia/hyro/resources/views/layouts/partials/frontend-footer.blade.php'),
+                'destination' => resource_path('views/layouts/partials/frontend-footer.blade.php'),
+                'name' => 'frontend-footer.blade.php'
+            ],
+        ];
+
+        $published = [];
+        $existing = [];
+        $failed = [];
+
+        foreach ($layoutsToCopy as $layout) {
+            // Check if destination already exists
+            if (File::exists($layout['destination'])) {
+                $existing[] = $layout['name'];
+                continue;
+            }
+
+            // Check if source exists
+            if (!File::exists($layout['source'])) {
+                $failed[] = $layout['name'] . ' (source not found)';
+                continue;
+            }
+
+            // Create directory if it doesn't exist
+            File::ensureDirectoryExists(dirname($layout['destination']));
+
+            // Copy the file
+            if (File::copy($layout['source'], $layout['destination'])) {
+                $published[] = $layout['name'];
+            } else {
+                $failed[] = $layout['name'] . ' (copy failed)';
+            }
+        }
+
+        // Display status
+        if (!empty($published)) {
+            $this->line("   ✓ Published: " . implode(', ', $published));
+        }
+
+        if (!empty($existing)) {
+            $this->line("   ✓ Already exists: " . implode(', ', $existing));
+        }
+
+        if (!empty($failed)) {
+            $this->warn("   ⚠ Failed: " . implode(', ', $failed));
+        }
+
         return true;
     }
 
@@ -481,17 +560,22 @@ class MakeCrudCommand extends Command
         }
 
         $fields = [];
-        $parts = explode(',', $fieldsString);
+        
+        // Split by comma, but handle type definitions like decimal:10,2
+        // Use regex to properly split field definitions
+        preg_match_all('/([a-zA-Z_][a-zA-Z0-9_]*):([^:,]+(?::\d+,\d+)?|[^:,]+)(?::([^,]+))?(?:,|$)/', $fieldsString, $matches, PREG_SET_ORDER);
+        
+        foreach ($matches as $match) {
+            $fieldName = $match[1];
+            $fieldType = $match[2] ?? 'string';
+            $rules = $match[3] ?? 'nullable';
 
-        foreach ($parts as $part) {
-            $segments = explode(':', trim($part));
-            $fieldName = $segments[0];
-            $fieldType = $segments[1] ?? 'string';
-            $rules = $segments[2] ?? 'nullable';
+            // Extract base type and parameters (e.g., "decimal:10,2" -> "decimal")
+            $baseType = explode(':', $fieldType)[0];
 
             $fields[$fieldName] = [
-                'type' => $this->mapFieldType($fieldType),
-                'db_type' => $fieldType,
+                'type' => $this->mapFieldType($baseType),
+                'db_type' => $fieldType, // Keep full type with parameters
                 'rules' => $rules,
                 'label' => Str::title(str_replace('_', ' ', $fieldName)),
             ];
@@ -825,6 +909,26 @@ class MakeCrudCommand extends Command
     protected function generateImportMessages(): string
     {
         return "            // Custom messages here";
+    }
+
+    /**
+     * Generate layout property for component based on frontend flag
+     * Uses the existing getLayout() method from HasCrud trait
+     */
+    protected function generateLayoutMethod(): string
+    {
+        // If frontend is enabled, add layout property to use frontend layout
+        // The getLayout() method in HasCrud trait will use this property
+        if ($this->config['frontend']) {
+            return "    /**
+     * The layout to use for this component
+     */
+    public \$layout = 'layouts.frontend';
+";
+        }
+
+        // For admin or default, return empty (uses default admin layout from config)
+        return '';
     }
 
     protected function formatArrayForPhp(array $items, bool $quotes = true, string $indent = ''): string

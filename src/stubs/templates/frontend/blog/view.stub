@@ -1,209 +1,537 @@
-<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-indigo-900/10">
-    <!-- Hero Header -->
-    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="text-center">
-                <h1 class="text-5xl font-bold mb-4">{{ $resourceNamePlural }}</h1>
-                <p class="text-xl text-purple-100">Discover stories, thinking, and expertise</p>
-            </div>
+{{-- Blog Template - F-Pattern Layout with Featured Hero --}}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+    {{-- Hero Header with Navigation --}}
+    <header class="relative bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white overflow-hidden">
+        {{-- Background Pattern --}}
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
         </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Search & Filter Bar -->
-        <div class="mb-12" x-data="{ showFilters: false }">
-            <div class="flex flex-col lg:flex-row gap-4 items-center">
-                <div class="flex-1 w-full">
-                    <div class="relative">
-                        <input
-                            wire:model.live.debounce.300ms="search"
-                            type="text"
-                            placeholder="Search articles..."
-                            class="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-purple-200 dark:border-purple-800 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-purple-500 focus:ring-4 focus:ring-purple-200 dark:focus:ring-purple-900 transition-all">
-                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {{-- Navigation Bar --}}
+            <nav class="flex items-center justify-between mb-12">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                         </svg>
                     </div>
+                    <span class="text-xl font-bold">{{ $resourceNamePlural }}</span>
                 </div>
-                
-                @auth
-                <button
-                    wire:click="create"
-                    class="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-2xl font-semibold shadow-lg shadow-purple-500/50 transition-all transform hover:scale-105">
-                    <span class="flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                <div class="flex items-center space-x-4">
+                    <input wire:model.live.debounce.300ms="search" 
+                           type="search" 
+                           placeholder="Search articles..."
+                           class="hidden md:block px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50 w-64">
+                    @auth
+                    <button wire:click="create" 
+                            class="px-6 py-2.5 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl hover:scale-105">
+                        <span class="flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            <span class="hidden sm:inline">New Article</span>
+                        </span>
+                    </button>
+                    @endauth
+                </div>
+            </nav>
+
+            {{-- Hero Content --}}
+            <div class="text-center max-w-3xl mx-auto pb-16">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                    Discover Amazing Stories
+                </h1>
+                <p class="text-lg md:text-xl text-purple-100 mb-8">
+                    Explore our collection of insightful articles, tutorials, and thought-provoking content
+                </p>
+                <div class="flex flex-wrap items-center justify-center gap-4 text-sm">
+                    <div class="flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
                         </svg>
-                        Write Article
-                    </span>
+                        <span>{{ $items->total() }} Articles</span>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Updated Daily</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Wave Divider --}}
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="rgb(250, 245, 255)"/>
+            </svg>
+        </div>
+    </header>
+
+    {{-- Main Content - F-Pattern Layout --}}
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {{-- Mobile Search --}}
+        <div class="md:hidden mb-8">
+            <input wire:model.live.debounce.300ms="search" 
+                   type="search" 
+                   placeholder="Search articles..."
+                   class="w-full px-4 py-3 bg-white border-2 border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        @if($items->isEmpty())
+            {{-- Empty State --}}
+            <div class="text-center py-20">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-purple-100 rounded-full mb-6">
+                    <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">No articles yet</h3>
+                <p class="text-gray-600 mb-6">Be the first to share your story</p>
+                @auth
+                <button wire:click="create" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                    Write First Article
                 </button>
                 @endauth
             </div>
-        </div>
-
-        <!-- Featured Article -->
-        @if($items->isNotEmpty())
-        <div class="mb-16">
-            <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
-                <div class="grid lg:grid-cols-2 gap-0">
-                    @if(isset($items->first()->image) && $items->first()->image)
-                    <div class="h-96 lg:h-auto">
-                        <img src="{{ Storage::disk('public')->url($items->first()->image) }}" 
-                             alt="{{ $items->first()->title ?? 'Featured' }}"
-                             class="w-full h-full object-cover">
-                    </div>
-                    @endif
-                    <div class="p-12 flex flex-col justify-center">
-                        <span class="inline-block px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-full text-sm font-semibold mb-4 w-fit">
-                            Featured
-                        </span>
-                        <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                            {{ $items->first()->title ?? $items->first()->name ?? 'Featured Article' }}
-                        </h2>
-                        @if(isset($items->first()->description))
-                        <p class="text-lg text-gray-600 dark:text-gray-300 mb-6 line-clamp-3">
-                            {{ $items->first()->description }}
-                        </p>
-                        @endif
-                        <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-6">
-                            <span>{{ $items->first()->created_at->format('M d, Y') }}</span>
-                            <span>•</span>
-                            <span>5 min read</span>
+        @else
+            {{-- Featured Article (First Item) --}}
+            @if($items->isNotEmpty())
+            <div class="mb-12">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+                    <div class="grid md:grid-cols-2 gap-0">
+                        <div class="relative h-64 md:h-full min-h-[400px] bg-gradient-to-br from-purple-500 to-indigo-600">
+                            @if(isset($items->first()->image))
+                            <img src="{{ $items->first()->image }}" alt="{{ $items->first()->title ?? 'Featured' }}" class="w-full h-full object-cover">
+                            @else
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <svg class="w-24 h-24 text-white/30" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            @endif
+                            <div class="absolute top-4 left-4">
+                                <span class="px-4 py-2 bg-white/90 backdrop-blur-sm text-purple-600 rounded-full text-sm font-semibold">Featured</span>
+                            </div>
                         </div>
-                        <button
-                            wire:click="view({{ $items->first()->id }})"
-                            class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-colors w-fit">
-                            Read More →
-                        </button>
+                        <div class="p-8 md:p-12 flex flex-col justify-center">
+                            <div class="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ $items->first()->created_at->format('M d, Y') }}</span>
+                            </div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                                {{ $items->first()->title ?? 'Untitled' }}
+                            </h2>
+                            <p class="text-gray-600 mb-6 line-clamp-3">
+                                {{ $items->first()->description ?? $items->first()->content ?? 'No description available' }}
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <button wire:click="edit({{ $items->first()->id }})" 
+                                        class="inline-flex items-center space-x-2 text-purple-600 hover:text-purple-700 font-semibold group">
+                                    <span>Read More</span>
+                                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                    </svg>
+                                </button>
+                                @auth
+                                <button wire:click="delete({{ $items->first()->id }})" 
+                                        wire:confirm="Are you sure you want to delete this article?"
+                                        class="text-red-600 hover:text-red-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                                @endauth
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        @endif
+            @endif
 
-        <!-- Articles Grid -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach($items->skip(1) as $item)
-            <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                @if(isset($item->image) && $item->image)
-                <div class="h-56 overflow-hidden">
-                    <img src="{{ Storage::disk('public')->url($item->image) }}" 
-                         alt="{{ $item->title ?? 'Article' }}"
-                         class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
-                </div>
-                @endif
-                
-                <div class="p-6">
-                    <div class="flex items-center gap-2 mb-3">
-                        @if(isset($item->category))
-                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-full text-xs font-semibold">
-                            {{ $item->category }}
-                        </span>
+            {{-- Article Grid (Remaining Items) --}}
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($items->skip(1) as $item)
+                <article class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                    <div class="relative h-48 bg-gradient-to-br from-purple-400 to-indigo-500">
+                        @if(isset($item->image))
+                        <img src="{{ $item->image }}" alt="{{ $item->title ?? 'Article' }}" class="w-full h-full object-cover">
+                        @else
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white/30" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
                         @endif
-                        <span class="text-xs text-gray-500 dark:text-gray-400">
-                            {{ $item->created_at->diffForHumans() }}
-                        </span>
                     </div>
-                    
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
-                        {{ $item->title ?? $item->name ?? 'Article #' . $item->id }}
-                    </h3>
-                    
-                    @if(isset($item->description))
-                    <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                        {{ $item->description }}
-                    </p>
-                    @endif
-
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <button
-                            wire:click="view({{ $item->id }})"
-                            class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium">
-                            Read More →
-                        </button>
-                        
-                        @if(auth()->check() && auth()->id() === $item->user_id)
-                        <div class="flex gap-2">
-                            <button
-                                wire:click="edit({{ $item->id }})"
-                                class="p-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
+                    <div class="p-6">
+                        <div class="flex items-center space-x-2 text-xs text-gray-500 mb-3">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ $item->created_at->format('M d, Y') }}</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                            {{ $item->title ?? 'Untitled' }}
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                            {{ $item->description ?? $item->content ?? 'No description' }}
+                        </p>
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <button wire:click="edit({{ $item->id }})" 
+                                    class="text-purple-600 hover:text-purple-700 font-medium text-sm">
+                                Read More →
                             </button>
-                            <button
-                                wire:click="confirmDelete({{ $item->id }})"
-                                class="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                            @auth
+                            <button wire:click="delete({{ $item->id }})" 
+                                    wire:confirm="Are you sure?"
+                                    class="text-red-600 hover:text-red-700">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                 </svg>
                             </button>
+                            @endauth
                         </div>
-                        @endif
                     </div>
-                </div>
-            </article>
-            @endforeach
-        </div>
+                </article>
+                @endforeach
+            </div>
 
-        <!-- Empty State -->
-        @if($items->isEmpty())
-        <div class="text-center py-20">
-            <svg class="mx-auto h-24 w-24 text-purple-300 dark:text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-            </svg>
-            <h3 class="mt-6 text-2xl font-bold text-gray-900 dark:text-white">No articles yet</h3>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">Start writing your first article!</p>
-        </div>
+            {{-- Pagination --}}
+            <div class="mt-12">
+                {{ $items->links() }}
+            </div>
         @endif
+    </main>
 
-        <!-- Pagination -->
-        @if($items->hasPages())
-        <div class="mt-12">
-            {{ $items->links() }}
+    {{-- Footer --}}
+    <footer class="bg-gray-900 text-white mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="text-center">
+                <p class="text-gray-400">&copy; {{ date('Y') }} {{ $resourceNamePlural }}. All rights reserved.</p>
+            </div>
         </div>
-        @endif
-    </div>
+    </footer>
 
-    <!-- Modal -->
-    @if($showModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto" x-data x-init="document.body.style.overflow = 'hidden'" x-destroy="document.body.style.overflow = 'auto'">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" wire:click="closeModal"></div>
-            
-            <div class="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-3xl w-full p-8 max-h-[90vh] overflow-y-auto">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white">
-                        {{ $editMode ? 'Edit' : 'Create' }} Article
+    {{-- Create/Edit Modal --}}
+    <div x-data="{ showModal: @entangle('showModal').live }"
+         x-show="showModal"
+         x-cloak
+         @keydown.escape.window="showModal = false"
+         class="fixed inset-0 z-50 overflow-y-auto"
+         style="display: none;">
+
+        {{-- Backdrop --}}
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+             x-show="showModal"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @click="showModal = false"></div>
+
+        {{-- Modal Panel --}}
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-2xl transform bg-white dark:bg-gray-800 rounded-2xl shadow-2xl transition-all"
+                 x-show="showModal"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 @click.stop>
+
+                {{-- Modal Header --}}
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        @if($isEditing)
+                            Edit {{ $resourceName }}
+                        @else
+                            Create {{ $resourceName }}
+                        @endif
                     </h3>
                     <button
-                        wire:click="closeModal"
-                        class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        @click="showModal = false"
+                        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
                 </div>
 
-                <form wire:submit.prevent="save" class="space-y-6">
-{{ formFields }}
+                {{-- Modal Body --}}
+                <form wire:submit="save">
+                    <div class="px-6 py-6 max-h-[calc(100vh-16rem)] overflow-y-auto">
+                        <div class="grid grid-cols-6 gap-6">
+                            @foreach($fields as $fieldName => $field)
+                                @php
+                                    $fieldType = $field['type'];
+                                    $isRequired = str_contains($field['rules'] ?? '', 'required');
+                                @endphp
 
-                    <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                                {{-- Text/Email/URL Input --}}
+                                @if(in_array($fieldType, ['text', 'email', 'url', 'password']))
+                                <div class="col-span-6">
+                                    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        {{ $field['label'] ?? Str::title(str_replace('_', ' ', $fieldName)) }}
+                                        @if($isRequired)<span class="text-red-500">*</span>@endif
+                                    </label>
+                                    <input
+                                        wire:model="{{ $fieldName }}"
+                                        type="{{ $fieldType === 'email' ? 'email' : ($fieldType === 'url' ? 'url' : ($fieldType === 'password' ? 'password' : 'text')) }}"
+                                        id="{{ $fieldName }}"
+                                        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        placeholder="Enter {{ strtolower($field['label'] ?? $fieldName) }}">
+                                    @error($fieldName)
+                                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                @endif
+
+                                {{-- Textarea --}}
+                                @if($fieldType === 'textarea')
+                                <div class="col-span-6">
+                                    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        {{ $field['label'] ?? Str::title(str_replace('_', ' ', $fieldName)) }}
+                                        @if($isRequired)<span class="text-red-500">*</span>@endif
+                                    </label>
+                                    <textarea
+                                        wire:model="{{ $fieldName }}"
+                                        id="{{ $fieldName }}"
+                                        rows="4"
+                                        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                                        placeholder="Enter {{ strtolower($field['label'] ?? $fieldName) }}"></textarea>
+                                    @error($fieldName)
+                                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                @endif
+
+                                {{-- Number/Decimal --}}
+                                @if(in_array($fieldType, ['number', 'decimal']))
+                                <div class="col-span-3">
+                                    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        {{ $field['label'] ?? Str::title(str_replace('_', ' ', $fieldName)) }}
+                                        @if($isRequired)<span class="text-red-500">*</span>@endif
+                                    </label>
+                                    <input
+                                        wire:model="{{ $fieldName }}"
+                                        type="number"
+                                        step="{{ $fieldType === 'decimal' ? '0.01' : '1' }}"
+                                        id="{{ $fieldName }}"
+                                        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        placeholder="0">
+                                    @error($fieldName)
+                                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                @endif
+
+                                {{-- Checkbox --}}
+                                @if($fieldType === 'checkbox')
+                                <div class="col-span-6">
+                                    <div class="flex items-center">
+                                        <input
+                                            wire:model="{{ $fieldName }}"
+                                            type="checkbox"
+                                            id="{{ $fieldName }}"
+                                            class="w-5 h-5 text-blue-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2">
+                                        <label for="{{ $fieldName }}" class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            {{ $field['label'] ?? Str::title(str_replace('_', ' ', $fieldName)) }}
+                                        </label>
+                                    </div>
+                                    @error($fieldName)
+                                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                @endif
+
+                                {{-- Date/DateTime --}}
+                                @if(in_array($fieldType, ['date', 'datetime']))
+                                <div class="col-span-6">
+                                    <label for="{{ $fieldName }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        {{ $field['label'] ?? Str::title(str_replace('_', ' ', $fieldName)) }}
+                                        @if($isRequired)<span class="text-red-500">*</span>@endif
+                                    </label>
+                                    <input
+                                        wire:model="{{ $fieldName }}"
+                                        type="{{ $fieldType === 'datetime' ? 'datetime-local' : 'date' }}"
+                                        id="{{ $fieldName }}"
+                                        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                    @error($fieldName)
+                                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                @endif
+
+                                {{-- File/Image Upload --}}
+                                @if(in_array($fieldType, ['file', 'image']))
+                                <div class="col-span-6">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        {{ $field['label'] ?? Str::title(str_replace('_', ' ', $fieldName)) }}
+                                        @if($isRequired)<span class="text-red-500">*</span>@endif
+                                    </label>
+
+                                    <div class="mt-1"
+                                         x-data="{ uploading: false, progress: 0 }"
+                                         x-on:livewire-upload-start="uploading = true"
+                                         x-on:livewire-upload-finish="uploading = false; progress = 0"
+                                         x-on:livewire-upload-error="uploading = false"
+                                         x-on:livewire-upload-progress="progress = $event.detail.progress">
+
+                                        <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-blue-500 transition-colors cursor-pointer"
+                                             onclick="document.getElementById('{{ $fieldName }}_input').click()">
+                                            <div class="space-y-2 text-center">
+                                                <div class="mb-4">
+                                                    @if($fieldType === 'image')
+                                                        @if($this->{$fieldName})
+                                                            @if(is_string($this->{$fieldName}))
+                                                                <img src="{{ Storage::disk('public')->url($this->{$fieldName}) }}"
+                                                                     class="mx-auto h-32 w-auto rounded-lg object-cover">
+                                                            @else
+                                                                <img src="{{ $this->{$fieldName}->temporaryUrl() }}"
+                                                                     class="mx-auto h-32 w-auto rounded-lg object-cover">
+                                                            @endif
+                                                        @else
+                                                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                            </svg>
+                                                        @endif
+                                                    @else
+                                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                        </svg>
+                                                    @endif
+                                                </div>
+
+                                                <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
+                                                    <span class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-blue-600 hover:text-blue-500 px-2">
+                                                        <span>Upload a file</span>
+                                                        <input
+                                                            wire:model="{{ $fieldName }}"
+                                                            id="{{ $fieldName }}_input"
+                                                            type="file"
+                                                            class="sr-only"
+                                                            accept="{{ $fieldType === 'image' ? 'image/*' : '*/*' }}">
+                                                    </span>
+                                                    <p class="pl-1">or drag and drop</p>
+                                                </div>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                    @if($fieldType === 'image')
+                                                        PNG, JPG, GIF up to 2MB
+                                                    @else
+                                                        Any file up to 10MB
+                                                    @endif
+                                                </p>
+
+                                                <div x-show="uploading" class="mt-4" style="display: none;">
+                                                    <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                                                        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                                             :style="`width: ${progress}%`"></div>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 mt-1" x-text="`Uploading... ${progress}%`"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @if($this->{$fieldName})
+                                        <button
+                                            type="button"
+                                            wire:click="$set('{{ $fieldName }}', null)"
+                                            class="mt-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                            Remove file
+                                        </button>
+                                        @endif
+                                    </div>
+
+                                    @error($fieldName)
+                                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Modal Footer --}}
+                    <div class="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700">
                         <button
                             type="button"
-                            wire:click="closeModal"
-                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                            @click="showModal = false"
+                            class="px-4 py-2.5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            class="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl font-semibold shadow-lg shadow-purple-500/50 transition-all">
-                            {{ $editMode ? 'Update' : 'Publish' }}
+                            class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+                            @if($isEditing)
+                                Update
+                            @else
+                                Create
+                            @endif
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    @endif
+
+    {{-- Delete Confirmation Modal --}}
+    <div x-data="{ showDeleteModal: @entangle('showDeleteModal').live }"
+         x-show="showDeleteModal"
+         x-cloak
+         @keydown.escape.window="showDeleteModal = false"
+         class="fixed inset-0 z-50 overflow-y-auto"
+         style="display: none;">
+
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+             x-show="showDeleteModal"
+             x-transition
+             @click="showDeleteModal = false"></div>
+
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-md transform bg-white dark:bg-gray-800 rounded-2xl shadow-2xl transition-all"
+                 x-show="showDeleteModal"
+                 x-transition
+                 @click.stop>
+
+                <div class="p-6">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Delete {{ $resourceName }}</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Are you sure you want to delete this {{ strtolower($resourceName) }}? This action cannot be undone.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 justify-end">
+                        <button
+                            type="button"
+                            @click="showDeleteModal = false"
+                            class="px-4 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                            Cancel
+                        </button>
+                        <button
+                            wire:click="delete"
+                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

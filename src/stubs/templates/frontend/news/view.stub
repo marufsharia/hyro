@@ -1,249 +1,224 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <!-- Breaking News Banner -->
-    <div class="bg-gradient-to-r from-red-600 to-orange-600 text-white py-3 sticky top-0 z-40 shadow-lg">
+{{-- News Template - Z-Pattern Layout with Breaking News Banner --}}
+<div class="min-h-screen bg-gray-50">
+    {{-- Breaking News Banner --}}
+    <div class="bg-gradient-to-r from-red-600 to-orange-600 text-white py-3 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center gap-4">
-                <span class="px-3 py-1 bg-white/20 backdrop-blur rounded-full text-sm font-bold animate-pulse">
-                    BREAKING
-                </span>
-                <p class="flex-1 text-sm font-medium truncate">
-                    Latest updates and breaking news stories
-                </p>
+            <div class="flex items-center space-x-4">
+                <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-bold flex-shrink-0">BREAKING</span>
+                <div class="flex-1 overflow-hidden">
+                    <p class="animate-marquee whitespace-nowrap">
+                        Latest updates • {{ $items->total() }} stories available • Stay informed with real-time news
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Header -->
-    <div class="bg-white dark:bg-gray-800 border-b-4 border-red-600 dark:border-red-500 sticky top-12 z-30 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-4xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
-                        {{ $resourceNamePlural }}
-                    </h1>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        {{ now()->format('l, F j, Y') }}
-                    </p>
+    {{-- Header Navigation --}}
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between py-4">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">{{ $resourceNamePlural }}</h1>
+                            <p class="text-xs text-gray-500">{{ date('l, F j, Y') }}</p>
+                        </div>
+                    </div>
                 </div>
                 
+                <div class="flex items-center space-x-4">
+                    <input wire:model.live.debounce.300ms="search" 
+                           type="search" 
+                           placeholder="Search news..."
+                           class="hidden md:block px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 w-64">
+                    @auth
+                    <button wire:click="create" 
+                            class="px-6 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg hover:from-red-700 hover:to-orange-700 transition-all duration-200 font-semibold shadow-lg">
+                        <span class="flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            <span class="hidden sm:inline">Publish Story</span>
+                        </span>
+                    </button>
+                    @endauth
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {{-- Main Content - Z-Pattern Layout --}}
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {{-- Mobile Search --}}
+        <div class="md:hidden mb-6">
+            <input wire:model.live.debounce.300ms="search" 
+                   type="search" 
+                   placeholder="Search news..."
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+        </div>
+
+        @if($items->isEmpty())
+            {{-- Empty State --}}
+            <div class="text-center py-20">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-6">
+                    <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">No news yet</h3>
+                <p class="text-gray-600 mb-6">Be the first to break the story</p>
                 @auth
-                <button
-                    wire:click="create"
-                    class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-colors">
-                    + Submit News
+                <button wire:click="create" class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    Publish First Story
                 </button>
                 @endauth
             </div>
-        </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Search Bar -->
-        <div class="mb-8">
-            <input
-                wire:model.live.debounce.300ms="search"
-                type="text"
-                placeholder="Search news..."
-                class="w-full px-6 py-4 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-red-500 focus:ring-4 focus:ring-red-200 dark:focus:ring-red-900 transition-all">
-        </div>
-
-        <!-- Main News Grid -->
-        <div class="grid lg:grid-cols-3 gap-8">
-            <!-- Main Column -->
-            <div class="lg:col-span-2 space-y-8">
-                @foreach($items as $index => $item)
-                @if($index === 0)
-                <!-- Lead Story -->
-                <article class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden">
-                    @if(isset($item->image) && $item->image)
-                    <div class="relative h-96">
-                        <img src="{{ Storage::disk('public')->url($item->image) }}" 
-                             alt="{{ $item->title ?? 'News' }}"
-                             class="w-full h-full object-cover">
-                        <div class="absolute top-4 left-4">
-                            <span class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold shadow-lg">
-                                HEADLINE
-                            </span>
+        @else
+            {{-- Top Story (Z-Pattern: Top Left to Right) --}}
+            @if($items->isNotEmpty())
+            <div class="mb-12">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    <div class="grid lg:grid-cols-5 gap-0">
+                        <div class="lg:col-span-3 relative h-96 lg:h-auto bg-gradient-to-br from-red-500 to-orange-600">
+                            @if(isset($items->first()->image))
+                            <img src="{{ $items->first()->image }}" alt="{{ $items->first()->title ?? 'Top Story' }}" class="w-full h-full object-cover">
+                            @else
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <svg class="w-24 h-24 text-white/30" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            @endif
+                            <div class="absolute top-6 left-6">
+                                <span class="px-4 py-2 bg-red-600 text-white rounded-full text-sm font-bold shadow-lg">TOP STORY</span>
+                            </div>
                         </div>
-                    </div>
-                    @endif
-                    
-                    <div class="p-8">
-                        <div class="flex items-center gap-3 mb-4 text-sm text-gray-600 dark:text-gray-400">
-                            <span class="font-semibold text-red-600 dark:text-red-400">BREAKING NEWS</span>
-                            <span>•</span>
-                            <span>{{ $item->created_at->diffForHumans() }}</span>
-                        </div>
-                        
-                        <h2 class="text-3xl font-black text-gray-900 dark:text-white mb-4 leading-tight">
-                            {{ $item->title ?? $item->name ?? 'Breaking News' }}
-                        </h2>
-                        
-                        @if(isset($item->description))
-                        <p class="text-lg text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-                            {{ $item->description }}
-                        </p>
-                        @endif
-
-                        <div class="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
-                            <button
-                                wire:click="view({{ $item->id }})"
-                                class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-colors">
-                                Read Full Story →
-                            </button>
-                            
-                            @if(auth()->check() && auth()->id() === $item->user_id)
-                            <div class="flex gap-2">
-                                <button wire:click="edit({{ $item->id }})" class="p-2 text-gray-600 hover:text-red-600">
+                        <div class="lg:col-span-2 p-8 lg:p-10 flex flex-col justify-center">
+                            <div class="flex items-center space-x-2 text-sm text-red-600 font-semibold mb-4">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>{{ $items->first()->created_at->diffForHumans() }}</span>
+                            </div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                                {{ $items->first()->title ?? 'Untitled Story' }}
+                            </h2>
+                            <p class="text-gray-600 mb-6 line-clamp-4">
+                                {{ $items->first()->description ?? $items->first()->content ?? 'No description available' }}
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <button wire:click="edit({{ $items->first()->id }})" 
+                                        class="inline-flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">
+                                    <span>Read Full Story</span>
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                                     </svg>
                                 </button>
-                                <button wire:click="confirmDelete({{ $item->id }})" class="p-2 text-gray-600 hover:text-red-600">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                @auth
+                                <button wire:click="delete({{ $items->first()->id }})" 
+                                        wire:confirm="Are you sure?"
+                                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
                                 </button>
+                                @endauth
                             </div>
-                            @endif
                         </div>
                     </div>
-                </article>
-                @else
-                <!-- Regular News Items -->
-                <article class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                    <div class="flex gap-6 p-6">
-                        @if(isset($item->image) && $item->image)
-                        <div class="w-48 h-32 flex-shrink-0 rounded-lg overflow-hidden">
-                            <img src="{{ Storage::disk('public')->url($item->image) }}" 
-                                 alt="{{ $item->title ?? 'News' }}"
-                                 class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
+                </div>
+            </div>
+            @endif
+
+            {{-- Latest News Grid (Z-Pattern: Diagonal Flow) --}}
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="w-1 h-8 bg-red-600 mr-3"></span>
+                    Latest News
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($items->skip(1) as $item)
+                <article class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group">
+                    <div class="relative h-48 bg-gradient-to-br from-red-400 to-orange-500 overflow-hidden">
+                        @if(isset($item->image))
+                        <img src="{{ $item->image }}" alt="{{ $item->title ?? 'News' }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        @else
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white/30" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                            </svg>
                         </div>
                         @endif
-                        
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-2 text-xs text-gray-600 dark:text-gray-400">
-                                <span class="px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 rounded font-semibold">
-                                    NEWS
-                                </span>
-                                <span>{{ $item->created_at->format('M d, Y • h:i A') }}</span>
-                            </div>
-                            
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 hover:text-red-600 dark:hover:text-red-400 transition-colors cursor-pointer"
-                                wire:click="view({{ $item->id }})">
-                                {{ $item->title ?? $item->name ?? 'News Story' }}
-                            </h3>
-                            
-                            @if(isset($item->description))
-                            <p class="text-gray-600 dark:text-gray-300 line-clamp-2 mb-3">
-                                {{ $item->description }}
-                            </p>
-                            @endif
-
-                            <div class="flex items-center justify-between">
-                                <button
-                                    wire:click="view({{ $item->id }})"
-                                    class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold text-sm">
-                                    Read More →
-                                </button>
-                                
-                                @if(auth()->check() && auth()->id() === $item->user_id)
-                                <div class="flex gap-2">
-                                    <button wire:click="edit({{ $item->id }})" class="p-1 text-gray-400 hover:text-red-600">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                    </button>
-                                    <button wire:click="confirmDelete({{ $item->id }})" class="p-1 text-gray-400 hover:text-red-600">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                                @endif
-                            </div>
+                        <div class="absolute top-3 right-3">
+                            <span class="px-3 py-1 bg-red-600/90 backdrop-blur-sm text-white rounded-full text-xs font-bold">
+                                {{ $item->created_at->format('H:i') }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center space-x-2 text-xs text-red-600 font-semibold mb-3">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ $item->created_at->diffForHumans() }}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-600 transition-colors">
+                            {{ $item->title ?? 'Untitled' }}
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                            {{ $item->description ?? $item->content ?? 'No description' }}
+                        </p>
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <button wire:click="edit({{ $item->id }})" 
+                                    class="text-red-600 hover:text-red-700 font-semibold text-sm">
+                                Read More →
+                            </button>
+                            @auth
+                            <button wire:click="delete({{ $item->id }})" 
+                                    wire:confirm="Are you sure?"
+                                    class="text-gray-400 hover:text-red-600 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                            @endauth
                         </div>
                     </div>
                 </article>
-                @endif
                 @endforeach
-
-                @if($items->isEmpty())
-                <div class="text-center py-20 bg-white dark:bg-gray-800 rounded-xl">
-                    <svg class="mx-auto h-20 w-20 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-                    </svg>
-                    <h3 class="mt-4 text-xl font-bold text-gray-900 dark:text-white">No news yet</h3>
-                    <p class="mt-2 text-gray-600 dark:text-gray-400">Check back later for updates</p>
-                </div>
-                @endif
             </div>
 
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Trending -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-black text-gray-900 dark:text-white mb-4 pb-3 border-b-2 border-red-600">
-                        TRENDING NOW
-                    </h3>
-                    <div class="space-y-4">
-                        @foreach($items->take(5) as $index => $item)
-                        <div class="flex gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
-                             wire:click="view({{ $item->id }})">
-                            <span class="text-2xl font-black text-red-600 dark:text-red-400">{{ $index + 1 }}</span>
-                            <div class="flex-1">
-                                <h4 class="font-bold text-sm text-gray-900 dark:text-white line-clamp-2">
-                                    {{ $item->title ?? $item->name ?? 'News' }}
-                                </h4>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    {{ $item->created_at->diffForHumans() }}
-                                </p>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
+            {{-- Pagination --}}
+            <div class="mt-12">
+                {{ $items->links() }}
             </div>
-        </div>
-
-        <!-- Pagination -->
-        @if($items->hasPages())
-        <div class="mt-12">
-            {{ $items->links() }}
-        </div>
         @endif
-    </div>
+    </main>
 
-    <!-- Modal -->
-    @if($showModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" wire:click="closeModal"></div>
-            
-            <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full p-8">
-                <h3 class="text-3xl font-black text-gray-900 dark:text-white mb-6">
-                    {{ $editMode ? 'Edit' : 'Submit' }} News
-                </h3>
-
-                <form wire:submit.prevent="save" class="space-y-6">
-{{ formFields }}
-
-                    <div class="flex justify-end gap-3 pt-6">
-                        <button
-                            type="button"
-                            wire:click="closeModal"
-                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-bold transition-colors">
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold shadow-lg transition-all">
-                            {{ $editMode ? 'Update' : 'Publish' }}
-                        </button>
-                    </div>
-                </form>
+    {{-- Footer --}}
+    <footer class="bg-gray-900 text-white mt-20 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-gray-400">&copy; {{ date('Y') }} {{ $resourceNamePlural }}. All rights reserved.</p>
             </div>
         </div>
-    </div>
-    @endif
+    </footer>
 </div>
+
+<style>
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+    animation: marquee 20s linear infinite;
+}
+</style>
