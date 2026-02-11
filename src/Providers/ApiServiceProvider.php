@@ -55,7 +55,7 @@ class ApiServiceProvider extends ServiceProvider
     private function registerRoutes(): void
     {
         Route::prefix(Config::get('hyro.api.prefix', 'api/hyro'))
-            ->middleware(Config::get('hyro.api.middleware', ['api', 'auth:sanctum']))
+            ->middleware(['api'])  // Only 'api' middleware, not auth:sanctum
             ->name('hyro.api.')
             ->group(function () {
                 $this->loadRoutesFrom(__DIR__ . '/../../routes/api.php');
@@ -83,8 +83,8 @@ class ApiServiceProvider extends ServiceProvider
         $maxAttempts = Config::get('hyro.api.rate_limit.max_attempts', 60);
         $decayMinutes = Config::get('hyro.api.rate_limit.decay_minutes', 1);
 
-        // Register rate limiter
-        $this->app['rateLimiter']->for('hyro-api', function ($request) use ($maxAttempts, $decayMinutes) {
+        // Register rate limiter using RateLimiter facade
+        \Illuminate\Support\Facades\RateLimiter::for('hyro-api', function ($request) use ($maxAttempts, $decayMinutes) {
             $key = $request->user()
                 ? 'hyro-api:' . $request->user()->id
                 : 'hyro-api:' . $request->ip();
