@@ -132,22 +132,73 @@ Hyro is a comprehensive, enterprise-grade authentication and authorization syste
 
 ## 🚀 Installation
 
-### Step 1: Install via Composer
+Hyro provides multiple installation modes to suit different project needs. Choose the mode that best fits your requirements.
+
+### Quick Install (Recommended)
+
+```bash
+# Install via Composer
+composer require marufsharia/hyro
+
+# Run interactive installer
+php artisan hyro:install
+```
+
+The interactive installer will guide you through choosing the best installation mode for your project.
+
+### Installation Modes
+
+#### 🚀 Silent Mode (Zero Configuration)
+Perfect for production and CI/CD pipelines:
+```bash
+php artisan hyro:install --mode=silent --no-interaction
+```
+
+#### 📦 Minimal Mode (Recommended)
+Essential files only - clean and production-ready:
+```bash
+php artisan hyro:install --mode=minimal
+```
+
+#### 🎨 CRUD Mode
+Minimal + CRUD generator templates:
+```bash
+php artisan hyro:install --mode=crud
+```
+
+#### 🎁 Full Mode
+Everything including views and translations:
+```bash
+php artisan hyro:install --mode=full
+```
+
+> 📖 **Learn more:** See [Installation Modes Documentation](docs/INSTALLATION_MODES.md) for detailed comparison and use cases.
+
+### Manual Installation (Advanced)
+
+If you prefer manual control:
+
+#### Step 1: Install via Composer
 
 ```bash
 composer require marufsharia/hyro
 ```
 
-### Step 2: Publish Assets
+#### Step 2: Publish Assets
 
 ```bash
-# Publish configuration and migrations
+# Essential (required)
 php artisan vendor:publish --tag=hyro-config
 php artisan vendor:publish --tag=hyro-migrations
 php artisan vendor:publish --tag=hyro-assets
+
+# Optional (for customization)
+php artisan vendor:publish --tag=hyro-views
+php artisan vendor:publish --tag=hyro-stubs
+php artisan vendor:publish --tag=hyro-templates
 ```
 
-### Step 3: Configure Environment
+#### Step 3: Configure Environment
 
 Add to your `.env` file:
 
@@ -158,32 +209,32 @@ HYRO_ADMIN_ENABLED=true
 HYRO_NOTIFICATIONS_ENABLED=true
 ```
 
-### Step 4: Run Migrations
+#### Step 4: Run Migrations
 
 ```bash
 php artisan migrate
 ```
 
-### Step 5: Seed Initial Data
+#### Step 5: Seed Initial Data
 
 ```bash
 php artisan db:seed --class=Marufsharia\\Hyro\\Database\\Seeders\\HyroSeeder
 ```
 
-### Step 6: Create Admin User
+#### Step 6: Create Admin User
 
 ```bash
-php artisan hyro:user:create --admin
+php artisan hyro:user:create
 ```
 
-### Step 7: Add Trait to User Model
+#### Step 7: Add Trait to User Model
 
 ```php
-use Marufsharia\Hyro\Traits\HasHyroAccess;
+use Marufsharia\Hyro\Traits\HasHyroFeatures;
 
 class User extends Authenticatable
 {
-    use HasHyroAccess;
+    use HasHyroFeatures;
 }
 ```
 
