@@ -162,9 +162,9 @@ class MakeCrudCommand extends Command
         $this->info('🚀 Generating files...');
         $this->newLine();
 
-        // Publish frontend layouts if needed
-        if ($this->config['frontend']) {
-            $this->components->task('Publishing frontend layouts', fn() => $this->publishFrontendLayouts());
+        // Always check and publish frontend layouts if using frontend template
+        if ($this->config['frontend'] || $this->config['template_type'] === 'frontend') {
+            $this->components->task('Checking/publishing frontend layouts', fn() => $this->ensureFrontendLayouts());
         }
 
         if ($this->config['migration']) {
@@ -380,6 +380,24 @@ class MakeCrudCommand extends Command
         return true;
     }
 
+    /**
+     * Ensure frontend layouts exist, publish if missing
+     */
+    protected function ensureFrontendLayouts()
+    {
+        $frontendLayoutPath = resource_path('views/layouts/frontend.blade.php');
+        
+        // Check if frontend layout exists
+        if (File::exists($frontendLayoutPath)) {
+            $this->line("   ✓ Frontend layout already exists");
+            return true;
+        }
+
+        // Layout doesn't exist, publish it
+        $this->line("   📦 Frontend layout not found, publishing...");
+        return $this->publishFrontendLayouts();
+    }
+
     protected function publishFrontendLayouts()
     {
         // Define source and destination paths
@@ -404,6 +422,7 @@ class MakeCrudCommand extends Command
         $published = [];
         $existing = [];
         $failed = [];
+        $needsAssets = false;
 
         foreach ($layoutsToCopy as $layout) {
             // Check if destination already exists
@@ -424,6 +443,7 @@ class MakeCrudCommand extends Command
             // Copy the file
             if (File::copy($layout['source'], $layout['destination'])) {
                 $published[] = $layout['name'];
+                $needsAssets = true; // Mark that we need to publish assets
             } else {
                 $failed[] = $layout['name'] . ' (copy failed)';
             }
@@ -442,7 +462,33 @@ class MakeCrudCommand extends Command
             $this->warn("   ⚠ Failed: " . implode(', ', $failed));
         }
 
+        // Publish assets if layouts were published
+        if ($needsAssets || !empty($published)) {
+            $this->publishFrontendAssets();
+        }
+
         return true;
+    }
+
+    /**
+     * Publish frontend assets (CSS/JS)
+     */
+    protected function publishFrontendAssets()
+    {
+        $this->newLine();
+        $this->line("   📦 Publishing frontend assets...");
+
+        try {
+            // Publish Hyro assets
+            Artisan::call('vendor:publish', [
+                '--tag' => 'hyro-assets',
+                '--force' => false,
+            ]);
+
+            $this->line("   ✓ Assets published successfully");
+        } catch (\Exception $e) {
+            $this->warn("   ⚠ Failed to publish assets: " . $e->getMessage());
+        }
     }
 
     protected function runOptimizations()
