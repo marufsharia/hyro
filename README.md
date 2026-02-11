@@ -4,7 +4,7 @@
 
 ### Enterprise Authentication & Authorization System for Laravel 12+
 
-[![Latest Version](https://img.shields.io/badge/version-1.0.0--beta.3-blue.svg)](https://github.com/marufsharia/hyro)
+[![Latest Version](https://img.shields.io/badge/version-1.1.2-blue.svg)](https://github.com/marufsharia/hyro)
 [![PHP Version](https://img.shields.io/badge/php-%3E%3D8.2-8892BF.svg)](https://php.net/)
 [![Laravel Version](https://img.shields.io/badge/laravel-%3E%3D12.0-FF2D20.svg)](https://laravel.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
