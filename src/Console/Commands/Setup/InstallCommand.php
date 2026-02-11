@@ -18,6 +18,7 @@ use function Laravel\Prompts\note;
 use function Laravel\Prompts\outro;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\spin;
+use function Laravel\Prompts\table;
 use function Laravel\Prompts\warning;
 
 class InstallCommand extends BaseCommand
@@ -32,11 +33,20 @@ class InstallCommand extends BaseCommand
 
     protected function executeCommand(): void
     {
+        // Show beautiful welcome screen
+        $this->showBeautifulWelcome();
+
         // Determine installation mode
         $mode = $this->option('mode') ?? $this->selectInstallationMode();
 
-        // Show welcome message
-        $this->showWelcome($mode);
+        // Show installation details
+        $this->showInstallationDetails($mode);
+
+        // Confirm installation
+        if (!$this->confirmInstallation($mode)) {
+            outro('Installation cancelled.');
+            return;
+        }
 
         // Execute installation based on mode
         match ($mode) {
@@ -52,6 +62,55 @@ class InstallCommand extends BaseCommand
     }
 
     /**
+     * Show beautiful welcome screen
+     */
+    private function showBeautifulWelcome(): void
+    {
+        if ($this->option('no-interaction') || !$this->input->isInteractive()) {
+            return;
+        }
+
+        $this->newLine();
+        
+        // Beautiful ASCII art banner
+        $banner = <<<'BANNER'
+        ╔═══════════════════════════════════════════════════════════════╗
+        ║                                                               ║
+        ║   ██╗  ██╗██╗   ██╗██████╗  ██████╗                          ║
+        ║   ██║  ██║╚██╗ ██╔╝██╔══██╗██╔═══██╗                         ║
+        ║   ███████║ ╚████╔╝ ██████╔╝██║   ██║                         ║
+        ║   ██╔══██║  ╚██╔╝  ██╔══██╗██║   ██║                         ║
+        ║   ██║  ██║   ██║   ██║  ██║╚██████╔╝                         ║
+        ║   ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝                          ║
+        ║                                                               ║
+        ║        Enterprise Authorization System for Laravel           ║
+        ║                                                               ║
+        ╚═══════════════════════════════════════════════════════════════╝
+        BANNER;
+
+        foreach (explode("\n", $banner) as $line) {
+            $this->line("<fg=cyan>{$line}</>");
+        }
+
+        $this->newLine();
+
+        intro('🚀 Welcome to Hyro Installation');
+
+        note(
+            "Hyro is a comprehensive authorization system that provides:\n\n" .
+            "  🔐 Advanced role-based access control (RBAC)\n" .
+            "  ⚡ Powerful CRUD generator with 10+ templates\n" .
+            "  🔔 Built-in notification system\n" .
+            "  📊 Enterprise audit logging\n" .
+            "  🔌 Extensible plugin system\n" .
+            "  🚀 RESTful API with Sanctum\n" .
+            "  🎨 Beautiful admin interface"
+        );
+
+        $this->newLine();
+    }
+
+    /**
      * Select installation mode interactively
      */
     private function selectInstallationMode(): string
@@ -60,52 +119,132 @@ class InstallCommand extends BaseCommand
             return 'minimal';
         }
 
-        intro('🚀 Hyro Installation');
-
-        note(
-            "Choose your installation mode:\n\n" .
-            "• Silent   - Zero configuration, minimal setup (production-ready)\n" .
-            "• Minimal  - Essential files only (recommended for most projects)\n" .
-            "• CRUD     - Minimal + CRUD generator templates and stubs\n" .
-            "• Full     - Everything including views, translations, and examples"
+        // Show mode comparison table
+        table(
+            headers: ['Mode', 'Size', 'Files', 'Best For'],
+            rows: [
+                ['Silent', '~2MB', 'Config, Migrations, Assets', 'Production, CI/CD'],
+                ['Minimal', '~2MB', 'Config, Migrations, Assets', 'Most Projects (Recommended)'],
+                ['CRUD', '~5MB', 'Minimal + CRUD Stubs/Templates', 'Admin Panels, Dashboards'],
+                ['Full', '~10MB', 'Everything (Views, Translations)', 'Development, Customization'],
+            ]
         );
+
+        $this->newLine();
 
         return select(
             label: 'Select installation mode',
             options: [
-                'minimal' => 'Minimal - Essential files only (Recommended)',
-                'crud' => 'CRUD - Minimal + CRUD templates',
-                'full' => 'Full - All publishable assets',
-                'silent' => 'Silent - Zero interaction, auto-configure',
+                'minimal' => '📦 Minimal - Essential files only (Recommended)',
+                'crud' => '🎨 CRUD - Minimal + CRUD templates',
+                'full' => '🎁 Full - All publishable assets',
+                'silent' => '🚀 Silent - Zero interaction, auto-configure',
             ],
-            default: 'minimal'
+            default: 'minimal',
+            hint: 'Use arrow keys to navigate, Enter to select'
         );
     }
 
     /**
-     * Show welcome message
+     * Show installation details
      */
-    private function showWelcome(string $mode): void
+    private function showInstallationDetails(string $mode): void
     {
         if ($this->option('no-interaction') || !$this->input->isInteractive()) {
-            $this->info("Installing Hyro in {$mode} mode...");
             return;
         }
 
         $this->newLine();
-        $this->components->twoColumnDetail(
-            '<fg=cyan>Installation Mode</>',
-            '<fg=green>' . strtoupper($mode) . '</>'
+
+        $details = $this->getInstallationDetails($mode);
+
+        note(
+            "Installation Details:\n\n" .
+            "  Mode: {$details['mode']}\n" .
+            "  Size: {$details['size']}\n" .
+            "  Files: {$details['files']}\n\n" .
+            "What will be installed:\n" .
+            implode("\n", array_map(fn($item) => "  {$item}", $details['includes']))
         );
-        $this->components->twoColumnDetail(
-            '<fg=cyan>Environment</>',
-            '<fg=yellow>' . app()->environment() . '</>'
-        );
-        $this->components->twoColumnDetail(
-            '<fg=cyan>Database</>',
-            '<fg=yellow>' . Config::get('database.default') . '</>'
-        );
+
         $this->newLine();
+    }
+
+    /**
+     * Get installation details for a mode
+     */
+    private function getInstallationDetails(string $mode): array
+    {
+        return match ($mode) {
+            'silent' => [
+                'mode' => '🚀 Silent',
+                'size' => '~2MB',
+                'files' => 'Minimal',
+                'includes' => [
+                    '✓ Configuration file',
+                    '✓ Database migrations',
+                    '✓ Compiled CSS/JS assets',
+                    '✓ Default roles & privileges',
+                ],
+            ],
+            'minimal' => [
+                'mode' => '📦 Minimal',
+                'size' => '~2MB',
+                'files' => 'Essential only',
+                'includes' => [
+                    '✓ Configuration file',
+                    '✓ Database migrations',
+                    '✓ Compiled CSS/JS assets',
+                    '✓ Default roles & privileges',
+                ],
+            ],
+            'crud' => [
+                'mode' => '🎨 CRUD',
+                'size' => '~5MB',
+                'files' => 'Minimal + CRUD',
+                'includes' => [
+                    '✓ Configuration file',
+                    '✓ Database migrations',
+                    '✓ Compiled CSS/JS assets',
+                    '✓ Default roles & privileges',
+                    '✓ CRUD generator stubs',
+                    '✓ 10+ frontend templates',
+                ],
+            ],
+            'full' => [
+                'mode' => '🎁 Full',
+                'size' => '~10MB',
+                'files' => 'Everything',
+                'includes' => [
+                    '✓ Configuration file',
+                    '✓ Database migrations',
+                    '✓ Compiled CSS/JS assets',
+                    '✓ Default roles & privileges',
+                    '✓ CRUD generator stubs',
+                    '✓ 10+ frontend templates',
+                    '✓ All Blade views',
+                    '✓ Translation files',
+                ],
+            ],
+        };
+    }
+
+    /**
+     * Confirm installation
+     */
+    private function confirmInstallation(string $mode): bool
+    {
+        if ($this->option('force') || $this->option('no-interaction') || !$this->input->isInteractive()) {
+            return true;
+        }
+
+        return confirm(
+            label: 'Ready to install Hyro?',
+            default: true,
+            yes: 'Yes, install now',
+            no: 'No, cancel',
+            hint: 'This will publish files and run migrations'
+        );
     }
 
     /**
@@ -113,27 +252,24 @@ class InstallCommand extends BaseCommand
      */
     private function silentInstall(): void
     {
+        if ($this->option('no-interaction') || !$this->input->isInteractive()) {
+            $this->info('Installing Hyro in silent mode...');
+        }
+
         spin(
             callback: function () {
-                // Publish only essential config
                 $this->publishConfig();
-                
-                // Publish migrations
                 $this->publishMigrations();
-                
-                // Run migrations
                 $this->runMigrations(silent: true);
-                
-                // Seed initial data
                 $this->seedInitialData(silent: true);
-                
-                // Publish compiled assets
                 $this->publishAssets();
             },
             message: 'Installing Hyro (silent mode)...'
         );
 
-        info('Installation completed successfully!');
+        if ($this->input->isInteractive()) {
+            info('Installation completed successfully!');
+        }
     }
 
     /**
@@ -142,14 +278,14 @@ class InstallCommand extends BaseCommand
     private function minimalInstall(): void
     {
         $steps = [
-            'Publishing configuration' => fn() => $this->publishConfig(),
-            'Publishing migrations' => fn() => $this->publishMigrations(),
-            'Publishing compiled assets' => fn() => $this->publishAssets(),
-            'Running migrations' => fn() => $this->runMigrations(),
-            'Seeding initial data' => fn() => $this->seedInitialData(),
+            ['Publishing configuration', fn() => $this->publishConfig()],
+            ['Publishing migrations', fn() => $this->publishMigrations()],
+            ['Publishing compiled assets', fn() => $this->publishAssets()],
+            ['Running migrations', fn() => $this->runMigrations()],
+            ['Seeding initial data', fn() => $this->seedInitialData()],
         ];
 
-        $this->executeSteps($steps);
+        $this->executeStepsWithProgress($steps);
     }
 
     /**
@@ -158,16 +294,16 @@ class InstallCommand extends BaseCommand
     private function crudInstall(): void
     {
         $steps = [
-            'Publishing configuration' => fn() => $this->publishConfig(),
-            'Publishing migrations' => fn() => $this->publishMigrations(),
-            'Publishing compiled assets' => fn() => $this->publishAssets(),
-            'Publishing CRUD stubs' => fn() => $this->publishCrudStubs(),
-            'Publishing CRUD templates' => fn() => $this->publishCrudTemplates(),
-            'Running migrations' => fn() => $this->runMigrations(),
-            'Seeding initial data' => fn() => $this->seedInitialData(),
+            ['Publishing configuration', fn() => $this->publishConfig()],
+            ['Publishing migrations', fn() => $this->publishMigrations()],
+            ['Publishing compiled assets', fn() => $this->publishAssets()],
+            ['Publishing CRUD stubs', fn() => $this->publishCrudStubs()],
+            ['Publishing CRUD templates', fn() => $this->publishCrudTemplates()],
+            ['Running migrations', fn() => $this->runMigrations()],
+            ['Seeding initial data', fn() => $this->seedInitialData()],
         ];
 
-        $this->executeSteps($steps);
+        $this->executeStepsWithProgress($steps);
     }
 
     /**
@@ -176,31 +312,45 @@ class InstallCommand extends BaseCommand
     private function fullInstall(): void
     {
         $steps = [
-            'Publishing configuration' => fn() => $this->publishConfig(),
-            'Publishing migrations' => fn() => $this->publishMigrations(),
-            'Publishing compiled assets' => fn() => $this->publishAssets(),
-            'Publishing views' => fn() => $this->publishViews(),
-            'Publishing translations' => fn() => $this->publishTranslations(),
-            'Publishing CRUD stubs' => fn() => $this->publishCrudStubs(),
-            'Publishing CRUD templates' => fn() => $this->publishCrudTemplates(),
-            'Running migrations' => fn() => $this->runMigrations(),
-            'Seeding initial data' => fn() => $this->seedInitialData(),
+            ['Publishing configuration', fn() => $this->publishConfig()],
+            ['Publishing migrations', fn() => $this->publishMigrations()],
+            ['Publishing compiled assets', fn() => $this->publishAssets()],
+            ['Publishing views', fn() => $this->publishViews()],
+            ['Publishing translations', fn() => $this->publishTranslations()],
+            ['Publishing CRUD stubs', fn() => $this->publishCrudStubs()],
+            ['Publishing CRUD templates', fn() => $this->publishCrudTemplates()],
+            ['Running migrations', fn() => $this->runMigrations()],
+            ['Seeding initial data', fn() => $this->seedInitialData()],
         ];
 
-        $this->executeSteps($steps);
+        $this->executeStepsWithProgress($steps);
     }
 
     /**
-     * Execute installation steps with progress
+     * Execute installation steps with progress indicators
      */
-    private function executeSteps(array $steps): void
+    private function executeStepsWithProgress(array $steps): void
     {
-        foreach ($steps as $message => $callback) {
+        if ($this->option('no-interaction') || !$this->input->isInteractive()) {
+            foreach ($steps as [$message, $callback]) {
+                $callback();
+            }
+            return;
+        }
+
+        $this->newLine();
+        
+        foreach ($steps as $index => [$message, $callback]) {
+            $stepNumber = $index + 1;
+            $totalSteps = count($steps);
+            
             spin(
                 callback: $callback,
-                message: $message . '...'
+                message: "[{$stepNumber}/{$totalSteps}] {$message}..."
             );
         }
+
+        $this->newLine();
     }
 
     /**
@@ -431,43 +581,74 @@ class InstallCommand extends BaseCommand
             return;
         }
 
-        outro('✓ Hyro installed successfully!');
+        $this->newLine();
+
+        outro('✨ Installation Complete!');
 
         $this->newLine();
+
+        // Show installation summary
+        $details = $this->getInstallationDetails($mode);
         
         note(
             "Installation Summary:\n\n" .
-            "• Mode: " . strtoupper($mode) . "\n" .
-            "• Configuration: config/hyro.php\n" .
-            "• Migrations: database/migrations/\n" .
-            "• Assets: public/vendor/hyro/\n" .
-            ($mode === 'crud' || $mode === 'full' ? "• CRUD Stubs: resources/stubs/hyro/\n" : "") .
-            ($mode === 'full' ? "• Views: resources/views/vendor/hyro/\n" : "")
+            "  Mode: {$details['mode']}\n" .
+            "  Size: {$details['size']}\n" .
+            "  Environment: " . app()->environment() . "\n" .
+            "  Database: " . Config::get('database.default') . "\n\n" .
+            "Files Published:\n" .
+            "  • Configuration: config/hyro.php\n" .
+            "  • Migrations: database/migrations/\n" .
+            "  • Assets: public/vendor/hyro/\n" .
+            ($mode === 'crud' || $mode === 'full' ? "  • CRUD Stubs: resources/stubs/hyro/\n" : "") .
+            ($mode === 'full' ? "  • Views: resources/views/vendor/hyro/\n" : "")
         );
 
         $this->newLine();
 
-        $this->components->info('Next Steps:');
-        $this->components->task('Add HasHyroFeatures trait to your User model');
-        $this->components->task('Review and customize config/hyro.php');
-        $this->components->task('Create your first admin user: php artisan hyro:user:create');
-        $this->components->task('Run health check: php artisan hyro:health-check');
+        // Show next steps with beautiful formatting
+        $this->line('<fg=cyan>╔═══════════════════════════════════════════════════════════════╗</>');
+        $this->line('<fg=cyan>║</> <fg=yellow;options=bold>Next Steps</>                                                    <fg=cyan>║</>');
+        $this->line('<fg=cyan>╠═══════════════════════════════════════════════════════════════╣</>');
+        $this->line('<fg=cyan>║</>                                                               <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</> <fg=white>1. Add trait to your User model:</>                          <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>    <fg=gray>use Marufsharia\Hyro\Traits\HasHyroFeatures;</>           <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>                                                               <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</> <fg=white>2. Review configuration:</>                                  <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>    <fg=green>php artisan config:clear</>                               <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>    <fg=gray>nano config/hyro.php</>                                   <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>                                                               <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</> <fg=white>3. Create your first admin user:</>                          <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>    <fg=green>php artisan hyro:user:create</>                           <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>                                                               <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</> <fg=white>4. Run health check:</>                                      <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>    <fg=green>php artisan hyro:health-check</>                          <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>                                                               <fg=cyan>║</>');
         
         if ($mode === 'crud' || $mode === 'full') {
-            $this->components->task('Generate CRUD: php artisan hyro:crud YourModel');
+            $this->line('<fg=cyan>║</> <fg=white>5. Generate your first CRUD:</>                              <fg=cyan>║</>');
+            $this->line('<fg=cyan>║</>    <fg=green>php artisan hyro:crud Product</>                          <fg=cyan>║</>');
+            $this->line('<fg=cyan>║</>                                                               <fg=cyan>║</>');
         }
+        
+        $this->line('<fg=cyan>╠═══════════════════════════════════════════════════════════════╣</>');
+        $this->line('<fg=cyan>║</> <fg=yellow;options=bold>Resources</>                                                    <fg=cyan>║</>');
+        $this->line('<fg=cyan>╠═══════════════════════════════════════════════════════════════╣</>');
+        $this->line('<fg=cyan>║</>                                                               <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</> <fg=white>📚 Documentation:</>                                          <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>    <fg=blue;options=underscore>https://github.com/marufsharia/hyro</>                  <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>                                                               <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</> <fg=white>💬 Support & Issues:</>                                      <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>    <fg=blue;options=underscore>https://github.com/marufsharia/hyro/issues</>           <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>                                                               <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</> <fg=white>🌟 Star us on GitHub if you find Hyro useful!<//>            <fg=cyan>║</>');
+        $this->line('<fg=cyan>║</>                                                               <fg=cyan>║</>');
+        $this->line('<fg=cyan>╚═══════════════════════════════════════════════════════════════╝</>');
 
         $this->newLine();
         
-        $this->components->twoColumnDetail(
-            '<fg=cyan>Documentation</>',
-            '<fg=blue>https://github.com/marufsharia/hyro</>'
-        );
-        $this->components->twoColumnDetail(
-            '<fg=cyan>Support</>',
-            '<fg=blue>https://github.com/marufsharia/hyro/issues</>'
-        );
-
+        // Final message
+        $this->line('  <fg=green;options=bold>🎉 Happy coding with Hyro!</>');
         $this->newLine();
     }
 }
