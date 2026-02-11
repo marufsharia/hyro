@@ -400,20 +400,23 @@ class MakeCrudCommand extends Command
 
     protected function publishFrontendLayouts()
     {
+        // Determine package path (supports both local development and vendor installation)
+        $packagePath = $this->getPackagePath();
+        
         // Define source and destination paths
         $layoutsToCopy = [
             [
-                'source' => base_path('packages/marufsharia/hyro/resources/views/layouts/frontend.blade.php'),
+                'source' => $packagePath . '/resources/views/layouts/frontend.blade.php',
                 'destination' => resource_path('views/layouts/frontend.blade.php'),
                 'name' => 'frontend.blade.php'
             ],
             [
-                'source' => base_path('packages/marufsharia/hyro/resources/views/layouts/partials/frontend-nav.blade.php'),
+                'source' => $packagePath . '/resources/views/layouts/partials/frontend-nav.blade.php',
                 'destination' => resource_path('views/layouts/partials/frontend-nav.blade.php'),
                 'name' => 'frontend-nav.blade.php'
             ],
             [
-                'source' => base_path('packages/marufsharia/hyro/resources/views/layouts/partials/frontend-footer.blade.php'),
+                'source' => $packagePath . '/resources/views/layouts/partials/frontend-footer.blade.php',
                 'destination' => resource_path('views/layouts/partials/frontend-footer.blade.php'),
                 'name' => 'frontend-footer.blade.php'
             ],
@@ -489,6 +492,32 @@ class MakeCrudCommand extends Command
         } catch (\Exception $e) {
             $this->warn("   ⚠ Failed to publish assets: " . $e->getMessage());
         }
+    }
+
+    /**
+     * Get the package path (supports both local development and vendor installation)
+     */
+    protected function getPackagePath(): string
+    {
+        // Check if package is in local development (packages/marufsharia/hyro)
+        $localPath = base_path('packages/marufsharia/hyro');
+        if (File::exists($localPath)) {
+            return $localPath;
+        }
+
+        // Check if package is installed via Composer (vendor/marufsharia/hyro)
+        $vendorPath = base_path('vendor/marufsharia/hyro');
+        if (File::exists($vendorPath)) {
+            return $vendorPath;
+        }
+
+        // Fallback: try to detect from the command class location
+        $reflection = new \ReflectionClass($this);
+        $commandPath = dirname($reflection->getFileName());
+        // Navigate up from src/Console/Commands/Crud to package root
+        $packagePath = dirname(dirname(dirname(dirname($commandPath))));
+        
+        return $packagePath;
     }
 
     protected function runOptimizations()

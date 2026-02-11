@@ -6,10 +6,21 @@ The CRUD generator now automatically detects and publishes frontend layouts when
 
 When generating a CRUD page with a frontend template, the generator:
 
-1. **Checks** if `frontend.blade.php` exists in your project
-2. **Publishes** the layout automatically if it's missing
-3. **Publishes** frontend assets (CSS/JS) automatically
-4. **Skips** publishing if layouts already exist
+1. **Detects Package Location** - Automatically finds the Hyro package whether installed via Composer (vendor/) or local development (packages/)
+2. **Checks** if `frontend.blade.php` exists in `resources/views/layouts/`
+3. **Publishes** the layout automatically if it's missing from the package location
+4. **Publishes** frontend assets (CSS/JS) automatically
+5. **Skips** publishing if layouts already exist (no overwrites)
+
+## Package Path Detection
+
+The auto-publish feature intelligently detects the package location:
+
+1. **Local Development**: `packages/marufsharia/hyro/` (for package development)
+2. **Composer Installation**: `vendor/marufsharia/hyro/` (for production use)
+3. **Fallback**: Uses reflection to detect from command class location
+
+This ensures the feature works in all scenarios!
 
 ## Automatic Detection
 
