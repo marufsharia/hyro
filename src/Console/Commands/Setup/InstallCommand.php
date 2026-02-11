@@ -20,6 +20,8 @@ use function Laravel\Prompts\select;
 use function Laravel\Prompts\spin;
 use function Laravel\Prompts\table;
 use function Laravel\Prompts\warning;
+use function Laravel\Prompts\text;
+use function Laravel\Prompts\textarea;
 
 class InstallCommand extends BaseCommand
 {
@@ -33,6 +35,7 @@ class InstallCommand extends BaseCommand
 
     protected function executeCommand(): void
     {
+  
         // Show beautiful welcome screen
         $this->showBeautifulWelcome();
 
