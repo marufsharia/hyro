@@ -292,12 +292,17 @@ abstract class BaseCommand extends Command
      */
     protected function findUser(string $identifier): ?object
     {
-        $userModel = Config::get('hyro.models.users');
+        $userModel = Config::get('hyro.database.models.users');
 
-        return $userModel::where('email', $identifier)
-            ->orWhere('id', $identifier)
-            ->orWhere('username', $identifier)
-            ->first();
+        $query = $userModel::where('email', $identifier)
+            ->orWhere('id', $identifier);
+        
+        // Only check username if column exists
+        if (\Schema::hasColumn('users', 'username')) {
+            $query->orWhere('username', $identifier);
+        }
+        
+        return $query->first();
     }
 
     /**
@@ -305,7 +310,7 @@ abstract class BaseCommand extends Command
      */
     protected function findRole(string $identifier): ?object
     {
-        $roleModel = Config::get('hyro.models.role');
+        $roleModel = Config::get('hyro.database.models.role');
 
         return $roleModel::where('slug', $identifier)
             ->orWhere('id', $identifier)
@@ -317,7 +322,7 @@ abstract class BaseCommand extends Command
      */
     protected function findPrivilege(string $identifier): ?object
     {
-        $privilegeModel = Config::get('hyro.models.privilege');
+        $privilegeModel = Config::get('hyro.database.models.privilege');
 
         return $privilegeModel::where('slug', $identifier)
             ->orWhere('id', $identifier)

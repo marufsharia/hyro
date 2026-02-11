@@ -101,7 +101,7 @@
                             @endif
                         </div>
 
-                        <button wire:click="view({{ $item->id }})" class="mt-4 px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold transition-colors">
+                        <button wire:click="edit({{ $item->id }})" class="mt-4 px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold transition-colors">
                             View Details
                         </button>
                     </div>

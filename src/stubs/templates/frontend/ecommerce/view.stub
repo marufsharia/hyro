@@ -113,7 +113,7 @@
                             </svg>
                         </button>
                         <button
-                            wire:click="view({{ $item->id }})"
+                            wire:click="edit({{ $item->id }})"
                             class="p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-emerald-50 dark:hover:bg-emerald-900 transition-colors">
                             <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>

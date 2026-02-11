@@ -8,6 +8,7 @@ use Livewire\WithFileUploads;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Powerful CRUD Trait for Livewire Components
@@ -36,6 +37,10 @@ trait HasCrud
 
     // File uploads temporary storage
     protected array $temporaryFiles = [];
+
+    // Enhanced: Field mapping cache
+    protected $fieldMapping = [];
+    protected $reverseFieldMapping = [];
 
     /**
      * Get the model class for CRUD operations
@@ -72,18 +77,48 @@ trait HasCrud
     /**
      * Boot the trait
      */
-    public function boot()
+    public function bootHasCrud()
     {
+        $this->initializeFieldMapping();
         $this->initializeFields();
     }
 
     /**
      * Mount component
      */
-    public function mount()
+    public function mountHasCrud()
     {
+        $this->initializeFieldMapping();
         $this->initializeFields();
         $this->perPage = config('hyro.livewire.pagination.per_page', 15);
+    }
+
+    /**
+     * Initialize field mapping for dynamic field handling
+     */
+    protected function initializeFieldMapping(): void
+    {
+        foreach ($this->getFields() as $formField => $config) {
+            $modelField = $config['model_field'] ?? $formField;
+            $this->fieldMapping[$formField] = $modelField;
+            $this->reverseFieldMapping[$modelField] = $formField;
+        }
+    }
+
+    /**
+     * Get the model field name for a form field
+     */
+    protected function getModelField(string $formField): string
+    {
+        return $this->fieldMapping[$formField] ?? $formField;
+    }
+
+    /**
+     * Get the form field name for a model field
+     */
+    protected function getFormField(string $modelField): string
+    {
+        return $this->reverseFieldMapping[$modelField] ?? $modelField;
     }
 
     /**
@@ -93,9 +128,30 @@ trait HasCrud
     {
         foreach ($this->getFields() as $field => $config) {
             if (!property_exists($this, $field)) {
-                $this->{$field} = $config['default'] ?? null;
+                $this->{$field} = $this->getDefaultValue($config);
             }
         }
+    }
+
+    /**
+     * Get default value based on field type
+     */
+    protected function getDefaultValue(array $config)
+    {
+        $type = $config['type'] ?? 'text';
+        $default = $config['default'] ?? null;
+
+        if ($default !== null) {
+            return $default;
+        }
+
+        return match($type) {
+            'number', 'decimal' => 0,
+            'checkbox' => false,
+            'select' => null,
+            'textarea' => '',
+            default => '',
+        };
     }
 
     /**
@@ -235,11 +291,14 @@ trait HasCrud
         $this->modelId = $id;
         $this->isEditing = true;
 
+        // Enhanced: Populate form fields using field mapping
         foreach ($this->getFields() as $field => $config) {
-            if (isset($record->{$field})) {
-                $this->{$field} = $record->{$field};
+            $modelField = $this->getModelField($field);
+            
+            if (isset($record->{$modelField})) {
+                $this->{$field} = $record->{$modelField};
             } else {
-                $this->{$field} = $config['default'] ?? null;
+                $this->{$field} = $config['default'] ?? $this->getDefaultValue($config);
             }
         }
 
@@ -253,21 +312,31 @@ trait HasCrud
     }
 
     /**
-     * Save record (create or update)
+     * Save record (create or update) with enhanced error handling
      */
     public function save()
     {
-        $this->validate($this->rules());
-
-        $model = $this->getModel();
-        $data = $this->getFormData();
-
-        // Before save hook
-        if (method_exists($this, 'beforeSave')) {
-            $data = $this->beforeSave($data);
-        }
+        Log::info('Starting save process', [
+            'isEditing' => $this->isEditing,
+            'modelId' => $this->modelId,
+            'model' => $this->getModel(),
+        ]);
 
         try {
+            // Validate input
+            $this->validate($this->rules());
+
+            $model = $this->getModel();
+            $data = $this->getFormData();
+
+            Log::info('Form data prepared:', $data);
+
+            // Before save hook
+            if (method_exists($this, 'beforeSave')) {
+                $data = $this->beforeSave($data);
+                Log::info('After beforeSave hook:', $data);
+            }
+
             if ($this->isEditing) {
                 $record = $model::find($this->modelId);
 
@@ -282,6 +351,11 @@ trait HasCrud
                     return;
                 }
 
+                // Before update hook
+                if (method_exists($this, 'beforeUpdate')) {
+                    $data = $this->beforeUpdate($record, $data);
+                }
+
                 // Handle file cleanup for updates
                 $this->handleFileUpdates($record, $data);
 
@@ -292,6 +366,11 @@ trait HasCrud
                     $this->afterUpdate($record);
                 }
 
+                Log::info('Record updated successfully:', [
+                    'id' => $record->id,
+                    'model' => get_class($record),
+                ]);
+
                 $this->alert('success', $this->getResourceName() . ' updated successfully!');
                 $this->dispatch('record-updated', id: $record->id);
             } else {
@@ -301,7 +380,24 @@ trait HasCrud
                     return;
                 }
 
+                // Before create hook
+                if (method_exists($this, 'beforeCreate')) {
+                    $data = $this->beforeCreate($data);
+                }
+
+                // Create the record
+                Log::info('Creating record with data:', $data);
                 $record = $model::create($data);
+
+                if (!$record) {
+                    throw new \Exception('Failed to create record. Database returned null.');
+                }
+
+                Log::info('Record created successfully:', [
+                    'id' => $record->id,
+                    'model' => get_class($record),
+                    'data' => $record->toArray(),
+                ]);
 
                 // After create hook
                 if (method_exists($this, 'afterCreate')) {
@@ -315,10 +411,65 @@ trait HasCrud
             $this->closeModal();
             $this->resetFields();
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('Validation failed:', ['errors' => $e->errors()]);
+            throw $e;
         } catch (\Exception $e) {
-            Log::error('CRUD Save Error: ' . $e->getMessage());
+            Log::error('Save Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'data' => $data ?? [],
+                'model' => $model ?? null,
+            ]);
             $this->alert('error', 'An error occurred while saving: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Enhanced form data preparation with field mapping
+     */
+    protected function getFormData(): array
+    {
+        $data = [];
+        $fields = $this->getFields();
+
+        foreach ($fields as $formField => $config) {
+            $modelField = $this->getModelField($formField);
+            $fieldType = $config['type'] ?? 'text';
+            $value = $this->{$formField} ?? $config['default'] ?? null;
+
+            // Handle file uploads
+            if (in_array($fieldType, ['file', 'image']) && $value) {
+                if (is_object($value) && method_exists($value, 'store')) {
+                    $disk = $config['disk'] ?? 'public';
+                    $path = $config['storage_path'] ?? $this->getResourceNameKebab();
+                    
+                    $data[$modelField] = $value->store($path, $disk);
+                    
+                    Log::info('File uploaded:', [
+                        'field' => $modelField,
+                        'path' => $data[$modelField],
+                        'disk' => $disk,
+                    ]);
+                } else {
+                    $data[$modelField] = $value;
+                }
+            } 
+            // Handle JSON fields
+            elseif ($fieldType === 'json' && is_array($value)) {
+                $data[$modelField] = json_encode($value);
+            }
+            // Handle all other field types
+            else {
+                $data[$modelField] = $value;
+                
+                // Convert empty strings to null for nullable fields
+                if ($value === '' && !str_contains($config['rules'] ?? '', 'required')) {
+                    $data[$modelField] = null;
+                }
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -535,7 +686,7 @@ trait HasCrud
         $this->isEditing = false;
 
         foreach ($this->getFields() as $field => $config) {
-            $this->{$field} = $config['default'] ?? null;
+            $this->{$field} = $this->getDefaultValue($config);
         }
 
         // Clean up temporary uploads
@@ -609,38 +760,6 @@ trait HasCrud
         }
 
         return $attributes;
-    }
-
-    /**
-     * Get form data
-     */
-    protected function getFormData(): array
-    {
-        $data = [];
-
-        foreach ($this->getFields() as $field => $config) {
-            if (!isset($this->{$field})) {
-                $data[$field] = $config['default'] ?? null;
-                continue;
-            }
-
-            // Handle file uploads
-            if (($config['type'] === 'file' || $config['type'] === 'image') && $this->{$field}) {
-                if (is_object($this->{$field}) && method_exists($this->{$field}, 'store')) {
-                    $data[$field] = $this->{$field}->store(
-                        $config['storage_path'] ?? $this->getResourceNameKebab(),
-                        $config['disk'] ?? 'public'
-                    );
-                } else {
-                    // Keep existing path if not a new upload
-                    $data[$field] = $this->{$field};
-                }
-            } else {
-                $data[$field] = $this->{$field};
-            }
-        }
-
-        return $data;
     }
 
     /**
@@ -734,5 +853,79 @@ trait HasCrud
         if (str_starts_with($propertyName, 'filter')) {
             $this->resetPage();
         }
+    }
+
+    /**
+     * Query string parameters for persistent state
+     */
+    protected function queryStringHasCrud(): array
+    {
+        return [
+            'search' => ['except' => ''],
+            'sortField' => ['except' => 'created_at'],
+            'sortDirection' => ['except' => 'desc'],
+            'perPage' => ['except' => 15],
+        ];
+    }
+
+    /**
+     * Enhanced: Debug method to check field mapping
+     */
+    public function debugFieldMapping()
+    {
+        $this->initializeFieldMapping();
+        
+        return [
+            'fields' => $this->getFields(),
+            'field_mapping' => $this->fieldMapping,
+            'reverse_mapping' => $this->reverseFieldMapping,
+            'form_data_sample' => $this->getFormData(),
+            'model' => $this->getModel(),
+            'fillable' => method_exists($this->getModel(), 'getFillable') ? 
+                (new ($this->getModel()))->getFillable() : [],
+        ];
+    }
+
+    /**
+     * Enhanced: Dynamically get table columns with labels
+     */
+    protected function getTableColumnsWithLabels(): array
+    {
+        $columns = [];
+        
+        foreach ($this->getFields() as $field => $config) {
+            $columns[$field] = [
+                'label' => $config['label'] ?? Str::title(str_replace('_', ' ', $field)),
+                'type' => $config['type'] ?? 'text',
+                'sortable' => $config['sortable'] ?? true,
+            ];
+        }
+        
+        return $columns;
+    }
+
+    /**
+     * Enhanced: Get field configuration for a specific field
+     */
+    protected function getFieldConfig(string $fieldName): ?array
+    {
+        $fields = $this->getFields();
+        return $fields[$fieldName] ?? null;
+    }
+
+    /**
+     * Enhanced: Validate if all required fields are filled
+     */
+    protected function validateRequiredFields(): bool
+    {
+        foreach ($this->getFields() as $field => $config) {
+            if (str_contains($config['rules'] ?? '', 'required')) {
+                if (empty($this->{$field})) {
+                    $this->addError($field, 'This field is required.');
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

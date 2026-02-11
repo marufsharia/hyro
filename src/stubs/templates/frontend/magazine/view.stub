@@ -55,7 +55,7 @@
                             <span>•</span>
                             <span>5 min read</span>
                         </div>
-                        <button wire:click="view({{ $item->id }})" class="text-amber-600 dark:text-amber-400 hover:text-amber-700 font-semibold">
+                        <button wire:click="edit({{ $item->id }})" class="text-amber-600 dark:text-amber-400 hover:text-amber-700 font-semibold">
                             Read More →
                         </button>
                     </div>
@@ -85,7 +85,7 @@
                     <h3 class="text-xl font-serif font-bold text-gray-900 dark:text-white mb-4">Latest Issues</h3>
                     <div class="space-y-3">
                         @foreach($items->take(5) as $item)
-                        <div class="cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 p-2 rounded" wire:click="view({{ $item->id }})">
+                        <div class="cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 p-2 rounded" wire:click="edit({{ $item->id }})">
                             <h4 class="font-semibold text-sm text-gray-900 dark:text-white line-clamp-2">{{ $item->title ?? $item->name }}</h4>
                             <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ $item->created_at->format('M d') }}</p>
                         </div>

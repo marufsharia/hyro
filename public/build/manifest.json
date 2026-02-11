@@ -1,6 +1,6 @@
 {
   "resources/css/hyro.css": {
-    "file": "assets/hyro-BBP35Pso.css",
+    "file": "assets/hyro-CQT7qDDD.css",
     "src": "resources/css/hyro.css",
     "isEntry": true,
     "name": "hyro",
@@ -9,7 +9,7 @@
     ]
   },
   "resources/js/hyro.js": {
-    "file": "assets/hyro-CkkjSyUV.js",
+    "file": "assets/hyro-DxfT0VBY.js",
     "name": "hyro",
     "src": "resources/js/hyro.js",
     "isEntry": true

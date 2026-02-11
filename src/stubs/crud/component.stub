@@ -56,7 +56,14 @@ class {{ componentName }} extends BaseCrudComponent
      */
     protected function canUpdate($record): bool
     {
-        return auth()->user()->hasPrivilege('{{ permission }}.update');
+        // Simple authentication check - customize as needed
+        return auth()->check();
+        
+        // For ownership-based permissions, uncomment and add user_id column:
+        // return auth()->check() && auth()->id() === $record->user_id;
+        
+        // For Hyro privilege system, uncomment:
+        // return auth()->user()->hasPrivilege('{{ permission }}.update');
     }
 
     /**
@@ -64,7 +71,14 @@ class {{ componentName }} extends BaseCrudComponent
      */
     protected function canDelete($record): bool
     {
-        return auth()->user()->hasPrivilege('{{ permission }}.delete');
+        // Simple authentication check - customize as needed
+        return auth()->check();
+        
+        // For ownership-based permissions, uncomment and add user_id column:
+        // return auth()->check() && auth()->id() === $record->user_id;
+        
+        // For Hyro privilege system, uncomment:
+        // return auth()->user()->hasPrivilege('{{ permission }}.delete');
     }
 
 {{ exportMethods }}

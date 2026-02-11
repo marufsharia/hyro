@@ -26,7 +26,7 @@
         <!-- Minimal List -->
         <div class="space-y-12">
             @forelse($items as $item)
-            <article class="group cursor-pointer" wire:click="view({{ $item->id }})">
+            <article class="group cursor-pointer" wire:click="edit({{ $item->id }})">
                 <div class="flex gap-8">
                     @if(isset($item->image) && $item->image)
                     <div class="w-32 h-32 flex-shrink-0 bg-gray-100 dark:bg-gray-900 overflow-hidden">

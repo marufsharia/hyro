@@ -172,6 +172,13 @@ Alpine.directive('tooltip', (el, { expression }, { evaluate }) => {
 // ============================================
 
 document.addEventListener('alpine:init', () => {
+     // Make $wire available globally for Alpine
+    Alpine.magic('wire', (el) => {
+        if (window.livewire) {
+            return window.livewire.find(el.closest('[wire\\:id]').getAttribute('wire:id'));
+        }
+        return null;
+    });
     // Listen for Livewire upload events
     window.addEventListener('livewire-upload-start', () => {
         console.log('Upload started');
@@ -224,8 +231,12 @@ class HyroUtils {
     }
 }
 
+// Make sure Livewire is initialized before Alpine
+if (window.livewire) {
+    window.livewire.start();
+}
 // Make utilities available globally
 window.HyroUtils = HyroUtils;
-
+Alpine.start();
 // Export for ES module usage
 export default Alpine;
