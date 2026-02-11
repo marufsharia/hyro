@@ -24,7 +24,7 @@ class BladeDirectivesServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Only register Blade directives if UI is enabled
-        if (!Config::get('hyro.ui.enabled', false)) {
+        if (!Config::get('hyro.enabled', false)) {
             return;
         }
 

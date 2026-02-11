@@ -202,10 +202,10 @@ class CrudRouteAutoDiscoverer
             $content = $this->buildRouteFileContent($routes);
 
             // Backup existing file if it exists
-            if (File::exists($routeFile)) {
-                $backupFile = $routeFile . '.backup.' . time();
-                File::copy($routeFile, $backupFile);
-            }
+            // if (File::exists($routeFile)) {
+            //     $backupFile = $routeFile . '.backup.' . time();
+            //     File::copy($routeFile, $backupFile);
+            // }
 
             File::put($routeFile, $content);
 
