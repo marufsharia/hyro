@@ -441,7 +441,12 @@ class PluginListCommand extends BaseCommand
             $this->line("Subdirectories:   <fg=yellow>" . count($directories) . "</>");
 
             foreach ($directories as $dir) {
-                $pluginFile = $dir . '/Plugin.php';
+                // Check for Plugin.php in both src and root directory
+                $pluginFile = $dir . '/src/Plugin.php';
+                if (!File::exists($pluginFile)) {
+                    $pluginFile = $dir . '/Plugin.php';
+                }
+                
                 $pluginName = basename($dir);
                 $hasPlugin = File::exists($pluginFile);
 

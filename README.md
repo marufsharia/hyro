@@ -885,6 +885,8 @@ php artisan hyro:db:status                # Check database status
 ```bash
 php artisan hyro:plugin:list              # List installed plugins
 php artisan hyro:plugin:make              # Create new plugin
+
+NOTE: The `hyro:plugin:make` command will attempt to run `composer dump-autoload` after scaffolding. On Windows, if a local `composer.phar` is present the command uses the PHP binary with `composer.phar` to ensure correct execution.
 php artisan hyro:plugin:install           # Install plugin
 php artisan hyro:plugin:uninstall         # Uninstall plugin
 php artisan hyro:plugin:activate          # Activate plugin

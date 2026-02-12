@@ -98,21 +98,73 @@
 
                 @foreach(Hyro::sidebar() as $sectionOrItem)
                     @if(isset($sectionOrItem['group']) && isset($sectionOrItem['items']))
-                        <!-- Section with items -->
-                        <div class="pt-4 pb-2">
-                            <p class="px-4 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ $sectionOrItem['group'] }}</p>
-                        </div>
-                        @foreach($sectionOrItem['items'] as $item)
-                            @if(isset($item['route']) && Route::has($item['route']))
-                                <a href="{{ route($item['route']) }}" 
-                                   class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all {{ request()->routeIs($item['route'] . '*') ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/50' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
-                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                        @if($sectionOrItem['group'] === 'Plugins')
+                            <!-- Collapsible Plugins Section -->
+                            <div class="pt-4" x-data="{ pluginsOpen: true }">
+                                <button @click="pluginsOpen = !pluginsOpen" 
+                                        class="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                                    <div class="flex items-center space-x-2">
+                                        <span>{{ $sectionOrItem['group'] }}</span>
+                                        <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-purple-600 rounded-full">
+                                            {{ count($sectionOrItem['items']) }}
+                                        </span>
+                                    </div>
+                                    <svg class="w-4 h-4 transition-transform duration-200" 
+                                         :class="{ 'rotate-180': pluginsOpen }"
+                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
-                                    {{ $item['title'] ?? 'Untitled' }}
-                                </a>
-                            @endif
-                        @endforeach
+                                </button>
+                                
+                                <div x-show="pluginsOpen" 
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 -translate-y-2"
+                                     x-transition:enter-end="opacity-100 translate-y-0"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="opacity-100 translate-y-0"
+                                     x-transition:leave-end="opacity-0 -translate-y-2"
+                                     class="mt-2 space-y-1">
+                                    @foreach($sectionOrItem['items'] as $item)
+                                        @if(isset($item['url']))
+                                            {{-- Plugin item with direct URL --}}
+                                            <a href="{{ $item['url'] }}" 
+                                               class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all {{ request()->is(ltrim($item['url'], '/') . '*') ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/50' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                                                </svg>
+                                                {{ $item['title'] ?? 'Untitled' }}
+                                            </a>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @else
+                            <!-- Regular Section with items -->
+                            <div class="pt-4 pb-2">
+                                <p class="px-4 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ $sectionOrItem['group'] }}</p>
+                            </div>
+                            @foreach($sectionOrItem['items'] as $item)
+                                @if(isset($item['url']))
+                                    {{-- Plugin item with direct URL --}}
+                                    <a href="{{ $item['url'] }}" 
+                                       class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all {{ request()->is(ltrim($item['url'], '/') . '*') ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/50' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                                        </svg>
+                                        {{ $item['title'] ?? 'Untitled' }}
+                                    </a>
+                                @elseif(isset($item['route']) && Route::has($item['route']))
+                                    {{-- Module item with route --}}
+                                    <a href="{{ route($item['route']) }}" 
+                                       class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all {{ request()->routeIs($item['route'] . '*') ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/50' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                                        </svg>
+                                        {{ $item['title'] ?? 'Untitled' }}
+                                    </a>
+                                @endif
+                            @endforeach
+                        @endif
                     @elseif(isset($sectionOrItem['route']) && Route::has($sectionOrItem['route']))
                         <!-- Single item -->
                         <a href="{{ route($sectionOrItem['route']) }}" 

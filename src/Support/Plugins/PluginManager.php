@@ -236,10 +236,14 @@ class PluginManager
             logger()->info("Found " . count($directories) . " plugin directories");
 
             foreach ($directories as $pluginDir) {
-                $pluginFile = $pluginDir . '/Plugin.php';
+                // Check for Plugin.php in both root and src directory
+                $pluginFile = $pluginDir . '/src/Plugin.php';
+                if (!File::exists($pluginFile)) {
+                    $pluginFile = $pluginDir . '/Plugin.php';
+                }
 
                 if (!File::exists($pluginFile)) {
-                    logger()->debug("Skipping {$pluginDir}: Plugin.php not found");
+                    logger()->debug("Skipping {$pluginDir}: Plugin.php not found in root or src directory");
                     continue;
                 }
 
@@ -266,14 +270,32 @@ class PluginManager
 
     protected function loadLocalPluginData(string $pluginDir): ?array
     {
-        $pluginFile = $pluginDir . '/Plugin.php';
+        // Check for Plugin.php in both src and root directory
+        $pluginFile = $pluginDir . '/src/Plugin.php';
+        if (!File::exists($pluginFile)) {
+            $pluginFile = $pluginDir . '/Plugin.php';
+        }
 
         if (!File::exists($pluginFile)) {
             return null;
         }
 
         $pluginName = basename($pluginDir);
-        $className = "HyroPlugins\\{$pluginName}\\Plugin";
+        
+        // Try to extract the namespace from the Plugin.php file
+        $content = File::get($pluginFile);
+        $className = null;
+        
+        if (preg_match('/namespace\s+([^;]+);/i', $content, $matches)) {
+            $namespace = trim($matches[1]);
+            $className = $namespace . '\\Plugin';
+        }
+        
+        // Fallback to directory name (convert kebab-case to PascalCase)
+        if (!$className) {
+            $pluginNamePascal = str_replace(' ', '', ucwords(str_replace('-', ' ', $pluginName)));
+            $className = "HyroPlugins\\{$pluginNamePascal}\\Plugin";
+        }
 
         // First, try to require the file directly
         try {
@@ -564,7 +586,12 @@ class PluginManager
         if (!class_exists($className)) {
             // For local plugins, try to require the file
             if ($pluginData['type'] === 'local' && isset($pluginData['path'])) {
-                $pluginFile = $pluginData['path'] . '/Plugin.php';
+                // Check for Plugin.php in both src and root directory
+                $pluginFile = $pluginData['path'] . '/src/Plugin.php';
+                if (!File::exists($pluginFile)) {
+                    $pluginFile = $pluginData['path'] . '/Plugin.php';
+                }
+                
                 if (File::exists($pluginFile)) {
                     require_once $pluginFile;
                 }
@@ -793,9 +820,14 @@ class PluginManager
         }
 
         // Check if it's a valid Hyro plugin
-        if (!File::exists($installPath . '/Plugin.php')) {
+        $pluginFile = $installPath . '/src/Plugin.php';
+        if (!File::exists($pluginFile)) {
+            $pluginFile = $installPath . '/Plugin.php';
+        }
+        
+        if (!File::exists($pluginFile)) {
             File::deleteDirectory($installPath);
-            throw new Exception("Downloaded repository is not a valid Hyro plugin");
+            throw new Exception("Downloaded repository is not a valid Hyro plugin (Plugin.php not found)");
         }
     }
 
@@ -869,7 +901,12 @@ class PluginManager
         if (!class_exists($className)) {
             // Try to load the class manually
             if (isset($pluginData['path'])) {
-                $pluginFile = $pluginData['path'] . '/Plugin.php';
+                // Check for Plugin.php in both src and root directory
+                $pluginFile = $pluginData['path'] . '/src/Plugin.php';
+                if (!File::exists($pluginFile)) {
+                    $pluginFile = $pluginData['path'] . '/Plugin.php';
+                }
+                
                 if (File::exists($pluginFile)) {
                     require_once $pluginFile;
                 }
@@ -1077,7 +1114,17 @@ class PluginManager
         $pluginsPath = config('hyro.plugins.path', base_path('hyro-plugins'));
         $pluginPath = $pluginsPath . '/' . $pluginId;
 
-        return File::exists($pluginPath) && File::exists($pluginPath . '/Plugin.php');
+        if (!File::exists($pluginPath)) {
+            return false;
+        }
+        
+        // Check for Plugin.php in both src and root directory
+        $pluginFile = $pluginPath . '/src/Plugin.php';
+        if (!File::exists($pluginFile)) {
+            $pluginFile = $pluginPath . '/Plugin.php';
+        }
+        
+        return File::exists($pluginFile);
     }
 
     /**
@@ -1151,6 +1198,14 @@ class PluginManager
     public function getAllPlugins(): Collection
     {
         return $this->plugins;
+    }
+
+    /**
+     * Get plugin states
+     */
+    public function getPluginStates(): array
+    {
+        return $this->loadPluginStates();
     }
 
     /**

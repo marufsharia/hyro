@@ -141,7 +141,12 @@ class PluginInstallRemoteCommand extends BaseCommand
             });
 
             // Verify it's a valid Hyro plugin
-            if (!file_exists($installPath . '/Plugin.php')) {
+            $pluginFile = $installPath . '/src/Plugin.php';
+            if (!file_exists($pluginFile)) {
+                $pluginFile = $installPath . '/Plugin.php';
+            }
+            
+            if (!file_exists($pluginFile)) {
                 throw new \Exception("Downloaded repository is not a valid Hyro plugin (Plugin.php not found)");
             }
 

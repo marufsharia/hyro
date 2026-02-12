@@ -87,7 +87,40 @@ class ModuleManager
             ];
         }
 
+        // Add plugins section
+        $plugins = self::getActivePlugins();
+        if (!empty($plugins)) {
+            $groups['Plugins']['group'] = 'Plugins';
+            $groups['Plugins']['items'] = $plugins;
+        }
+
         return $groups;
+    }
+
+    /**
+     * Get active plugins for sidebar
+     */
+    public static function getActivePlugins(): array
+    {
+        $pluginManager = app('hyro.plugins');
+        $states = $pluginManager->getPluginStates();
+        $allPlugins = $pluginManager->getAllPlugins();
+        
+        $activePlugins = [];
+        
+        foreach ($states as $pluginId => $state) {
+            if (($state['active'] ?? false) && isset($allPlugins[$pluginId])) {
+                $plugin = $allPlugins[$pluginId];
+                $activePlugins[] = [
+                    'title' => $plugin['meta']['name'] ?? ucfirst($pluginId),
+                    'route' => 'hyro.plugin.' . $pluginId . '.index',
+                    'icon'  => 'puzzle',
+                    'url'   => '/hyro/plugins/' . $pluginId,
+                ];
+            }
+        }
+        
+        return $activePlugins;
     }
     /**
      * Check if module exists
