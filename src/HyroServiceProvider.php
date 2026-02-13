@@ -462,6 +462,9 @@ class HyroServiceProvider extends ServiceProvider
             
             // Register sidebar component
             \Livewire\Livewire::component('hyro::admin.sidebar', \Marufsharia\Hyro\Livewire\Admin\Sidebar::class);
+            
+            // Register header component
+            \Livewire\Livewire::component('hyro::admin.header', \Marufsharia\Hyro\Livewire\Admin\Header::class);
         } catch (\Exception $e) {
             // Silently fail if Livewire components can't be registered
             if ($this->app->runningInConsole()) {
