@@ -3,7 +3,9 @@
 namespace Marufsharia\Hyro\Livewire\Admin;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Marufsharia\Hyro\Facades\Hyro;
+use Illuminate\Support\Facades\Route;
 
 class Header extends Component
 {
@@ -11,82 +13,146 @@ class Header extends Component
     public $searchResults = [];
     public $showResults = false;
 
-    public function updatedSearch()
+    public function mount()
     {
-        if (strlen($this->search) < 2) {
+        $this->search = '';
+        $this->searchResults = [];
+        $this->showResults = false;
+    }
+
+    public function updatedSearch($value)
+    {
+        if (strlen($value) < 1) {
             $this->searchResults = [];
             $this->showResults = false;
             return;
         }
 
-        $this->searchResults = $this->performSearch($this->search);
-        $this->showResults = true;
+        $this->searchResults = $this->performFuzzySearch($value);
+        $this->showResults = count($this->searchResults) > 0;
     }
 
-    protected function performSearch($query)
+    protected function performFuzzySearch($query)
     {
         $results = [];
-        $query = strtolower($query);
+        $query = strtolower(trim($query));
 
-        // Search in sidebar items
-        $sidebarItems = Hyro::sidebar();
-        
-        foreach ($sidebarItems as $sectionOrItem) {
-            if (isset($sectionOrItem['group']) && isset($sectionOrItem['items'])) {
-                // Section with items
-                foreach ($sectionOrItem['items'] as $item) {
-                    if ($this->matchesSearch($item, $query)) {
-                        $results[] = [
-                            'title' => $item['title'] ?? 'Untitled',
-                            'url' => $item['url'] ?? ($item['route'] ?? '#'),
-                            'group' => $sectionOrItem['group'],
-                            'icon' => 'puzzle',
-                            'type' => 'menu'
-                        ];
-                    }
-                }
-            } elseif (isset($sectionOrItem['title'])) {
-                // Single item
-                if ($this->matchesSearch($sectionOrItem, $query)) {
-                    $results[] = [
-                        'title' => $sectionOrItem['title'],
-                        'url' => $sectionOrItem['url'] ?? ($sectionOrItem['route'] ?? '#'),
-                        'group' => 'System',
-                        'icon' => 'cog',
-                        'type' => 'menu'
-                    ];
-                }
-            }
-        }
-
-        // Add common admin features
-        $commonFeatures = [
-            ['title' => 'Dashboard', 'url' => route('hyro.admin.dashboard'), 'group' => 'System', 'icon' => 'home'],
-            ['title' => 'Plugin Manager', 'url' => route('hyro.admin.plugins'), 'group' => 'System', 'icon' => 'puzzle'],
-            ['title' => 'Users', 'url' => '#', 'group' => 'Management', 'icon' => 'users'],
-            ['title' => 'Roles', 'url' => '#', 'group' => 'Management', 'icon' => 'shield'],
-            ['title' => 'Settings', 'url' => '#', 'group' => 'System', 'icon' => 'cog'],
+        // Define all searchable items
+        $searchableItems = [
+            // System
+            ['title' => 'Dashboard', 'url' => route('hyro.admin.dashboard'), 'group' => 'System', 'icon' => 'home', 'keywords' => ['dashboard', 'home', 'main']],
+            ['title' => 'Plugin Manager', 'url' => route('hyro.admin.plugins'), 'group' => 'System', 'icon' => 'puzzle', 'keywords' => ['plugin', 'plugins', 'manager', 'extensions']],
+            
+            // Management
+            ['title' => 'Users', 'url' => '#', 'group' => 'Management', 'icon' => 'users', 'keywords' => ['users', 'user', 'people', 'accounts']],
+            ['title' => 'Roles', 'url' => '#', 'group' => 'Management', 'icon' => 'shield', 'keywords' => ['roles', 'permissions', 'access', 'security']],
+            ['title' => 'Settings', 'url' => '#', 'group' => 'System', 'icon' => 'cog', 'keywords' => ['settings', 'config', 'configuration', 'preferences']],
         ];
 
-        foreach ($commonFeatures as $feature) {
-            if (str_contains(strtolower($feature['title']), $query)) {
-                $results[] = array_merge($feature, ['type' => 'feature']);
+        // Add sidebar items
+        try {
+            $sidebarItems = Hyro::sidebar();
+            
+            foreach ($sidebarItems as $sectionOrItem) {
+                if (isset($sectionOrItem['group']) && isset($sectionOrItem['items'])) {
+                    foreach ($sectionOrItem['items'] as $item) {
+                        if (isset($item['title'])) {
+                            $url = $item['url'] ?? '#';
+                            if (isset($item['route']) && Route::has($item['route'])) {
+                                $url = route($item['route']);
+                            }
+                            
+                            $searchableItems[] = [
+                                'title' => $item['title'],
+                                'url' => $url,
+                                'group' => $sectionOrItem['group'],
+                                'icon' => 'puzzle',
+                                'keywords' => [strtolower($item['title'])]
+                            ];
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Search error: ' . $e->getMessage());
+        }
+
+        // Fuzzy search algorithm
+        foreach ($searchableItems as $item) {
+            $score = $this->calculateFuzzyScore($query, $item);
+            
+            if ($score > 0) {
+                $item['score'] = $score;
+                $results[] = $item;
             }
         }
 
-        return array_slice($results, 0, 10); // Limit to 10 results
+        // Sort by score (highest first)
+        usort($results, function($a, $b) {
+            return $b['score'] <=> $a['score'];
+        });
+
+        return array_slice($results, 0, 8);
     }
 
-    protected function matchesSearch($item, $query)
+    protected function calculateFuzzyScore($query, $item)
     {
-        $title = strtolower($item['title'] ?? '');
-        return str_contains($title, $query);
+        $score = 0;
+        $title = strtolower($item['title']);
+        
+        // Exact match
+        if ($title === $query) {
+            return 1000;
+        }
+        
+        // Starts with query
+        if (str_starts_with($title, $query)) {
+            $score += 500;
+        }
+        
+        // Contains query
+        if (str_contains($title, $query)) {
+            $score += 300;
+        }
+        
+        // Check keywords
+        foreach ($item['keywords'] ?? [] as $keyword) {
+            if (str_contains($keyword, $query)) {
+                $score += 200;
+            }
+            if (str_starts_with($keyword, $query)) {
+                $score += 100;
+            }
+        }
+        
+        // Fuzzy character matching
+        $queryChars = str_split($query);
+        $titleChars = str_split($title);
+        $matchCount = 0;
+        $titleIndex = 0;
+        
+        foreach ($queryChars as $char) {
+            for ($i = $titleIndex; $i < count($titleChars); $i++) {
+                if ($titleChars[$i] === $char) {
+                    $matchCount++;
+                    $titleIndex = $i + 1;
+                    break;
+                }
+            }
+        }
+        
+        if ($matchCount === count($queryChars)) {
+            $score += 50 + (100 * ($matchCount / strlen($title)));
+        }
+        
+        return $score;
     }
 
-    public function selectResult($url)
+    public function clearSearch()
     {
-        $this->dispatch('navigate', ['url' => $url]);
-        $this->reset(['search', 'searchResults', 'showResults']);
+        $this->search = '';
+        $this->searchResults = [];
+        $this->showResults = false;
     }
 
     public function render()

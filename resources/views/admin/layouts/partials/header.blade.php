@@ -16,24 +16,26 @@
             </button>
 
             <!-- Search Bar -->
-            <div class="relative flex-1 max-w-2xl" x-data="{ showResults: @entangle('showResults') }">
+            <div class="relative flex-1 max-w-2xl" x-data="{ showResults: @entangle('showResults').live }">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg class="w-4 h-4 md:w-5 md:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
                     <input 
                         type="text" 
-                        wire:model.live.debounce.300ms="search"
-                        placeholder="Search..."
-                        class="block w-full pl-9 md:pl-10 pr-8 md:pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                        @keydown.escape="showResults = false"
+                        wire:model.live.debounce.150ms="search"
+                        placeholder="Search... (Ctrl+K)"
+                        class="block w-full pl-9 md:pl-10 pr-8 md:pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors"
+                        @keydown.escape="showResults = false; $wire.clearSearch()"
+                        @keydown.ctrl.k.prevent="$el.focus()"
                     >
                     @if($search)
                         <button 
-                            wire:click="$set('search', '')"
-                            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                            wire:click="clearSearch"
+                            type="button"
+                            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
                         >
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -255,3 +257,17 @@
         </div>
     </div>
 </header>
+
+
+<script>
+    // Global keyboard shortcut for search
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            const searchInput = document.querySelector('input[placeholder*="Ctrl+K"]');
+            if (searchInput) {
+                searchInput.focus();
+            }
+        }
+    });
+</script>
