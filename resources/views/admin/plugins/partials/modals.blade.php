@@ -1881,6 +1881,7 @@
                              x-data="{ 
                                  searchQuery: '', 
                                  showToc: true,
+                                 showMarkdown: false,
                                  copyCode(button) {
                                      const code = button.parentElement.nextElementSibling.innerText;
                                      navigator.clipboard.writeText(code);
@@ -1979,12 +1980,13 @@
                                                 </svg>
                                             </button>
                                             
-                                            {{-- Print --}}
-                                            <button onclick="window.print()"
-                                                    class="hidden sm:block p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-                                                    title="Print Documentation">
+                                            {{-- Toggle Markdown View --}}
+                                            <button @click="showMarkdown = !showMarkdown"
+                                                    :class="showMarkdown ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+                                                    class="p-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                                    title="Toggle Markdown Source">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                                                 </svg>
                                             </button>
                                             
@@ -2003,7 +2005,7 @@
                                 {{-- Documentation Body with TOC --}}
                                 <div class="flex flex-col lg:flex-row">
                                     {{-- Table of Contents Sidebar --}}
-                                    <div x-show="showToc" 
+                                    <div x-show="showToc && !showMarkdown" 
                                          x-transition:enter="transition ease-out duration-200"
                                          x-transition:enter-start="opacity-0 -translate-x-4"
                                          x-transition:enter-end="opacity-100 translate-x-0"
@@ -2021,9 +2023,31 @@
                                         </div>
                                     </div>
                                     
+                                    {{-- Markdown Source View --}}
+                                    <div x-show="showMarkdown" 
+                                         x-transition:enter="transition ease-out duration-200"
+                                         x-transition:enter-start="opacity-0"
+                                         x-transition:enter-end="opacity-100"
+                                         class="flex-1 p-4 sm:p-6 md:p-8 max-h-[600px] overflow-y-auto">
+                                        <div class="relative">
+                                            <button onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText); this.innerHTML = '<svg class=\'w-4 h-4\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M5 13l4 4L19 7\'/></svg><span>Copied!</span>'; setTimeout(() => this.innerHTML = '<svg class=\'w-4 h-4\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z\'/></svg><span>Copy Markdown</span>', 2000)"
+                                                    class="absolute top-2 right-2 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg transition-colors flex items-center space-x-1.5 z-10">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                </svg>
+                                                <span>Copy Markdown</span>
+                                            </button>
+                                            <pre class="bg-gray-900 dark:bg-gray-950 text-gray-100 p-4 rounded-xl overflow-x-auto text-sm font-mono border border-gray-700"><code>{{ $selectedPlugin['readme'] }}</code></pre>
+                                        </div>
+                                    </div>
+                                    
                                     {{-- Documentation Content with Enhanced Markdown Styling --}}
-                                    <div class="flex-1 p-4 sm:p-6 md:p-8 max-h-[600px] overflow-y-auto readme-content">
-                                        <div class="prose prose-sm sm:prose lg:prose-lg dark:prose-invert max-w-none
+                                    <div x-show="!showMarkdown" 
+                                         x-transition:enter="transition ease-out duration-200"
+                                         x-transition:enter-start="opacity-0"
+                                         x-transition:enter-end="opacity-100"
+                                         class="flex-1 p-4 sm:p-6 md:p-8 max-h-[600px] overflow-y-auto readme-content">
+                                        <div class="prose prose-sm sm:prose lg:prose-lg dark:prose-invert w-full
                                                     prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-headings:scroll-mt-6
                                                     prose-h1:text-2xl sm:prose-h1:text-3xl prose-h1:mb-4 prose-h1:pb-3 prose-h1:border-b-2 prose-h1:border-blue-200 dark:prose-h1:border-blue-800
                                                     prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-gray-200 dark:prose-h2:border-gray-700
