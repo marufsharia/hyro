@@ -29,7 +29,7 @@
     </div>
 
     {{-- Stats Cards with Shimmer --}}
-    <div class="grid grid-cols-3 md:grid-cols-4 gap-4" wire:loading.class="pointer-events-none">
+    <div class="grid grid-cols-3 md:grid-cols-5 gap-4" wire:loading.class="pointer-events-none">
         @if(!$isLoaded)
             {{-- Shimmer placeholders --}}
             @for($i = 0; $i < 5; $i++)

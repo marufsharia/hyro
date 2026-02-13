@@ -308,6 +308,17 @@
                                 <span>Screenshots</span>
                             </button>
                             @endif
+                            
+                            @if($selectedPlugin['is_installed'])
+                            <button @click="activeTab = 'danger'" 
+                                    :class="activeTab === 'danger' ? 'border-red-600 text-red-600 bg-red-50 dark:bg-red-900/20' : 'border-transparent text-gray-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20'"
+                                    class="px-4 sm:px-6 py-2.5 sm:py-3 border-b-2 font-semibold text-xs sm:text-sm transition-all duration-200 rounded-t-lg flex items-center space-x-1.5 sm:space-x-2 whitespace-nowrap flex-shrink-0">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                <span>Danger Zone</span>
+                            </button>
+                            @endif
                         </nav>
                     </div>
 
@@ -2159,206 +2170,218 @@
                             </div>
                         </div>
                         @endif
-                    </div>
-                </div>
 
-                {{-- Danger Zone Section (Phase 9) --}}
-                @if($selectedPlugin['is_installed'])
-                <div class="mt-8 p-8 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/30 rounded-xl border-2 border-red-300 dark:border-red-800" x-data="{ showDangerConfirm: false, confirmText: '', dangerAction: '' }">
-                    {{-- Danger Zone Header --}}
-                    <div class="flex items-start space-x-4 mb-6">
-                        <div class="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                            </svg>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="text-xl font-bold text-red-900 dark:text-red-300 mb-2">Danger Zone</h3>
-                            <p class="text-sm text-red-800 dark:text-red-400">
-                                These actions are irreversible and may cause data loss. Proceed with extreme caution.
-                                A backup is strongly recommended before performing any dangerous operations.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    {{-- Dangerous Actions Grid --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {{-- Force Uninstall --}}
-                        <div class="p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-red-200 dark:border-red-800">
-                            <div class="flex items-start space-x-3 mb-3">
-                                <svg class="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1">Force Uninstall</h4>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                                        Completely remove plugin files and directories. Cannot be undone.
-                                    </p>
-                                    <button @click="showDangerConfirm = true; dangerAction = 'force_uninstall'"
-                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold transition-colors w-full">
-                                        Force Uninstall
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {{-- Reset Plugin Data --}}
-                        <div class="p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-red-200 dark:border-red-800">
-                            <div class="flex items-start space-x-3 mb-3">
-                                <svg class="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                </svg>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1">Reset Plugin Data</h4>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                                        Clear all plugin data and restore to default state. Settings will be lost.
-                                    </p>
-                                    <button @click="showDangerConfirm = true; dangerAction = 'reset_data'"
-                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold transition-colors w-full">
-                                        Reset Data
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {{-- Delete Configuration --}}
-                        <div class="p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-red-200 dark:border-red-800">
-                            <div class="flex items-start space-x-3 mb-3">
-                                <svg class="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1">Delete Configuration</h4>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                                        Remove all configuration files and settings. Plugin will need reconfiguration.
-                                    </p>
-                                    <button @click="showDangerConfirm = true; dangerAction = 'delete_config'"
-                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold transition-colors w-full">
-                                        Delete Config
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {{-- Remove Database Tables --}}
-                        <div class="p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-red-200 dark:border-red-800">
-                            <div class="flex items-start space-x-3 mb-3">
-                                <svg class="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                                </svg>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1">Remove Database Tables</h4>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                                        Drop all database tables created by this plugin. All data will be lost.
-                                    </p>
-                                    <button @click="showDangerConfirm = true; dangerAction = 'remove_tables'"
-                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold transition-colors w-full">
-                                        Remove Tables
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {{-- Clear Plugin Cache --}}
-                        <div class="p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-orange-200 dark:border-orange-800">
-                            <div class="flex items-start space-x-3 mb-3">
-                                <svg class="w-6 h-6 text-orange-600 dark:text-orange-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1">Clear Plugin Cache</h4>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                                        Remove all cached data for this plugin. Less dangerous but may affect performance.
-                                    </p>
-                                    <button wire:click="clearPluginCache('{{ $selectedPlugin['id'] }}')"
-                                            class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-semibold transition-colors w-full">
-                                        Clear Cache
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {{-- Disable Permanently --}}
-                        <div class="p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-red-200 dark:border-red-800">
-                            <div class="flex items-start space-x-3 mb-3">
-                                <svg class="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                                </svg>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1">Disable Permanently</h4>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                                        Prevent plugin from being activated again. Requires manual intervention to re-enable.
-                                    </p>
-                                    <button @click="showDangerConfirm = true; dangerAction = 'disable_permanently'"
-                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold transition-colors w-full">
-                                        Disable Forever
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {{-- Danger Confirmation Modal --}}
-                    <div x-show="showDangerConfirm" 
-                         x-cloak
-                         class="fixed inset-0 z-[60] overflow-y-auto"
-                         style="display: none;">
-                        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                            <div class="fixed inset-0 transition-opacity bg-gray-900/75" @click="showDangerConfirm = false"></div>
-
-                            <div class="inline-block w-full max-w-md my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-2xl rounded-2xl relative z-10">
-                                <div class="p-6">
-                                    <div class="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
-                                        <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                        </svg>
-                                    </div>
-
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">Confirm Dangerous Action</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 text-center mb-6">
-                                        This action cannot be undone. To confirm, please type the plugin name:
-                                        <span class="font-bold text-red-600 dark:text-red-400">{{ $selectedPlugin['name'] }}</span>
-                                    </p>
-
-                                    <input type="text" 
-                                           x-model="confirmText"
-                                           placeholder="Type plugin name to confirm"
-                                           class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:text-white mb-4">
-
-                                    <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg mb-6">
-                                        <div class="flex items-start space-x-2">
-                                            <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        {{-- Danger Zone Tab (Phase 9) --}}
+                        @if($selectedPlugin['is_installed'])
+                        <div x-show="activeTab === 'danger'"
+                             x-data="{ showDangerConfirm: false, confirmText: '', dangerAction: '' }"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 transform scale-95"
+                             x-transition:enter-end="opacity-100 transform scale-100">
+                            <div class="bg-white dark:bg-gray-800 rounded-xl border-2 border-red-300 dark:border-red-800 overflow-hidden">
+                                {{-- Danger Zone Header --}}
+                                <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/30 border-b-2 border-red-300 dark:border-red-800">
+                                    <div class="flex items-start space-x-3 sm:space-x-4">
+                                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                             </svg>
-                                            <div class="text-xs text-yellow-800 dark:text-yellow-300">
-                                                <strong>Warning:</strong> A backup will be created automatically, but recovery is not guaranteed. Make sure you have a recent backup of your entire system.
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-lg sm:text-xl font-bold text-red-900 dark:text-red-300 mb-2">Danger Zone</h3>
+                                            <p class="text-xs sm:text-sm text-red-800 dark:text-red-400">
+                                                These actions are irreversible and may cause data loss. Proceed with extreme caution.
+                                                A backup is strongly recommended before performing any dangerous operations.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {{-- Dangerous Actions Grid --}}
+                                <div class="p-4 sm:p-6 md:p-8">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {{-- Force Uninstall --}}
+                                        <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 transition-colors">
+                                            <div class="flex items-start space-x-3 mb-3">
+                                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                                <div class="flex-1">
+                                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1 text-sm sm:text-base">Force Uninstall</h4>
+                                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                                                        Completely remove plugin files and directories. Cannot be undone.
+                                                    </p>
+                                                    <button @click="showDangerConfirm = true; dangerAction = 'force_uninstall'"
+                                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold transition-colors w-full">
+                                                        Force Uninstall
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {{-- Reset Plugin Data --}}
+                                        <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 transition-colors">
+                                            <div class="flex items-start space-x-3 mb-3">
+                                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                                </svg>
+                                                <div class="flex-1">
+                                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1 text-sm sm:text-base">Reset Plugin Data</h4>
+                                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                                                        Clear all plugin data and restore to default state. Settings will be lost.
+                                                    </p>
+                                                    <button @click="showDangerConfirm = true; dangerAction = 'reset_data'"
+                                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold transition-colors w-full">
+                                                        Reset Data
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {{-- Delete Configuration --}}
+                                        <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 transition-colors">
+                                            <div class="flex items-start space-x-3 mb-3">
+                                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                </svg>
+                                                <div class="flex-1">
+                                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1 text-sm sm:text-base">Delete Configuration</h4>
+                                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                                                        Remove all configuration files and settings. Plugin will need reconfiguration.
+                                                    </p>
+                                                    <button @click="showDangerConfirm = true; dangerAction = 'delete_config'"
+                                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold transition-colors w-full">
+                                                        Delete Config
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {{-- Remove Database Tables --}}
+                                        <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 transition-colors">
+                                            <div class="flex items-start space-x-3 mb-3">
+                                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+                                                </svg>
+                                                <div class="flex-1">
+                                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1 text-sm sm:text-base">Remove Database Tables</h4>
+                                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                                                        Drop all database tables created by this plugin. All data will be lost.
+                                                    </p>
+                                                    <button @click="showDangerConfirm = true; dangerAction = 'remove_tables'"
+                                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold transition-colors w-full">
+                                                        Remove Tables
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {{-- Clear Plugin Cache --}}
+                                        <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-orange-200 dark:border-orange-800 hover:border-orange-400 dark:hover:border-orange-600 transition-colors">
+                                            <div class="flex items-start space-x-3 mb-3">
+                                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 dark:text-orange-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                                <div class="flex-1">
+                                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1 text-sm sm:text-base">Clear Plugin Cache</h4>
+                                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                                                        Remove all cached data for this plugin. Less dangerous but may affect performance.
+                                                    </p>
+                                                    <button wire:click="clearPluginCache('{{ $selectedPlugin['id'] }}')"
+                                                            class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-semibold transition-colors w-full">
+                                                        Clear Cache
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {{-- Disable Permanently --}}
+                                        <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 rounded-lg border-2 border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 transition-colors">
+                                            <div class="flex items-start space-x-3 mb-3">
+                                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                                </svg>
+                                                <div class="flex-1">
+                                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1 text-sm sm:text-base">Disable Permanently</h4>
+                                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                                                        Prevent plugin from being activated again. Requires manual intervention to re-enable.
+                                                    </p>
+                                                    <button @click="showDangerConfirm = true; dangerAction = 'disable_permanently'"
+                                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold transition-colors w-full">
+                                                        Disable Forever
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            
+                            {{-- Danger Confirmation Modal --}}
+                            <div x-show="showDangerConfirm" 
+                                 x-cloak
+                                 class="fixed inset-0 z-[60] overflow-y-auto"
+                                 style="display: none;">
+                                <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                                    <div class="fixed inset-0 transition-opacity bg-gray-900/75" @click="showDangerConfirm = false"></div>
 
-                                    <div class="flex items-center justify-end space-x-3">
-                                        <button @click="showDangerConfirm = false; confirmText = ''" 
-                                                class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium">
-                                            Cancel
-                                        </button>
-                                        <button @click="if(confirmText === '{{ $selectedPlugin['name'] }}') { 
-                                                    $wire.executeDangerousAction('{{ $selectedPlugin['id'] }}', dangerAction); 
-                                                    showDangerConfirm = false; 
-                                                    confirmText = ''; 
-                                                }"
-                                                :disabled="confirmText !== '{{ $selectedPlugin['name'] }}'"
-                                                :class="confirmText === '{{ $selectedPlugin['name'] }}' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'"
-                                                class="px-6 py-2 text-white rounded-lg font-medium transition-colors disabled:opacity-50">
-                                            Confirm & Execute
-                                        </button>
+                                    <div class="inline-block w-full max-w-md my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-2xl rounded-2xl relative z-10">
+                                        <div class="p-6">
+                                            <div class="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
+                                                <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                                </svg>
+                                            </div>
+
+                                            <h3 class="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">Confirm Dangerous Action</h3>
+                                            <p class="text-sm text-gray-600 dark:text-gray-300 text-center mb-6">
+                                                This action cannot be undone. To confirm, please type the plugin name:
+                                                <span class="font-bold text-red-600 dark:text-red-400">{{ $selectedPlugin['name'] }}</span>
+                                            </p>
+
+                                            <input type="text" 
+                                                   x-model="confirmText"
+                                                   placeholder="Type plugin name to confirm"
+                                                   class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:text-white mb-4">
+
+                                            <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg mb-6">
+                                                <div class="flex items-start space-x-2">
+                                                    <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    <div class="text-xs text-yellow-800 dark:text-yellow-300">
+                                                        <strong>Warning:</strong> A backup will be created automatically, but recovery is not guaranteed. Make sure you have a recent backup of your entire system.
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center justify-end space-x-3">
+                                                <button @click="showDangerConfirm = false; confirmText = ''" 
+                                                        class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium">
+                                                    Cancel
+                                                </button>
+                                                <button @click="if(confirmText === '{{ $selectedPlugin['name'] }}') { 
+                                                            $wire.executeDangerousAction('{{ $selectedPlugin['id'] }}', dangerAction); 
+                                                            showDangerConfirm = false; 
+                                                            confirmText = ''; 
+                                                        }"
+                                                        :disabled="confirmText !== '{{ $selectedPlugin['name'] }}'"
+                                                        :class="confirmText === '{{ $selectedPlugin['name'] }}' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'"
+                                                        class="px-6 py-2 text-white rounded-lg font-medium transition-colors disabled:opacity-50">
+                                                    Confirm & Execute
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        @endif
                     </div>
                 </div>
-                @endif
+
+                {{-- Danger Zone Section (Phase 9) - REMOVED, NOW IN TAB --}}
 
                 {{-- Enhanced Action Buttons --}}
                 <div class="flex items-center justify-between pt-8 border-t-2 border-gray-200 dark:border-gray-700">
