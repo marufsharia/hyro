@@ -357,6 +357,9 @@ class PluginManager extends Component
             $this->dispatch('notify', ['type' => 'success', 'message' => 'Plugin activated successfully']);
             $this->dispatch('refreshPlugins');
             
+            // Dispatch browser event to reload page and refresh sidebar
+            $this->dispatch('refreshSidebar');
+            
         } catch (Exception $e) {
             $this->dispatch('notify', ['type' => 'error', 'message' => 'Activation failed: ' . $e->getMessage()]);
         }
@@ -374,6 +377,9 @@ class PluginManager extends Component
             $this->logActivity('deactivate', $pluginId);
             $this->dispatch('notify', ['type' => 'success', 'message' => 'Plugin deactivated successfully']);
             $this->dispatch('refreshPlugins');
+            
+            // Dispatch browser event to reload page and refresh sidebar
+            $this->dispatch('refreshSidebar');
             
         } catch (Exception $e) {
             $this->dispatch('notify', ['type' => 'error', 'message' => 'Deactivation failed: ' . $e->getMessage()]);

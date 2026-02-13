@@ -2009,7 +2009,7 @@
                                          x-transition:enter="transition ease-out duration-200"
                                          x-transition:enter-start="opacity-0 -translate-x-4"
                                          x-transition:enter-end="opacity-100 translate-x-0"
-                                         class="w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+                                         class=" sm:w-64 md:w-64 lg:w-64 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
                                         <div class="p-4 sm:p-6 sticky top-0 max-h-[600px] overflow-y-auto">
                                             <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center">
                                                 <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

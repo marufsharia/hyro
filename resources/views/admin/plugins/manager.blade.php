@@ -29,7 +29,7 @@
     </div>
 
     {{-- Stats Cards with Shimmer --}}
-    <div class="grid grid-cols-3 grid-cols-6 gap-4" wire:loading.class="pointer-events-none">
+    <div class="grid grid-cols-3  sm:grid-cols-6 grid-cols-6 gap-4" wire:loading.class="pointer-events-none">
         @if(!$isLoaded)
             {{-- Shimmer placeholders --}}
             @for($i = 0; $i < 5; $i++)
@@ -383,3 +383,17 @@
 </div>
 
 
+
+@push('scripts')
+<script>
+    // Listen for sidebar refresh event and reload the page
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('refreshSidebar', () => {
+            // Small delay to ensure the cache is cleared and success message is shown
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        });
+    });
+</script>
+@endpush
