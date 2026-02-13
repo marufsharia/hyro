@@ -69,58 +69,86 @@ class ModuleManager
         return self::all()[$key] ?? null;
     }
     /**
-     * Get modules organized for sidebar
+     * Get modules organized for sidebar (CACHED for performance)
      */
     public static function getSidebarGroups(): array
     {
-        $modules = self::enabled();
+        // Cache sidebar for 1 hour to avoid slow plugin lookups on every page
+        return cache()->remember('hyro.sidebar.groups', 3600, function() {
+            $modules = self::enabled();
 
-        $groups = [];
+            $groups = [];
 
-        foreach ($modules as $slug => $module) {
-            $group = $module['group'] ?? 'Modules';
-            $groups[$group]['group'] = $group;
-            $groups[$group]['items'][] = [
-                'title' => $module['title'],
-                'route' => 'admin.' . \Str::plural($slug),
-                'icon'  => $module['icon'] ?? 'folder',
+            foreach ($modules as $slug => $module) {
+                $group = $module['group'] ?? 'Modules';
+                $groups[$group]['group'] = $group;
+                $groups[$group]['items'][] = [
+                    'title' => $module['title'],
+                    'route' => 'admin.' . \Str::plural($slug),
+                    'icon'  => $module['icon'] ?? 'folder',
+                ];
+            }
+
+            // Add plugins section (cached separately)
+            $plugins = self::getActivePlugins();
+            if (!empty($plugins)) {
+                $groups['Plugins']['group'] = 'Plugins';
+                $groups['Plugins']['items'] = $plugins;
+            }
+
+            // Add Plugin Manager to Settings section
+            $groups['Settings']['group'] = 'Settings';
+            $groups['Settings']['items'][] = [
+                'title' => 'Plugin Manager',
+                'route' => 'hyro.admin.plugins',
+                'icon'  => 'puzzle',
             ];
-        }
 
-        // Add plugins section
-        $plugins = self::getActivePlugins();
-        if (!empty($plugins)) {
-            $groups['Plugins']['group'] = 'Plugins';
-            $groups['Plugins']['items'] = $plugins;
-        }
-
-        return $groups;
+            return $groups;
+        });
     }
 
     /**
-     * Get active plugins for sidebar
+     * Clear sidebar cache (call this when plugins are activated/deactivated)
+     */
+    public static function clearSidebarCache(): void
+    {
+        cache()->forget('hyro.sidebar.groups');
+        cache()->forget('hyro.active.plugins');
+    }
+
+    /**
+     * Get active plugins for sidebar (CACHED)
      */
     public static function getActivePlugins(): array
     {
-        $pluginManager = app('hyro.plugins');
-        $states = $pluginManager->getPluginStates();
-        $allPlugins = $pluginManager->getAllPlugins();
-        
-        $activePlugins = [];
-        
-        foreach ($states as $pluginId => $state) {
-            if (($state['active'] ?? false) && isset($allPlugins[$pluginId])) {
-                $plugin = $allPlugins[$pluginId];
-                $activePlugins[] = [
-                    'title' => $plugin['meta']['name'] ?? ucfirst($pluginId),
-                    'route' => 'hyro.plugin.' . $pluginId . '.index',
-                    'icon'  => 'puzzle',
-                    'url'   => '/hyro/plugins/' . $pluginId,
-                ];
+        // Cache for 1 hour to avoid slow lookups
+        return cache()->remember('hyro.active.plugins', 3600, function() {
+            try {
+                $pluginManager = app('hyro.plugins');
+                $states = $pluginManager->getPluginStates();
+                $allPlugins = $pluginManager->getAllPlugins();
+                
+                $activePlugins = [];
+                
+                foreach ($states as $pluginId => $state) {
+                    if (($state['active'] ?? false) && isset($allPlugins[$pluginId])) {
+                        $plugin = $allPlugins[$pluginId];
+                        $activePlugins[] = [
+                            'title' => $plugin['meta']['name'] ?? ucfirst($pluginId),
+                            'route' => 'hyro.plugin.' . $pluginId . '.index',
+                            'icon'  => 'puzzle',
+                            'url'   => '/hyro/plugins/' . $pluginId,
+                        ];
+                    }
+                }
+                
+                return $activePlugins;
+            } catch (\Exception $e) {
+                // Don't break the app if plugins fail
+                return [];
             }
-        }
-        
-        return $activePlugins;
+        });
     }
     /**
      * Check if module exists

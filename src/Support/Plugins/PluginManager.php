@@ -161,7 +161,7 @@ class PluginManager
         $cacheEnabled = config('hyro.plugins.cache.enabled', true);
         $cacheTtl = config('hyro.plugins.cache.ttl', 3600);
 
-        // Discover local plugins
+        // Discover local plugins (cached)
         if ($forceRefresh || !$cacheEnabled) {
             $localPlugins = $this->scanLocalPlugins($pluginsPath);
             if ($cacheEnabled) {
@@ -173,8 +173,9 @@ class PluginManager
             );
         }
 
-        // Discover remote plugins (cached separately)
-        $remotePlugins = $this->discoverRemotePlugins($forceRefresh);
+        // OPTIMIZATION: Skip remote plugin discovery unless forced
+        // Remote discovery is SLOW (API calls) - only do it manually
+        $remotePlugins = $forceRefresh ? $this->discoverRemotePlugins($forceRefresh) : [];
 
         // Merge arrays correctly
         $allPlugins = array_merge($localPlugins, $remotePlugins);
@@ -543,14 +544,19 @@ class PluginManager
     }
 
     /**
-     * Load all enabled plugins
+     * Load all enabled plugins (OPTIMIZED)
      */
     public function load(): void
     {
+        // If plugins haven't been discovered yet, discover from cache only
+        if ($this->plugins->isEmpty()) {
+            $this->discover(false); // Use cache, don't scan filesystem
+        }
+        
         $sortedPlugins = $this->resolveDependencies();
 
         foreach ($sortedPlugins as $id) {
-            // CHANGED: Only load plugins marked as active
+            // Only load plugins marked as active
             if ($this->isPluginActive($id)) {
                 try {
                     $this->loadPlugin($id);

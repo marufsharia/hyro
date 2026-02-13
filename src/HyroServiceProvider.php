@@ -456,6 +456,9 @@ class HyroServiceProvider extends ServiceProvider
             \Livewire\Livewire::component('hyro.notification-center', \Marufsharia\Hyro\Livewire\NotificationCenter::class);
             \Livewire\Livewire::component('hyro.notification-bell', \Marufsharia\Hyro\Livewire\NotificationBell::class);
             \Livewire\Livewire::component('hyro.notification-preferences', \Marufsharia\Hyro\Livewire\NotificationPreferences::class);
+            
+            // Register plugin manager component
+            \Livewire\Livewire::component('hyro.plugin-manager', \Marufsharia\Hyro\Livewire\Admin\PluginManager::class);
         } catch (\Exception $e) {
             // Silently fail if Livewire components can't be registered
             if ($this->app->runningInConsole()) {
@@ -573,8 +576,10 @@ class HyroServiceProvider extends ServiceProvider
 
         try {
             $pluginManager = $this->app->make('hyro.plugins');
-            $pluginManager->discover();
+            
+            // Only load active plugins (fast - reads from state file + cache)
             $pluginManager->load();
+            
         } catch (\Exception $e) {
             if ($this->app->runningInConsole()) {
                 $this->app['log']->warning('Hyro: Could not load plugins: ' . $e->getMessage());

@@ -341,7 +341,7 @@
     </div>
 
     <!-- Scripts -->
-     @hyroJs
+    @hyroJs
     @livewireScripts
     @stack('scripts')
 </body>

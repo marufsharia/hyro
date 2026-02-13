@@ -231,12 +231,12 @@ class HyroUtils {
     }
 }
 
-// Make sure Livewire is initialized before Alpine
-if (window.livewire) {
-    window.livewire.start();
-}
 // Make utilities available globally
 window.HyroUtils = HyroUtils;
-Alpine.start();
+
+// DON'T start Alpine here - let Livewire handle it
+// Livewire will automatically start Alpine when it initializes
+// Alpine.start(); // REMOVED - causes duplicate Alpine instances
+
 // Export for ES module usage
 export default Alpine;

@@ -44,5 +44,8 @@ Route::prefix(config('hyro.admin.route.prefix'))
             Route::get('privileges', [RoleController::class, 'editPrivileges'])->name('privileges.edit');
             Route::put('privileges', [RoleController::class, 'updatePrivileges'])->name('privileges.update');
         });
+
+        // Plugin Manager
+        Route::get('/plugins', [\Marufsharia\Hyro\Http\Controllers\Admin\PluginController::class, 'index'])->name('plugins');
     });
 
