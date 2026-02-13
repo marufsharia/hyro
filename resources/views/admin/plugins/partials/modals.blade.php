@@ -1864,18 +1864,78 @@
                         </div>
                         @endif
 
-                        {{-- README/Documentation Tab --}}
+                        {{-- README/Documentation Tab - Enhanced --}}
                         @if($selectedPlugin['readme'])
                         <div x-show="activeTab === 'readme'" 
+                             x-data="{ 
+                                 searchQuery: '', 
+                                 showToc: true,
+                                 copyCode(button) {
+                                     const code = button.parentElement.nextElementSibling.innerText;
+                                     navigator.clipboard.writeText(code);
+                                     button.innerHTML = '<svg class=\'w-4 h-4\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M5 13l4 4L19 7\'/></svg><span>Copied!</span>';
+                                     setTimeout(() => {
+                                         button.innerHTML = '<svg class=\'w-4 h-4\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z\'/></svg><span>Copy</span>';
+                                     }, 2000);
+                                 }
+                             }"
+                             x-init="
+                                 $nextTick(() => {
+                                     const readmeContent = document.querySelector('.readme-content');
+                                     if (!readmeContent) return;
+                                     
+                                     // Add copy buttons to code blocks
+                                     readmeContent.querySelectorAll('pre').forEach(pre => {
+                                         if (!pre.querySelector('.copy-code-btn')) {
+                                             const wrapper = document.createElement('div');
+                                             wrapper.className = 'relative group my-6';
+                                             pre.parentNode.insertBefore(wrapper, pre);
+                                             wrapper.appendChild(pre);
+                                             const btn = document.createElement('button');
+                                             btn.className = 'copy-code-btn absolute top-2 right-2 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1.5 z-10';
+                                             btn.innerHTML = '<svg class=\'w-4 h-4\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z\'/></svg><span>Copy</span>';
+                                             btn.onclick = function() { copyCode(this); };
+                                             wrapper.appendChild(btn);
+                                         }
+                                     });
+                                     
+                                     // Generate TOC
+                                     const headings = readmeContent.querySelectorAll('h1, h2, h3');
+                                     const tocList = document.getElementById('doc-toc-list');
+                                     if (tocList && headings.length > 0) {
+                                         tocList.innerHTML = '';
+                                         headings.forEach((heading, index) => {
+                                             const id = 'heading-' + index;
+                                             heading.id = id;
+                                             const level = parseInt(heading.tagName.substring(1));
+                                             const li = document.createElement('li');
+                                             const a = document.createElement('a');
+                                             a.href = '#' + id;
+                                             a.className = 'block py-1.5 px-3 text-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors ' + 
+                                                          (level === 1 ? 'font-bold text-gray-900 dark:text-white' : 
+                                                           level === 2 ? 'pl-6 text-gray-700 dark:text-gray-300' : 
+                                                           'pl-9 text-gray-600 dark:text-gray-400');
+                                             a.textContent = heading.textContent;
+                                             a.onclick = (e) => {
+                                                 e.preventDefault();
+                                                 heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                             };
+                                             li.appendChild(a);
+                                             tocList.appendChild(li);
+                                         });
+                                     }
+                                 });
+                             "
+                             x-show="activeTab === 'readme'" 
                              x-transition:enter="transition ease-out duration-200"
                              x-transition:enter-start="opacity-0 transform scale-95"
                              x-transition:enter-end="opacity-100 transform scale-100">
                             <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                                {{-- Documentation Header --}}
-                                <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-gray-200 dark:border-gray-700">
-                                    <div class="flex items-center justify-between">
+                                {{-- Documentation Header - Enhanced --}}
+                                <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-gray-200 dark:border-gray-700">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
                                         <div class="flex items-center space-x-3">
-                                            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                                            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
                                                 <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                                                 </svg>
@@ -1885,52 +1945,125 @@
                                                 <p class="text-sm text-gray-600 dark:text-gray-400">Complete user manual and guide</p>
                                             </div>
                                         </div>
-                                        <button onclick="navigator.clipboard.writeText(this.closest('[x-show]').querySelector('.readme-content').innerText)"
-                                                class="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 text-sm font-medium transition-colors flex items-center space-x-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                            </svg>
-                                            <span>Copy</span>
-                                        </button>
+                                        
+                                        {{-- Action Buttons --}}
+                                        <div class="flex items-center space-x-2 w-full sm:w-auto">
+                                            {{-- Search --}}
+                                            <div class="relative flex-1 sm:flex-initial">
+                                                <input type="text" 
+                                                       x-model="searchQuery"
+                                                       placeholder="Search docs..."
+                                                       class="w-full sm:w-48 px-3 py-2 pl-9 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 dark:text-white">
+                                                <svg class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                                </svg>
+                                            </div>
+                                            
+                                            {{-- Toggle TOC --}}
+                                            <button @click="showToc = !showToc"
+                                                    class="p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                                    title="Toggle Table of Contents">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                                                </svg>
+                                            </button>
+                                            
+                                            {{-- Print --}}
+                                            <button onclick="window.print()"
+                                                    class="hidden sm:block p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                                    title="Print Documentation">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                                                </svg>
+                                            </button>
+                                            
+                                            {{-- Copy All --}}
+                                            <button onclick="navigator.clipboard.writeText(document.querySelector('.readme-content').innerText); this.innerHTML = '<svg class=\'w-5 h-5\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M5 13l4 4L19 7\'/></svg>'; setTimeout(() => this.innerHTML = '<svg class=\'w-5 h-5\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z\'/></svg>', 2000)"
+                                                    class="p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                                    title="Copy All Content">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                {{-- Documentation Content with Markdown Styling --}}
-                                <div class="p-8 max-h-[600px] overflow-y-auto readme-content">
-                                    <div class="prose prose-sm sm:prose lg:prose-lg dark:prose-invert max-w-none
-                                                prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white
-                                                prose-h1:text-3xl prose-h1:mb-4 prose-h1:pb-3 prose-h1:border-b prose-h1:border-gray-200 dark:prose-h1:border-gray-700
-                                                prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-gray-200 dark:prose-h2:border-gray-700
-                                                prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
-                                                prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-4
-                                                prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
-                                                prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:font-bold
-                                                prose-code:text-purple-600 dark:prose-code:text-purple-400 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
-                                                prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-pre:shadow-inner
-                                                prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-4 prose-ul:space-y-2
-                                                prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-4 prose-ol:space-y-2
-                                                prose-li:text-gray-700 dark:prose-li:text-gray-300
-                                                prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-400 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/20 prose-blockquote:py-2 prose-blockquote:rounded-r
-                                                prose-table:w-full prose-table:border-collapse
-                                                prose-th:bg-gray-100 dark:prose-th:bg-gray-700 prose-th:p-3 prose-th:text-left prose-th:font-bold prose-th:border prose-th:border-gray-300 dark:prose-th:border-gray-600
-                                                prose-td:p-3 prose-td:border prose-td:border-gray-300 dark:prose-td:border-gray-600
-                                                prose-img:rounded-lg prose-img:shadow-lg prose-img:my-6">
-                                        {!! \Illuminate\Support\Str::markdown($selectedPlugin['readme']) !!}
+                                {{-- Documentation Body with TOC --}}
+                                <div class="flex flex-col lg:flex-row">
+                                    {{-- Table of Contents Sidebar --}}
+                                    <div x-show="showToc" 
+                                         x-transition:enter="transition ease-out duration-200"
+                                         x-transition:enter-start="opacity-0 -translate-x-4"
+                                         x-transition:enter-end="opacity-100 translate-x-0"
+                                         class="w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+                                        <div class="p-4 sm:p-6 sticky top-0 max-h-[600px] overflow-y-auto">
+                                            <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                                                </svg>
+                                                Table of Contents
+                                            </h4>
+                                            <ul id="doc-toc-list" class="space-y-1">
+                                                {{-- Generated dynamically via Alpine.js --}}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Documentation Content with Enhanced Markdown Styling --}}
+                                    <div class="flex-1 p-4 sm:p-6 md:p-8 max-h-[600px] overflow-y-auto readme-content">
+                                        <div class="prose prose-sm sm:prose lg:prose-lg dark:prose-invert max-w-none
+                                                    prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-headings:scroll-mt-6
+                                                    prose-h1:text-2xl sm:prose-h1:text-3xl prose-h1:mb-4 prose-h1:pb-3 prose-h1:border-b-2 prose-h1:border-blue-200 dark:prose-h1:border-blue-800
+                                                    prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-gray-200 dark:prose-h2:border-gray-700
+                                                    prose-h3:text-lg sm:prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
+                                                    prose-h4:text-base sm:prose-h4:text-lg prose-h4:mt-4 prose-h4:mb-2
+                                                    prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-4 prose-p:text-sm sm:prose-p:text-base
+                                                    prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-a:font-medium
+                                                    prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:font-bold
+                                                    prose-em:text-gray-700 dark:prose-em:text-gray-300 prose-em:italic
+                                                    prose-code:text-purple-600 dark:prose-code:text-purple-400 prose-code:bg-purple-50 dark:prose-code:bg-purple-900/20 prose-code:px-2 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none prose-code:border prose-code:border-purple-200 dark:prose-code:border-purple-800
+                                                    prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-xl prose-pre:overflow-x-auto prose-pre:shadow-lg prose-pre:border prose-pre:border-gray-700
+                                                    prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-4 prose-ul:space-y-2
+                                                    prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-4 prose-ol:space-y-2
+                                                    prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:text-sm sm:prose-li:text-base
+                                                    prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-4 prose-blockquote:pr-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-400 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/20 prose-blockquote:py-3 prose-blockquote:rounded-r-lg prose-blockquote:my-4
+                                                    prose-table:w-full prose-table:border-collapse prose-table:my-6 prose-table:text-sm
+                                                    prose-thead:bg-gray-100 dark:prose-thead:bg-gray-700
+                                                    prose-th:bg-gray-100 dark:prose-th:bg-gray-700 prose-th:p-3 prose-th:text-left prose-th:font-bold prose-th:border prose-th:border-gray-300 dark:prose-th:border-gray-600 prose-th:text-gray-900 dark:prose-th:text-white
+                                                    prose-td:p-3 prose-td:border prose-td:border-gray-300 dark:prose-td:border-gray-600 prose-td:text-gray-700 dark:prose-td:text-gray-300
+                                                    prose-tr:even:bg-gray-50 dark:prose-tr:even:bg-gray-800/50
+                                                    prose-img:rounded-xl prose-img:shadow-xl prose-img:my-6 prose-img:border prose-img:border-gray-200 dark:prose-img:border-gray-700
+                                                    prose-hr:border-gray-300 dark:prose-hr:border-gray-700 prose-hr:my-8
+                                                    prose-kbd:bg-gray-100 dark:prose-kbd:bg-gray-800 prose-kbd:px-2 prose-kbd:py-1 prose-kbd:rounded prose-kbd:text-sm prose-kbd:font-mono prose-kbd:border prose-kbd:border-gray-300 dark:prose-kbd:border-gray-600">
+                                            {!! \Illuminate\Support\Str::markdown($selectedPlugin['readme']) !!}
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                {{-- Documentation Footer --}}
-                                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
-                                    <div class="flex items-center justify-between text-sm">
-                                        <span class="text-gray-600 dark:text-gray-400">
-                                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {{-- Documentation Footer - Enhanced --}}
+                                <div class="px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 text-sm">
+                                        <span class="text-gray-600 dark:text-gray-400 flex items-center">
+                                            <svg class="w-4 h-4 mr-1.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                             </svg>
-                                            Documentation provided by plugin author
+                                            <span class="truncate">Documentation provided by plugin author</span>
                                         </span>
-                                        <span class="text-gray-500 dark:text-gray-400">
-                                            Last updated: {{ $selectedPlugin['version'] }}
-                                        </span>
+                                        <div class="flex items-center space-x-4">
+                                            <span class="text-gray-500 dark:text-gray-400">
+                                                Version: {{ $selectedPlugin['version'] }}
+                                            </span>
+                                            @if($selectedPlugin['documentation_url'] ?? false)
+                                            <a href="{{ $selectedPlugin['documentation_url'] }}" target="_blank" 
+                                               class="text-blue-600 dark:text-blue-400 hover:underline flex items-center">
+                                                <span>Online Docs</span>
+                                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                                </svg>
+                                            </a>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
