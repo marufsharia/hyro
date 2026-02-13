@@ -381,19 +381,3 @@
         </div>
     </div>
 </div>
-
-
-
-@push('scripts')
-<script>
-    // Listen for sidebar refresh event and reload the page
-    document.addEventListener('livewire:init', () => {
-        Livewire.on('refreshSidebar', () => {
-            // Small delay to ensure the cache is cleared and success message is shown
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
-        });
-    });
-</script>
-@endpush
