@@ -1,34 +1,8 @@
-@import 'tailwindcss';
-
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@theme {
-    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    
-    /* Custom Colors */
-    --color-primary-50: oklch(0.98 0.01 250);
-    --color-primary-100: oklch(0.95 0.02 250);
-    --color-primary-200: oklch(0.90 0.04 250);
-    --color-primary-300: oklch(0.82 0.08 250);
-    --color-primary-400: oklch(0.72 0.15 250);
-    --color-primary-500: oklch(0.62 0.22 250);
-    --color-primary-600: oklch(0.52 0.25 250);
-    --color-primary-700: oklch(0.42 0.22 250);
-    --color-primary-800: oklch(0.35 0.18 250);
-    --color-primary-900: oklch(0.28 0.14 250);
-    --color-primary-950: oklch(0.18 0.08 250);
-    
-    /* Animations */
-    --animate-spin: spin 1s linear infinite;
-    --animate-ping: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-    --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    --animate-bounce: bounce 1s infinite;
-}
-
-/* Custom Utilities */
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+/* =========================================
+   Custom Utilities
+========================================= */
 @layer utilities {
     .text-balance {
         text-wrap: balance;
@@ -47,17 +21,57 @@
     }
 }
 
-/* Smooth Scrolling */
+/* =========================================
+   Base Styles (Tailwind v4 Safe)
+========================================= */
 @layer base {
-    * {
-        @apply border-gray-200 dark:border-gray-700;
-    }
-    
     html {
         scroll-behavior: smooth;
     }
-    
+
     body {
-        @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+        background-color: rgb(249 250 251); /* gray-50 */
+        color: rgb(17 24 39); /* gray-900 */
     }
+
+    .dark body {
+        background-color: rgb(17 24 39); /* gray-900 */
+        color: rgb(243 244 246); /* gray-100 */
+    }
+}
+
+/* =========================================
+   Alpine Cloak
+========================================= */
+[x-cloak] {
+    display: none !important;
+}
+
+/* =========================================
+   Custom Scrollbar
+========================================= */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
 }

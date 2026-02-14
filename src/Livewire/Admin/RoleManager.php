@@ -2,183 +2,157 @@
 
 namespace Marufsharia\Hyro\Livewire\Admin;
 
-use Marufsharia\Hyro\Livewire\BaseCrudComponent;
+use Livewire\Component;
+use Livewire\WithPagination;
 use Marufsharia\Hyro\Models\Role;
 use Marufsharia\Hyro\Models\Privilege;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
-class RoleManager extends BaseCrudComponent
+class RoleManager extends Component
 {
-    public $name;
-    public $slug;
-    public $description;
-    public $is_protected = false;
+    use WithPagination;
 
-    // Privilege assignment
+    public $privileges = [];
+    public $showModal = false;
+    public $editMode = false;
+    public $roleId;
+    public $name = '';
+    public $slug = '';
+    public $description = '';
     public $selectedPrivileges = [];
-    public $availablePrivileges = [];
+    public $search = '';
 
-    protected function getModel(): string
-    {
-        return config('hyro.database.models.role', Role::class);
-    }
+    protected $paginationTheme = 'tailwind';
 
-    protected function getFields(): array
+    protected function rules()
     {
+        $roleId = $this->roleId ?? 'NULL';
+        
         return [
-            'name' => [
-                'type' => 'text',
-                'label' => 'Role Name',
-                'rules' => 'required|string|max:255',
-                'default' => '',
-                'help' => 'Display name of the role',
-            ],
-            'slug' => [
-                'type' => 'text',
-                'label' => 'Slug',
-                'rules' => 'required|string|max:255|unique:' . config('hyro.database.tables.roles', 'hyro_roles') . ',slug',
-                'default' => '',
-                'help' => 'Unique identifier (auto-generated from name)',
-            ],
-            'description' => [
-                'type' => 'textarea',
-                'label' => 'Description',
-                'rules' => 'nullable|string|max:500',
-                'default' => '',
-                'help' => 'Brief description of this role',
-            ],
-            'is_protected' => [
-                'type' => 'checkbox',
-                'label' => 'Protected Role',
-                'rules' => 'boolean',
-                'default' => false,
-                'help' => 'Protected roles cannot be deleted',
-            ],
+            'name' => 'required|string|max:255|unique:hyro_roles,name,' . $roleId,
+            'slug' => 'required|string|max:255|unique:hyro_roles,slug,' . $roleId . '|alpha_dash',
+            'description' => 'nullable|string|max:500',
+            'selectedPrivileges' => 'array',
+            'selectedPrivileges.*' => 'exists:hyro_privileges,id',
         ];
-    }
-
-    protected function getSearchableFields(): array
-    {
-        return ['name', 'slug', 'description'];
-    }
-
-    protected function getTableColumns(): array
-    {
-        return ['name', 'slug', 'description', 'users_count', 'privileges_count', 'created_at'];
-    }
-
-    protected function withRelationships(): array
-    {
-        return ['users', 'privileges'];
     }
 
     public function mount()
     {
-        parent::mount();
-        $this->loadAvailablePrivileges();
+        $this->privileges = Privilege::orderBy('name')->get()->toArray();
     }
 
-    protected function loadAvailablePrivileges()
+    public function create()
     {
-        $privilegeModel = config('hyro.database.models.privilege', Privilege::class);
-        $this->availablePrivileges = $privilegeModel::orderBy('name')->get();
+        $this->resetForm();
+        $this->editMode = false;
+        $this->showModal = true;
     }
 
-    public function updatedName($value)
+    public function edit($id)
     {
-        if (!$this->isEditing && $value) {
-            $this->slug = Str::slug($value);
-        }
+        $role = Role::with('privileges')->findOrFail($id);
+        
+        $this->roleId = $role->id;
+        $this->name = $role->name;
+        $this->slug = $role->slug;
+        $this->description = $role->description ?? '';
+        $this->selectedPrivileges = $role->privileges->pluck('id')->toArray();
+        $this->editMode = true;
+        $this->showModal = true;
     }
 
-    protected function loadEditData($record)
+    public function save()
     {
-        $this->selectedPrivileges = $record->privileges->pluck('id')->toArray();
-    }
+        $this->validate();
 
-    protected function canUpdate($record): bool
-    {
-        if ($record->is_protected && !auth()->user()->hasPrivilege('roles.edit-protected')) {
-            return false;
-        }
-        return auth()->user()->hasPrivilege('roles.update');
-    }
-
-    protected function canDelete($record): bool
-    {
-        // Cannot delete protected roles
-        if ($record->is_protected) {
-            return false;
-        }
-
-        // Cannot delete if it's the last admin role
-        if (config('hyro.security.fail_closed', true)) {
-            $protectedRoles = config('hyro.security.protected_roles', []);
-            if (in_array($record->slug, $protectedRoles)) {
-                $count = $this->getModel()::whereIn('slug', $protectedRoles)->count();
-                if ($count === 1) {
-                    return false;
+        try {
+            DB::transaction(function () {
+                if ($this->editMode) {
+                    $role = Role::findOrFail($this->roleId);
+                    $role->update([
+                        'name' => $this->name,
+                        'slug' => $this->slug,
+                        'description' => $this->description,
+                    ]);
+                    $role->privileges()->sync($this->selectedPrivileges);
+                    $message = 'Role updated successfully.';
+                } else {
+                    $role = Role::create([
+                        'name' => $this->name,
+                        'slug' => $this->slug,
+                        'description' => $this->description,
+                    ]);
+                    $role->privileges()->sync($this->selectedPrivileges);
+                    $message = 'Role created successfully.';
                 }
+
+                session()->flash('success', $message);
+            });
+
+            $this->resetForm();
+            $this->showModal = false;
+            $this->resetPage();
+        } catch (\Exception $e) {
+            Log::error('Role save error: ' . $e->getMessage());
+            
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            $role = Role::findOrFail($id);
+            
+            // Prevent deletion of super admin role
+            $adminRole = Role::where('slug', config('hyro.super_admin_role', 'super-admin'))->first();
+            
+            if ($adminRole && $role->id === $adminRole->id && $adminRole->users()->count() > 0) {
+                session()->flash('error', 'Cannot delete the super admin role while it has assigned users.');
+                return;
             }
-        }
 
-        return auth()->user()->hasPrivilege('roles.delete');
-    }
+            $role->delete();
 
-    protected function beforeDelete($record): bool
-    {
-        // Check if role has users
-        if ($record->users()->count() > 0) {
-            $this->alert('error', 'Cannot delete role with assigned users. Reassign users first.');
-            $this->showDeleteModal = false;
-            return false;
-        }
-
-        return true;
-    }
-
-    protected function afterCreate($record)
-    {
-        // Sync privileges
-        $record->privileges()->sync($this->selectedPrivileges);
-
-        // Fire event
-        event('hyro.role.created', [$record]);
-    }
-
-    protected function afterUpdate($record)
-    {
-        // Sync privileges
-        $record->privileges()->sync($this->selectedPrivileges);
-
-        // Fire event
-        event('hyro.role.updated', [$record]);
-
-        // Invalidate cache
-        if (config('hyro.cache.enabled', true)) {
-            \Cache::forget(config('hyro.cache.prefix', 'hyro:') . "role.{$record->id}");
+            session()->flash('success', 'Role deleted successfully.');
+            $this->resetPage();
+        } catch (\Exception $e) {
+            Log::error('Role delete error: ' . $e->getMessage());
+            
+            session()->flash('error', 'An error occurred while deleting the role.');
         }
     }
 
-    protected function resetAdditionalFields()
+    public function resetForm()
     {
+        $this->roleId = null;
+        $this->name = '';
+        $this->slug = '';
+        $this->description = '';
         $this->selectedPrivileges = [];
+        $this->resetValidation();
     }
 
-    /**
-     * Apply custom filters to the query
-     *
-     * @param mixed $query
-     * @return void
-     */
-    protected function applyFilters($query): void
+    public function closeModal()
     {
-        // Add custom filters if needed
-        // Example: if ($this->filterStatus) { $query->where('status', $this->filterStatus); }
+        $this->showModal = false;
+        $this->resetForm();
     }
 
-    public function getItemsProperty()
+    public function render()
     {
-        return $this->getItems();
+        $roles = Role::withCount(['users', 'privileges'])
+            ->when($this->search, function ($query) {
+                $query->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('slug', 'like', '%' . $this->search . '%');
+            })
+            ->orderBy('name')
+            ->paginate(20);
+
+        return view('hyro::admin.roles.manager', [
+            'roles' => $roles,
+        ])->layout('hyro::admin.layouts.app');
     }
 }

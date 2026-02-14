@@ -2,210 +2,148 @@
 
 namespace Marufsharia\Hyro\Livewire\Admin;
 
-use Marufsharia\Hyro\Livewire\BaseCrudComponent;
+use Livewire\Component;
+use Livewire\WithPagination;
 use Marufsharia\Hyro\Models\Privilege;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
-class PrivilegeManager extends BaseCrudComponent
+class PrivilegeManager extends Component
 {
-    public $name;
-    public $slug;
-    public $description;
-    public $category;
+    use WithPagination;
 
-    // Filter
-    public $filterCategory = '';
+    public $showModal = false;
+    public $editMode = false;
+    public $privilegeId;
+    public $name = '';
+    public $slug = '';
+    public $category = '';
+    public $description = '';
+    public $search = '';
 
-    protected function getModel(): string
+    protected $paginationTheme = 'tailwind';
+
+    protected function rules()
     {
-        return config('hyro.database.models.privilege', Privilege::class);
-    }
-
-    protected function getFields(): array
-    {
+        $privilegeId = $this->privilegeId ?? 'NULL';
+        
         return [
-            'name' => [
-                'type' => 'text',
-                'label' => 'Privilege Name',
-                'rules' => 'required|string|max:255',
-                'default' => '',
-                'help' => 'Display name of the privilege',
-            ],
-            'slug' => [
-                'type' => 'text',
-                'label' => 'Slug',
-                'rules' => 'required|string|max:255|unique:' . config('hyro.database.tables.privileges', 'hyro_privileges') . ',slug',
-                'default' => '',
-                'help' => 'Use dot notation (e.g., posts.create, users.delete)',
-            ],
-            'description' => [
-                'type' => 'textarea',
-                'label' => 'Description',
-                'rules' => 'nullable|string|max:500',
-                'default' => '',
-                'help' => 'Brief description of what this privilege allows',
-            ],
-            'category' => [
-                'type' => 'text',
-                'label' => 'Category',
-                'rules' => 'nullable|string|max:255',
-                'default' => '',
-                'help' => 'Group privileges by category (e.g., Users, Posts, Settings)',
-            ],
+            'name' => 'required|string|max:255|unique:hyro_privileges,name,' . $privilegeId,
+            'slug' => 'required|string|max:255|unique:hyro_privileges,slug,' . $privilegeId . '|alpha_dash',
+            'category' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:500',
         ];
     }
 
-    protected function getSearchableFields(): array
+    public function create()
     {
-        return ['name', 'slug', 'description', 'category'];
+        $this->resetForm();
+        $this->editMode = false;
+        $this->showModal = true;
     }
 
-    protected function getTableColumns(): array
+    public function edit($id)
     {
-        return ['name', 'slug', 'category', 'roles_count', 'created_at'];
+        $privilege = Privilege::findOrFail($id);
+        
+        $this->privilegeId = $privilege->id;
+        $this->name = $privilege->name;
+        $this->slug = $privilege->slug;
+        $this->category = $privilege->category ?? '';
+        $this->description = $privilege->description ?? '';
+        $this->editMode = true;
+        $this->showModal = true;
     }
 
-    protected function withRelationships(): array
+    public function save()
     {
-        return ['roles'];
-    }
+        $this->validate();
 
-    public function updatedName($value)
-    {
-        if (!$this->isEditing && $value) {
-            // Convert to dot notation for slug
-            $this->slug = Str::slug($value, '.');
-        }
-    }
-
-    public function updatedCategory($value)
-    {
-        if (!$this->isEditing && $value && $this->name) {
-            // Auto-update slug with category
-            $this->slug = Str::slug($value, '.') . '.' . Str::slug($this->name, '.');
-        }
-    }
-
-    protected function canUpdate($record): bool
-    {
-        return auth()->user()->hasPrivilege('privileges.update');
-    }
-
-    protected function canDelete($record): bool
-    {
-        return auth()->user()->hasPrivilege('privileges.delete');
-    }
-
-    protected function beforeDelete($record): bool
-    {
-        // Check if privilege is assigned to any roles
-        if ($record->roles()->count() > 0) {
-            $this->alert('error', 'Cannot delete privilege assigned to roles. Remove from roles first.');
-            $this->showDeleteModal = false;
-            return false;
-        }
-
-        return true;
-    }
-
-    protected function afterCreate($record)
-    {
-        event('hyro.privilege.created', [$record]);
-    }
-
-    protected function afterUpdate($record)
-    {
-        event('hyro.privilege.updated', [$record]);
-
-        // Invalidate cache for all roles that have this privilege
-        if (config('hyro.cache.enabled', true)) {
-            foreach ($record->roles as $role) {
-                \Cache::forget(config('hyro.cache.prefix', 'hyro:') . "role.{$role->id}");
+        try {
+            if ($this->editMode) {
+                $privilege = Privilege::findOrFail($this->privilegeId);
+                $privilege->update([
+                    'name' => $this->name,
+                    'slug' => $this->slug,
+                    'category' => $this->category,
+                    'description' => $this->description,
+                ]);
+                $message = 'Privilege updated successfully.';
+            } else {
+                Privilege::create([
+                    'name' => $this->name,
+                    'slug' => $this->slug,
+                    'category' => $this->category,
+                    'description' => $this->description,
+                ]);
+                $message = 'Privilege created successfully.';
             }
+
+            session()->flash('success', $message);
+
+            $this->resetForm();
+            $this->showModal = false;
+            $this->resetPage();
+        } catch (\Exception $e) {
+            Log::error('Privilege save error: ' . $e->getMessage());
+            
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Apply custom filters to the query
-     *
-     * @param mixed $query
-     * @return void
-     */
-    protected function applyFilters($query): void
+    public function delete($id)
     {
-        if ($this->filterCategory) {
-            $query->where('category', $this->filterCategory);
+        try {
+            $privilege = Privilege::findOrFail($id);
+            
+            // Don't allow deletion of core admin privileges
+            $corePrivileges = ['access-hyro-admin', 'view-roles', 'create-roles', 'edit-roles', 'delete-roles'];
+            
+            if (in_array($privilege->slug, $corePrivileges)) {
+                session()->flash('error', 'Cannot delete core admin privileges.');
+                return;
+            }
+
+            $privilege->delete();
+
+            session()->flash('success', 'Privilege deleted successfully.');
+            $this->resetPage();
+        } catch (\Exception $e) {
+            Log::error('Privilege delete error: ' . $e->getMessage());
+            
+            session()->flash('error', 'An error occurred while deleting the privilege.');
         }
     }
 
-    public function getCategoriesProperty()
+    public function resetForm()
     {
-        return $this->getModel()::select('category')
-            ->distinct()
-            ->whereNotNull('category')
-            ->where('category', '!=', '')
+        $this->privilegeId = null;
+        $this->name = '';
+        $this->slug = '';
+        $this->category = '';
+        $this->description = '';
+        $this->resetValidation();
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
+        $this->resetForm();
+    }
+
+    public function render()
+    {
+        $privileges = Privilege::withCount('roles')
+            ->when($this->search, function ($query) {
+                $query->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('slug', 'like', '%' . $this->search . '%')
+                    ->orWhere('category', 'like', '%' . $this->search . '%');
+            })
             ->orderBy('category')
-            ->pluck('category');
-    }
+            ->orderBy('name')
+            ->paginate(20);
 
-    public function filterByCategory($category)
-    {
-        $this->filterCategory = $category;
-        $this->resetPage();
-    }
-
-    public function clearCategoryFilter()
-    {
-        $this->filterCategory = '';
-        $this->resetPage();
-    }
-
-    // Bulk operations for privileges
-    public function bulkAssignToRole($roleId)
-    {
-        if (empty($this->selectedRows)) {
-            $this->alert('warning', 'No privileges selected!');
-            return;
-        }
-
-        $roleModel = config('hyro.database.models.role');
-        $role = $roleModel::findOrFail($roleId);
-
-        $role->privileges()->syncWithoutDetaching($this->selectedRows);
-
-        $this->alert('success', count($this->selectedRows) . ' privileges assigned to role!');
-        $this->selectedRows = [];
-        $this->selectAll = false;
-    }
-
-    // Generate common privileges
-    public function generateResourcePrivileges($resourceName)
-    {
-        $actions = ['view', 'create', 'update', 'delete'];
-        $created = [];
-
-        foreach ($actions as $action) {
-            $slug = Str::slug($resourceName, '.') . '.' . $action;
-
-            // Check if already exists
-            if ($this->getModel()::where('slug', $slug)->exists()) {
-                continue;
-            }
-
-            $privilege = $this->getModel()::create([
-                'name' => ucfirst($action) . ' ' . ucfirst($resourceName),
-                'slug' => $slug,
-                'description' => "Allow {$action} operations on {$resourceName}",
-                'category' => ucfirst($resourceName),
-            ]);
-
-            $created[] = $privilege->name;
-        }
-
-        if (count($created) > 0) {
-            $this->alert('success', 'Created ' . count($created) . ' privileges for ' . $resourceName);
-        } else {
-            $this->alert('info', 'All privileges for ' . $resourceName . ' already exist');
-        }
+        return view('hyro::admin.privileges.manager', [
+            'privileges' => $privileges,
+        ])->layout('hyro::admin.layouts.app');
     }
 }

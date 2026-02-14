@@ -272,7 +272,7 @@
 </div>
 
 <!-- Mobile Sidebar Backdrop -->
-<div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
+<div id="sidebar-backdrop" class="fixed inset-0 bg-opacity-70 backdrop-blur-sm z-40 hidden lg:hidden"></div>
 
 <!-- Scripts -->
 <script>

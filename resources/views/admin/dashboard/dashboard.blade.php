@@ -1,25 +1,28 @@
-@extends('hyro::admin.layouts.app')
-
-@section('header')
-    <div class="flex items-center justify-between">
+<div>
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6 transition-colors duration-300">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Welcome back, {{ auth()->user()->name }}!</p>
         </div>
         <div class="flex items-center space-x-3">
-            <button onclick="window.location.reload()" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button 
+                wire:click="refresh" 
+                wire:loading.attr="disabled"
+                class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+            >
+                <svg wire:loading.remove class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <svg wire:loading class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                 </svg>
                 Refresh
             </button>
         </div>
     </div>
-@endsection
-
-@section('content')
     <!-- Quick Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 transition-colors duration-300">
         <!-- Total Users Card -->
         <div class="group relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
             <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity"></div>
@@ -130,7 +133,7 @@
                 @if(isset($stats['recent_users']) && $stats['recent_users']->count() > 0)
                     <div class="space-y-4">
                         @foreach($stats['recent_users'] as $user)
-                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300">
                                 <div class="flex items-center space-x-4">
                                     <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                                         {{ strtoupper(substr($user->name, 0, 1)) }}
@@ -304,13 +307,4 @@
             </div>
         </div>
     </div>
-@endsection
-
-@push('scripts')
-<script>
-    // Auto-refresh stats every 5 minutes
-    setInterval(() => {
-        console.log('Auto-refreshing dashboard stats...');
-    }, 300000);
-</script>
-@endpush
+</div>

@@ -447,24 +447,20 @@ class HyroServiceProvider extends ServiceProvider
         }
 
         try {
-            // Register Livewire components
-            \Livewire\Livewire::component('hyro.role-manager', \HyroPlugins\PhoneBook\Livewire\Admin\RoleManager::class);
-            \Livewire\Livewire::component('hyro.user-manager', \HyroPlugins\PhoneBook\Livewire\Admin\UserManager::class);
-            \Livewire\Livewire::component('hyro.privilege-manager', \HyroPlugins\PhoneBook\Livewire\Admin\PrivilegeManager::class);
+            // Register admin components
+            \Livewire\Livewire::component('hyro::admin.dashboard', \Marufsharia\Hyro\Livewire\Admin\Dashboard::class);
+            \Livewire\Livewire::component('hyro::admin.role-manager', \Marufsharia\Hyro\Livewire\Admin\RoleManager::class);
+            \Livewire\Livewire::component('hyro::admin.privilege-manager', \Marufsharia\Hyro\Livewire\Admin\PrivilegeManager::class);
+            \Livewire\Livewire::component('hyro::admin.sidebar', \Marufsharia\Hyro\Livewire\Admin\Sidebar::class);
+            \Livewire\Livewire::component('hyro::admin.header', \Marufsharia\Hyro\Livewire\Admin\Header::class);
+            
+            // Register plugin manager component
+            \Livewire\Livewire::component('hyro.plugin-manager', \Marufsharia\Hyro\Livewire\Admin\PluginManager::class);
             
             // Register notification components
             \Livewire\Livewire::component('hyro.notification-center', \Marufsharia\Hyro\Livewire\NotificationCenter::class);
             \Livewire\Livewire::component('hyro.notification-bell', \Marufsharia\Hyro\Livewire\NotificationBell::class);
             \Livewire\Livewire::component('hyro.notification-preferences', \Marufsharia\Hyro\Livewire\NotificationPreferences::class);
-            
-            // Register plugin manager component
-            \Livewire\Livewire::component('hyro.plugin-manager', \Marufsharia\Hyro\Livewire\Admin\PluginManager::class);
-            
-            // Register sidebar component
-            \Livewire\Livewire::component('hyro::admin.sidebar', \Marufsharia\Hyro\Livewire\Admin\Sidebar::class);
-            
-            // Register header component
-            \Livewire\Livewire::component('hyro::admin.header', \Marufsharia\Hyro\Livewire\Admin\Header::class);
         } catch (\Exception $e) {
             // Silently fail if Livewire components can't be registered
             if ($this->app->runningInConsole()) {

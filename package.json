@@ -7,7 +7,13 @@
         "type": "git",
         "url": "git+https://github.com/marufsharia/hyro.git"
     },
-    "keywords": ["laravel", "authentication", "authorization", "rbac", "livewire"],
+    "keywords": [
+        "laravel",
+        "authentication",
+        "authorization",
+        "rbac",
+        "livewire"
+    ],
     "author": "Maruf Sharia",
     "license": "MIT",
     "bugs": {
@@ -24,12 +30,12 @@
         "@alpinejs/collapse": "^3.15.5",
         "@alpinejs/focus": "^3.15.5",
         "@alpinejs/intersect": "^3.15.5",
-        "@tailwindcss/vite": "^4.0.0",
+        "@tailwindcss/vite": "^4.1.18",
         "alpinejs": "^3.15.5",
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
-        "tailwindcss": "^4.0.0",
+        "tailwindcss": "^4.1.18",
         "vite": "^7.0.7"
     }
 }

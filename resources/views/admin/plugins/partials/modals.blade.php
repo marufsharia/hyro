@@ -1,13 +1,13 @@
 {{-- Plugin Details Modal --}}
 @if($showDetailsModal && $selectedPlugin)
-<div class="fixed inset-0 z-50 overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen px-2 sm:px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        {{-- Backdrop - removed blur --}}
-        <div class="fixed inset-0 transition-opacity bg-gray-900/75" 
-             wire:click="$set('showDetailsModal', false)"></div>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <!-- Background overlay -->
+    <div class="fixed inset-0 bg-opacity-70 backdrop-blur-sm transition-opacity" 
+     {{-- wire:click="$set('showDetailsModal', false)" --}}
+        ></div>
 
-        {{-- Modal - increased z-index, responsive width --}}
-        <div class="inline-block w-full max-w-5xl my-4 sm:my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-2xl rounded-xl sm:rounded-2xl relative z-10">
+    <!-- Modal panel -->
+    <div class="relative inline-block w-full max-w-5xl my-4 sm:my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-2xl rounded-xl sm:rounded-2xl z-50 max-h-[70vh] flex flex-col">
             
             {{-- Hero Header with Gradient - Responsive height --}}
             <div class="relative h-48 sm:h-64 md:h-72 bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 overflow-hidden">
@@ -129,7 +129,7 @@
             </div>
 
             {{-- Content - Responsive padding --}}
-            <div class="p-4 sm:p-6 md:p-8">
+            <div class="p-4 sm:p-6 md:p-8 flex-1 overflow-y-auto">
                 {{-- Quick Actions Bar - Responsive --}}
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-600 space-y-4 sm:space-y-0">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-6 w-full sm:w-auto">
@@ -2482,11 +2482,12 @@
 
 {{-- Upload Plugin Modal --}}
 @if($showUploadModal)
-<div class="fixed inset-0 z-50 overflow-y-auto" x-show="true" x-cloak>
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" wire:click="$set('showUploadModal', false)"></div>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto" x-show="true" x-cloak>
+    <!-- Background overlay -->
+    <div class="fixed inset-0 bg-opacity-70 backdrop-blur-sm transition-opacity" ></div>
 
-        <div class="inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-2xl rounded-2xl">
+    <!-- Modal panel -->
+    <div class="relative inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-2xl rounded-2xl z-50">
             <div class="p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Upload Plugin</h2>
@@ -2581,11 +2582,12 @@
 
 {{-- Confirmation Modal --}}
 @if($showConfirmModal)
-<div class="fixed inset-0 z-50 overflow-y-auto" x-show="true" x-cloak>
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" wire:click="$set('showConfirmModal', false)"></div>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto" x-show="true" x-cloak>
+    <!-- Background overlay -->
+    <div class="fixed inset-0 bg-opacity-70 backdrop-blur-sm transition-opacity" wire:click="$set('showConfirmModal', false)"></div>
 
-        <div class="inline-block w-full max-w-md my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-2xl rounded-2xl">
+    <!-- Modal panel -->
+    <div class="relative inline-block w-full max-w-md my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-2xl rounded-2xl z-50">
             <div class="p-6">
                 <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
                     <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+<header class="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
     <div class="flex items-center justify-between h-16 px-4 md:px-6">
         <div class="flex items-center space-x-2 md:space-x-4 flex-1 min-w-0">
             <!-- Mobile menu button -->
@@ -16,7 +16,7 @@
             </button>
 
             <!-- Search Bar -->
-            <div class="relative flex-1 max-w-2xl" x-data="{ showResults: @entangle('showResults').live }">
+            <div class="relative flex-1 max-w-2xl transition-colors duration-300" x-data="{ showResults: @entangle('showResults').live }">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg class="w-4 h-4 md:w-5 md:h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

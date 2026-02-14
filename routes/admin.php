@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Marufsharia\Hyro\Http\Controllers\Admin\DashboardController;
-use Marufsharia\Hyro\Http\Controllers\Admin\RoleController;
-use Marufsharia\Hyro\Http\Controllers\Admin\PrivilegeController;
 use Marufsharia\Hyro\Http\Controllers\Admin\UserRoleController;
+use Marufsharia\Hyro\Livewire\Admin\Dashboard;
+use Marufsharia\Hyro\Livewire\Admin\RoleManager;
+use Marufsharia\Hyro\Livewire\Admin\PrivilegeManager;
 require __DIR__.'/auth.php';
 /*
 |--------------------------------------------------------------------------
@@ -24,25 +24,19 @@ Route::prefix(config('hyro.admin.route.prefix'))
     ->middleware(config('hyro.admin.route.middleware'))
     ->name('hyro.admin.')
     ->group(function () {
-        // Dashboard
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        // Dashboard - Livewire Component
+        Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
-        // Roles
-        Route::resource('roles', RoleController::class)->except(['show']);
+        // Roles - Livewire Component
+        Route::get('/roles', RoleManager::class)->name('roles.index');
 
-        // Privileges
-        Route::resource('privileges', PrivilegeController::class)->except(['show']);
+        // Privileges - Livewire Component
+        Route::get('/privileges', PrivilegeManager::class)->name('privileges.index');
 
-        // User → Role Management
+        // User → Role Management (keeping controller for now)
         Route::prefix('users/{user}')->name('users.')->group(function () {
             Route::get('roles', [UserRoleController::class, 'edit'])->name('roles.edit');
             Route::put('roles', [UserRoleController::class, 'update'])->name('roles.update');
-        });
-
-        // Role → Privilege Management
-        Route::prefix('roles/{role}')->name('roles.')->group(function () {
-            Route::get('privileges', [RoleController::class, 'editPrivileges'])->name('privileges.edit');
-            Route::put('privileges', [RoleController::class, 'updatePrivileges'])->name('privileges.update');
         });
 
         // Plugin Manager
