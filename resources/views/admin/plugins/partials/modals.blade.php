@@ -3,7 +3,7 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
     <!-- Background overlay -->
     <div class="fixed inset-0 bg-opacity-70 backdrop-blur-sm transition-opacity" 
-     {{-- wire:click="$set('showDetailsModal', false)" --}}
+     wire:click="$set('showDetailsModal', false)" 
         ></div>
 
     <!-- Modal panel -->
@@ -2428,6 +2428,15 @@
                     </div>
                     
                     <div class="flex items-center space-x-3">
+                         <button wire:click="deactivate('{{ $selectedPlugin['id'] }}')" 
+                                        wire:loading.attr="disabled"
+                                        wire:target="deactivate('{{ $selectedPlugin['id'] }}')"
+                                        class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold transition-all duration-200 disabled:opacity-50 flex items-center space-x-2 group">
+                                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>Close</span>
+                                </button>
                         @if($selectedPlugin['is_installed'])
                             @if($selectedPlugin['is_active'])
                                 <button wire:click="deactivate('{{ $selectedPlugin['id'] }}')" 
