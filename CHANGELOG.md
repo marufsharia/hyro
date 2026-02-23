@@ -17,6 +17,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto-publishing now works seamlessly on both install and update
 - Better detection of when assets need to be republished
 
+## [1.0.9] - 2026-02-23
+
+### Added
+- CDN fallback for CSS (Tailwind CSS) when built assets are not available
+- CDN fallback for JS (Alpine.js + plugins) when built assets are not available
+- Inline utility styles for Hyro-specific features (glass effects, scrollbars, etc.)
+
+### Changed
+- `HyroAsset::css()` now loads Tailwind CSS from CDN if manifest not found
+- `HyroAsset::js()` now loads Alpine.js and plugins from CDN if manifest not found
+- Package now works immediately after `composer require` without any build step
+
+### Improved
+- True zero-configuration experience - works out of the box
+- No npm/build required for end users
+- Automatic fallback to CDN ensures styling always works
+- Better developer experience with instant functionality
+
 ## [1.0.8] - 2026-02-23
 
 ### Removed

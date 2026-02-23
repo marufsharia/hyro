@@ -72,13 +72,32 @@ class HyroAsset
             return "<link rel=\"stylesheet\" href=\"{$url}\">";
         }
         
-        // Fallback to raw CSS
+        // Fallback: Load Tailwind CSS from CDN + Hyro alert styles
+        $output = '';
+        
+        // Add Tailwind CSS v3 from CDN (compatible with the layouts)
+        $output .= '<script src="https://cdn.tailwindcss.com"></script>' . "\n";
+        
+        // Add Hyro alert CSS if available
         if (File::exists(public_path('vendor/hyro/css/hyro-alert.css'))) {
-            return '<link rel="stylesheet" href="' . asset('vendor/hyro/css/hyro-alert.css') . '">';
+            $output .= '<link rel="stylesheet" href="' . asset('vendor/hyro/css/hyro-alert.css') . '">';
         }
         
-        // Return empty string instead of null to avoid blade errors
-        return '<!-- Hyro CSS not found. Run: php artisan hyro:publish-assets -->';
+        // Add inline styles for Hyro-specific utilities
+        $output .= '<style>
+        [x-cloak] { display: none !important; }
+        .text-balance { text-wrap: balance; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-dark { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>';
+        
+        return $output;
     }
 
     /**
@@ -97,13 +116,21 @@ class HyroAsset
             return "<script type=\"module\" src=\"{$url}\"></script>";
         }
         
-        // Fallback to raw JS
+        // Fallback: Load Alpine.js and plugins from CDN + Hyro alert JS
+        $output = '';
+        
+        // Add Alpine.js v3 and plugins from CDN
+        $output .= '<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>' . "\n";
+        $output .= '<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>' . "\n";
+        $output .= '<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>' . "\n";
+        $output .= '<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>' . "\n";
+        
+        // Add Hyro alert JS if available
         if (File::exists(public_path('vendor/hyro/js/hyro-alert.js'))) {
-            return '<script src="' . asset('vendor/hyro/js/hyro-alert.js') . '"></script>';
+            $output .= '<script src="' . asset('vendor/hyro/js/hyro-alert.js') . '"></script>';
         }
         
-        // Return empty string instead of null to avoid blade errors
-        return '<!-- Hyro JS not found. Run: php artisan hyro:publish-assets -->';
+        return $output;
     }
 
     /**
