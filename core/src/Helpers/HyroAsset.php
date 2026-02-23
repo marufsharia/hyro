@@ -59,23 +59,47 @@ class HyroAsset
     /**
      * Get CSS link tag.
      *
-     * @return string|null
+     * @return string
      */
-    public static function css(): ?string
+    public static function css(): string
     {
         $css = self::asset('resources/css/hyro.css');
-        return $css ? "<link rel=\"stylesheet\" href=\"{$css}\">" : null;
+        
+        if ($css) {
+            return "<link rel=\"stylesheet\" href=\"{$css}\">";
+        }
+        
+        // Fallback: try to load hyro-alert.css directly
+        $fallbackCss = public_path('vendor/hyro/css/hyro-alert.css');
+        if (File::exists($fallbackCss)) {
+            return '<link rel="stylesheet" href="' . asset('vendor/hyro/css/hyro-alert.css') . '">';
+        }
+        
+        // Return empty string instead of null to avoid blade errors
+        return '<!-- Hyro CSS not found. Run: php artisan hyro:publish-assets -->';
     }
 
     /**
      * Get JS script tag.
      *
-     * @return string|null
+     * @return string
      */
-    public static function js(): ?string
+    public static function js(): string
     {
         $js = self::asset('resources/js/hyro.js');
-        return $js ? "<script type=\"module\" src=\"{$js}\"></script>" : null;
+        
+        if ($js) {
+            return "<script type=\"module\" src=\"{$js}\"></script>";
+        }
+        
+        // Fallback: try to load hyro-alert.js directly
+        $fallbackJs = public_path('vendor/hyro/js/hyro-alert.js');
+        if (File::exists($fallbackJs)) {
+            return '<script src="' . asset('vendor/hyro/js/hyro-alert.js') . '"></script>';
+        }
+        
+        // Return empty string instead of null to avoid blade errors
+        return '<!-- Hyro JS not found. Run: php artisan hyro:publish-assets -->';
     }
 
     /**
@@ -111,10 +135,7 @@ class HyroAsset
         $css = self::css();
         $js = self::js();
 
-        return collect([
-            $css,
-            $js,
-        ])->filter()->implode("\n");
+        return $css . "\n" . $js;
     }
 
     /**

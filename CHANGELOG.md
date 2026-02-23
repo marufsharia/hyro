@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed `@hyroCss`, `@hyroJs`, and `@hyroAssets` Blade directives not outputting CSS/JS tags
 - Changed namespace from `Marufsharia\Hyro\Helpers\HyroAsset` to `Marufsharia\Hyro\Core\Helpers\HyroAsset` in HyroServiceProvider
+- Improved HyroAsset helper to return HTML comments instead of null when assets not found
+- Added fallback logic to load hyro-alert.css and hyro-alert.js when manifest assets unavailable
+- Fixed Blade directive string escaping to ensure proper PHP code generation
 - Resolves issue where Hyro CSS was not loading in admin panel
 
 ## [1.0.4] - 2026-02-23

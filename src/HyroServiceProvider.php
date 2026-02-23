@@ -246,15 +246,15 @@ class HyroServiceProvider extends ServiceProvider
     private function registerBladeDirectives(): void
     {
         \Blade::directive('hyroAssets', function () {
-            return '<?php echo \Marufsharia\Hyro\Core\Helpers\HyroAsset::tags(); ?>';
+            return "<?php echo \\Marufsharia\\Hyro\\Core\\Helpers\\HyroAsset::tags(); ?>";
         });
 
         \Blade::directive('hyroCss', function () {
-            return '<?php echo \Marufsharia\Hyro\Core\Helpers\HyroAsset::css(); ?>';
+            return "<?php echo \\Marufsharia\\Hyro\\Core\\Helpers\\HyroAsset::css(); ?>";
         });
 
         \Blade::directive('hyroJs', function () {
-            return '<?php echo \Marufsharia\Hyro\Core\Helpers\HyroAsset::js(); ?>';
+            return "<?php echo \\Marufsharia\\Hyro\\Core\\Helpers\\HyroAsset::js(); ?>";
         });
 
         // Register Blade components
