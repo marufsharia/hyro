@@ -44,6 +44,7 @@ class CoreServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishResources();
+            $this->registerCommands();
         }
 
         // Load migrations
@@ -54,6 +55,22 @@ class CoreServiceProvider extends ServiceProvider
         // Register authorization gates
         $gateRegistrar = $this->app->make(GateRegistrar::class);
         $gateRegistrar->register();
+    }
+
+    /**
+     * Register console commands.
+     */
+    private function registerCommands(): void
+    {
+        $this->commands([
+            // User commands
+            \Marufsharia\Hyro\Core\Console\Commands\User\CreateUserCommand::class,
+            \Marufsharia\Hyro\Core\Console\Commands\User\ListUsersCommand::class,
+            
+            // Role commands
+            \Marufsharia\Hyro\Core\Console\Commands\Role\CreateRoleCommand::class,
+            \Marufsharia\Hyro\Core\Console\Commands\Role\ListRolesCommand::class,
+        ]);
     }
 
     /**
