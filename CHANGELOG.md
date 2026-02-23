@@ -5,6 +5,52 @@ All notable changes to the Hyro package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-02-23
+
+### 🎉 Major Release: Filament-Style Asset Architecture
+
+This is a major release with breaking changes. See [v2.0.0_RELEASE_NOTES.md](v2.0.0_RELEASE_NOTES.md) for complete migration guide.
+
+### Added
+- **AssetManager**: Centralized asset registration system (`Marufsharia\Hyro\Core\Support\Assets\AssetManager`)
+- **AssetHelper**: Helper class for manifest reading and asset URL resolution
+- **@hyroAssets Blade Directive**: Single directive to render all registered assets
+- **hyro:install Command**: One-command installation with all necessary setup (includes automatic seeding)
+- **hyro:seed Command**: Dedicated command to seed default roles and privileges
+- **Plugin Asset Support**: Plugins can now register their own assets programmatically
+- **Blade Component**: `resources/views/components/assets.blade.php` for rendering assets
+- **Comprehensive Documentation**: Added `FILAMENT_STYLE_ARCHITECTURE.md`
+- **Auto-Seeding**: `hyro:install` now automatically runs `HyroInstallSeeder` to create default roles and privileges
+
+### Changed
+- **BREAKING**: Assets now build to `/dist` directory instead of `/public/build`
+- **BREAKING**: Vite configuration updated to output to `dist/` with custom structure
+- **BREAKING**: Asset publishing path changed from `public/build/` to `dist/`
+- **BREAKING**: Removed raw CSS/JS fallback files, replaced with CDN fallbacks
+- Updated `AdminPanelServiceProvider` to register assets using `AssetManager`
+- Updated `HyroServiceProvider` to use new asset rendering system
+- Updated `PublishAssetsCommand` to work with `/dist` directory
+- Updated `.gitignore` to include `/dist` directory (pre-built assets committed)
+
+### Improved
+- Zero-configuration installation - works immediately after `composer require`
+- No build step required for end users (pre-built assets included)
+- Automatic asset publishing on package install/update
+- CDN fallback ensures package works even without published assets
+- Plugin-friendly architecture for easy asset registration
+- Multi-panel support with centralized asset management
+- Better cache busting with versioned filenames
+
+### Deprecated
+- `@hyroCss` directive (still works but use `@hyroAssets` instead)
+- `@hyroJs` directive (still works but use `@hyroAssets` instead)
+
+### Migration Guide
+1. Update composer: `composer update marufsharia/hyro`
+2. Reinstall assets: `php artisan hyro:install --force`
+3. Update layouts: Replace `@hyroCss` and `@hyroJs` with `@hyroAssets`
+4. Clear caches: `php artisan view:clear && php artisan cache:clear`
+
 ## [1.0.9] - 2026-02-23
 
 ### Fixed

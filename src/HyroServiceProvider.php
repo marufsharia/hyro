@@ -245,10 +245,12 @@ class HyroServiceProvider extends ServiceProvider
      */
     private function registerBladeDirectives(): void
     {
+        // Main directive to render all registered assets
         \Blade::directive('hyroAssets', function () {
-            return "<?php echo \\Marufsharia\\Hyro\\Core\\Helpers\\HyroAsset::tags(); ?>";
+            return "<?php echo view('hyro::components.assets')->render(); ?>";
         });
 
+        // Legacy directives for backward compatibility
         \Blade::directive('hyroCss', function () {
             return "<?php echo \\Marufsharia\\Hyro\\Core\\Helpers\\HyroAsset::css(); ?>";
         });

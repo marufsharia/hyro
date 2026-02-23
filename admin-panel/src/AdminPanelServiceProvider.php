@@ -44,6 +44,9 @@ class AdminPanelServiceProvider extends ServiceProvider
 
         // Register Blade directives
         $this->registerBladeDirectives();
+
+        // Register core assets
+        $this->registerAssets();
     }
 
     /**
@@ -66,16 +69,10 @@ class AdminPanelServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/views' => resource_path('views/vendor/hyro'),
         ], 'hyro-views');
 
-        // Built assets from Vite - publish the entire build directory
+        // Built assets from dist directory
         $this->publishes([
-            __DIR__ . '/../../public/build' => public_path('vendor/hyro'),
+            __DIR__ . '/../../dist' => public_path('vendor/hyro'),
         ], 'hyro-assets');
-
-        // Also publish raw CSS/JS for fallback
-        $this->publishes([
-            __DIR__ . '/../resources/css' => public_path('vendor/hyro/css'),
-            __DIR__ . '/../resources/js' => public_path('vendor/hyro/js'),
-        ], 'hyro-assets-raw');
 
         // Routes
         $this->publishes([
@@ -83,6 +80,88 @@ class AdminPanelServiceProvider extends ServiceProvider
             __DIR__ . '/../routes/notifications.php' => base_path('routes/hyro/notifications.php'),
             __DIR__ . '/../routes/profile.php' => base_path('routes/hyro/profile.php'),
         ], 'hyro-routes');
+    }
+
+    /**
+     * Register core assets using AssetManager.
+     */
+    private function registerAssets(): void
+    {
+        $assetHelper = \Marufsharia\Hyro\Core\Support\Assets\AssetHelper::class;
+        $assetManager = \Marufsharia\Hyro\Core\Support\Assets\AssetManager::class;
+
+        // Register CSS
+        $cssUrl = $assetHelper::getCssUrl();
+        if ($cssUrl) {
+            $assetManager::registerStyle('hyro-core', $cssUrl);
+        } else {
+            // Fallback: Register CDN assets
+            $this->registerFallbackAssets();
+        }
+
+        // Register JS
+        $jsUrl = $assetHelper::getJsUrl();
+        if ($jsUrl) {
+            $assetManager::registerScript('hyro-core', $jsUrl, ['type' => 'module']);
+        } else {
+            // Fallback: Register CDN scripts
+            $this->registerFallbackScripts();
+        }
+
+        // Register inline styles for Hyro-specific utilities
+        $assetManager::registerInlineStyle('hyro-utilities', $this->getUtilityStyles());
+    }
+
+    /**
+     * Register fallback CDN assets when built assets are not available.
+     */
+    private function registerFallbackAssets(): void
+    {
+        $assetManager = \Marufsharia\Hyro\Core\Support\Assets\AssetManager::class;
+
+        // Register Tailwind CSS from CDN
+        $assetManager::registerScript('tailwind-cdn', 'https://cdn.tailwindcss.com');
+    }
+
+    /**
+     * Register fallback CDN scripts when built assets are not available.
+     */
+    private function registerFallbackScripts(): void
+    {
+        $assetManager = \Marufsharia\Hyro\Core\Support\Assets\AssetManager::class;
+
+        // Register Alpine.js and plugins from CDN
+        $assetManager::registerScript('alpine-collapse', 'https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js', ['defer' => true]);
+        $assetManager::registerScript('alpine-focus', 'https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js', ['defer' => true]);
+        $assetManager::registerScript('alpine-intersect', 'https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js', ['defer' => true]);
+        $assetManager::registerScript('alpine-core', 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', ['defer' => true]);
+    }
+
+    /**
+     * Get utility styles for Hyro.
+     */
+    private function getUtilityStyles(): string
+    {
+        return <<<'CSS'
+[x-cloak] { display: none !important; }
+.text-balance { text-wrap: balance; }
+.glass { 
+    background: rgba(255, 255, 255, 0.05); 
+    backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+}
+.glass-dark { 
+    background: rgba(0, 0, 0, 0.3); 
+    backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb { background: #475569; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+CSS;
     }
 
     /**
@@ -152,7 +231,7 @@ class AdminPanelServiceProvider extends ServiceProvider
         }
 
         // Check if package manifest is newer than published manifest
-        $packageManifest = __DIR__ . '/../../public/build/manifest.json';
+        $packageManifest = __DIR__ . '/../../dist/manifest.json';
         if (!\Illuminate\Support\Facades\File::exists($packageManifest)) {
             return false; // No package manifest, nothing to publish
         }
@@ -171,30 +250,17 @@ class AdminPanelServiceProvider extends ServiceProvider
     private function publishAssetsAutomatically(): void
     {
         try {
-            $buildSource = __DIR__ . '/../../public/build';
-            $buildDest = public_path('vendor/hyro');
+            $distSource = __DIR__ . '/../../dist';
+            $distDest = public_path('vendor/hyro');
 
-            if (\Illuminate\Support\Facades\File::exists($buildSource)) {
+            if (\Illuminate\Support\Facades\File::exists($distSource)) {
                 // Create destination directory
-                if (!\Illuminate\Support\Facades\File::exists($buildDest)) {
-                    \Illuminate\Support\Facades\File::makeDirectory($buildDest, 0755, true);
+                if (!\Illuminate\Support\Facades\File::exists($distDest)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($distDest, 0755, true);
                 }
 
-                // Copy built assets
-                \Illuminate\Support\Facades\File::copyDirectory($buildSource, $buildDest);
-
-                // Also copy raw assets as fallback
-                $cssSource = __DIR__ . '/../resources/css';
-                $cssDest = public_path('vendor/hyro/css');
-                if (\Illuminate\Support\Facades\File::exists($cssSource)) {
-                    \Illuminate\Support\Facades\File::copyDirectory($cssSource, $cssDest);
-                }
-
-                $jsSource = __DIR__ . '/../resources/js';
-                $jsDest = public_path('vendor/hyro/js');
-                if (\Illuminate\Support\Facades\File::exists($jsSource)) {
-                    \Illuminate\Support\Facades\File::copyDirectory($jsSource, $jsDest);
-                }
+                // Copy built assets from dist
+                \Illuminate\Support\Facades\File::copyDirectory($distSource, $distDest);
             }
         } catch (\Exception $e) {
             // Silently fail - assets can be published manually

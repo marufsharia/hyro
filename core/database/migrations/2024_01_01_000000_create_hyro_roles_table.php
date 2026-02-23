@@ -22,6 +22,10 @@ return new class extends Migration
             $table->string('name', 191);
             $table->text('description')->nullable();
 
+               // Role hierarchy (important for enterprise)
+            $table->unsignedInteger('level')->default(1)->index();
+            // Higher level = higher authority (super-admin = 100)
+            
             // System protection flags
             $table->boolean('is_protected')->default(false);
             $table->boolean('is_system')->default(false);

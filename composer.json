@@ -57,6 +57,7 @@
         "psr-4": {
             "Marufsharia\\Hyro\\": "src/",
             "Marufsharia\\Hyro\\Core\\": "core/src/",
+            "Marufsharia\\Hyro\\Core\\Database\\Seeders\\": "core/database/seeders/",
             "Marufsharia\\Hyro\\Auth\\": "auth/src/",
             "Marufsharia\\Hyro\\Api\\": "api/src/",
             "Marufsharia\\Hyro\\AdminPanel\\": "admin-panel/src/",

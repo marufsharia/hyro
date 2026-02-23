@@ -18,7 +18,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Marufsharia\\Hyro\\Core\\": "src/"
+            "Marufsharia\\Hyro\\Core\\": "src/",
+            "Marufsharia\\Hyro\\Core\\Database\\Seeders\\": "database/seeders/"
         },
         "files": [
             "src/Helpers/hyro_helpers.php"

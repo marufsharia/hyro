@@ -7,9 +7,8 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
-# Build outputs
+# Build outputs - IMPORTANT: Do NOT ignore /dist/ as it contains pre-built assets for the package
 /public/hot
-/public/build/
 /public/storage
 
 # Environment files

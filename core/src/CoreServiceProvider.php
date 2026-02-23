@@ -63,6 +63,12 @@ class CoreServiceProvider extends ServiceProvider
     private function registerCommands(): void
     {
         $this->commands([
+            // Install command
+            \Marufsharia\Hyro\Core\Console\Commands\InstallCommand::class,
+            
+            // Seed command
+            \Marufsharia\Hyro\Core\Console\Commands\SeedCommand::class,
+            
             // User commands
             \Marufsharia\Hyro\Core\Console\Commands\User\CreateUserCommand::class,
             \Marufsharia\Hyro\Core\Console\Commands\User\ListUsersCommand::class,

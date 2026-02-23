@@ -18,43 +18,31 @@ class PublishAssetsCommand extends Command
 
         $force = $this->option('force');
 
-        // First, publish the built assets (manifest.json and compiled assets)
-        $buildSource = __DIR__ . '/../../../public/build';
-        $buildDestination = public_path('vendor/hyro');
+        // Publish the built assets from dist directory
+        $distSource = __DIR__ . '/../../../dist';
+        $distDestination = public_path('vendor/hyro');
         
-        if (File::exists($buildSource)) {
-            $this->info('Publishing built assets (Vite compiled)...');
-            $this->publishDirectory($buildSource, $buildDestination, 'built', $force, true);
+        if (File::exists($distSource)) {
+            $this->info('Publishing built assets from dist directory...');
+            $this->publishDirectory($distSource, $distDestination, 'dist', $force, true);
         } else {
-            $this->warn('⚠ Built assets not found. Run "npm run build" in the package directory first.');
-        }
-
-        // Then publish raw CSS/JS as fallback
-        $sources = [
-            'css' => [
-                'source' => __DIR__ . '/../../../resources/css',
-                'destination' => public_path('vendor/hyro/css'),
-            ],
-            'js' => [
-                'source' => __DIR__ . '/../../../resources/js',
-                'destination' => public_path('vendor/hyro/js'),
-            ],
-        ];
-
-        $this->newLine();
-        $this->info('Publishing raw assets (fallback)...');
-        foreach ($sources as $type => $paths) {
-            $this->publishDirectory($paths['source'], $paths['destination'], $type, $force);
+            $this->warn('⚠ Built assets not found in dist directory.');
+            $this->warn('  Run "npm run build" in the package directory first.');
+            $this->newLine();
+            $this->info('Falling back to CDN assets...');
+            $this->line('  The package will automatically use CDN fallbacks for Tailwind CSS and Alpine.js');
         }
 
         $this->newLine();
-        $this->info('✓ Assets published successfully!');
-        $this->newLine();
-        $this->info('Assets published to:');
-        $this->line('  • public/vendor/hyro/manifest.json (Vite manifest)');
-        $this->line('  • public/vendor/hyro/assets/ (compiled CSS/JS)');
-        $this->line('  • public/vendor/hyro/css/ (raw CSS fallback)');
-        $this->line('  • public/vendor/hyro/js/ (raw JS fallback)');
+        $this->info('✓ Asset publishing complete!');
+        
+        if (File::exists($distDestination . '/manifest.json')) {
+            $this->newLine();
+            $this->info('Assets published to:');
+            $this->line('  • public/vendor/hyro/manifest.json (Vite manifest)');
+            $this->line('  • public/vendor/hyro/css/ (compiled CSS)');
+            $this->line('  • public/vendor/hyro/js/ (compiled JS)');
+        }
 
         return 0;
     }

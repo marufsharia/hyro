@@ -1,0 +1,17 @@
+{
+  "resources/css/hyro.css": {
+    "file": "assets/hyro-HPBdpIdl.css",
+    "src": "resources/css/hyro.css",
+    "isEntry": true,
+    "name": "hyro",
+    "names": [
+      "hyro.css"
+    ]
+  },
+  "resources/js/hyro.js": {
+    "file": "assets/hyro-D-y3am57.js",
+    "name": "hyro",
+    "src": "resources/js/hyro.js",
+    "isEntry": true
+  }
+}
