@@ -322,7 +322,7 @@ Edit `app/Models/User.php`:
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Marufsharia\Hyro\Traits\HasHyroFeatures;
+use Marufsharia\Hyro\Core\Traits\HasHyroFeatures;
 
 class User extends Authenticatable
 {
