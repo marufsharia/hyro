@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed `@hyroCss`, `@hyroJs`, and `@hyroAssets` Blade directives not outputting CSS/JS tags
 - Changed namespace from `Marufsharia\Hyro\Helpers\HyroAsset` to `Marufsharia\Hyro\Core\Helpers\HyroAsset` in HyroServiceProvider
+- Fixed `addTraitToUserModel()` to use correct namespace `Marufsharia\Hyro\Core\Traits\HasHyroFeatures` instead of `Marufsharia\Hyro\Traits\HasHyroFeatures`
 - Improved HyroAsset helper to return HTML comments instead of null when assets not found
 - Added fallback logic to load hyro-alert.css and hyro-alert.js when manifest assets unavailable
 - Fixed Blade directive string escaping to ensure proper PHP code generation

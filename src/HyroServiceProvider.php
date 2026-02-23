@@ -358,10 +358,10 @@ class HyroServiceProvider extends ServiceProvider
             return;
         }
 
-        if (!str_contains($content, 'use Marufsharia\Hyro\Traits\HasHyroFeatures;')) {
+        if (!str_contains($content, 'use Marufsharia\Hyro\Core\Traits\HasHyroFeatures;')) {
             $content = preg_replace(
                 '/namespace App\\\\Models;/',
-                "namespace App\\Models;\n\nuse Marufsharia\\Hyro\\Traits\\HasHyroFeatures;",
+                "namespace App\\Models;\n\nuse Marufsharia\\Hyro\\Core\\Traits\\HasHyroFeatures;",
                 $content
             );
         }
