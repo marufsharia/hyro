@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
-use Marufsharia\Hyro\Support\Traits\HasUuidConfiguration;
+use Marufsharia\Hyro\Core\Support\Traits\HasUuidConfiguration;
 
 return new class extends Migration
 {
