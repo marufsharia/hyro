@@ -20,7 +20,7 @@ class HyroAsset
         }
 
         // Fallback to package assets (for development)
-        $packageManifest = base_path('packages/marufsharia/hyro/public/build/manifest.json');
+        $packageManifest = base_path('vendor/marufsharia/hyro/public/build/manifest.json');
         if (File::exists($packageManifest)) {
             return $packageManifest;
         }
@@ -63,15 +63,17 @@ class HyroAsset
      */
     public static function css(): string
     {
-        $css = self::asset('resources/css/hyro.css');
+        $manifest = static::manifest();
         
-        if ($css) {
-            return "<link rel=\"stylesheet\" href=\"{$css}\">";
+        // Try to get from manifest
+        if (isset($manifest['resources/css/hyro.css'])) {
+            $file = $manifest['resources/css/hyro.css']['file'];
+            $url = asset('vendor/hyro/' . $file);
+            return "<link rel=\"stylesheet\" href=\"{$url}\">";
         }
         
-        // Fallback: try to load hyro-alert.css directly
-        $fallbackCss = public_path('vendor/hyro/css/hyro-alert.css');
-        if (File::exists($fallbackCss)) {
+        // Fallback to raw CSS
+        if (File::exists(public_path('vendor/hyro/css/hyro-alert.css'))) {
             return '<link rel="stylesheet" href="' . asset('vendor/hyro/css/hyro-alert.css') . '">';
         }
         
@@ -86,43 +88,22 @@ class HyroAsset
      */
     public static function js(): string
     {
-        $js = self::asset('resources/js/hyro.js');
+        $manifest = static::manifest();
         
-        if ($js) {
-            return "<script type=\"module\" src=\"{$js}\"></script>";
+        // Try to get from manifest
+        if (isset($manifest['resources/js/hyro.js'])) {
+            $file = $manifest['resources/js/hyro.js']['file'];
+            $url = asset('vendor/hyro/' . $file);
+            return "<script type=\"module\" src=\"{$url}\"></script>";
         }
         
-        // Fallback: try to load hyro-alert.js directly
-        $fallbackJs = public_path('vendor/hyro/js/hyro-alert.js');
-        if (File::exists($fallbackJs)) {
+        // Fallback to raw JS
+        if (File::exists(public_path('vendor/hyro/js/hyro-alert.js'))) {
             return '<script src="' . asset('vendor/hyro/js/hyro-alert.js') . '"></script>';
         }
         
         // Return empty string instead of null to avoid blade errors
         return '<!-- Hyro JS not found. Run: php artisan hyro:publish-assets -->';
-    }
-
-    /**
-     * Get asset URL from manifest with smart loading.
-     *
-     * @param string $entry
-     * @return string|null
-     */
-    public static function asset(string $entry): ?string
-    {
-        $manifest = static::manifest();
-
-        if (!isset($manifest[$entry])) {
-            // If not in manifest, try direct path
-            $directPath = public_path('vendor/hyro/' . $entry);
-            if (File::exists($directPath)) {
-                return asset('vendor/hyro/' . $entry);
-            }
-            return null;
-        }
-
-        $baseUrl = self::getAssetBaseUrl();
-        return $baseUrl . '/' . $manifest[$entry]['file'];
     }
 
     /**
@@ -151,19 +132,19 @@ class HyroAsset
     /**
      * Get image URL with smart loading.
      *
-     * @param string $imagePath
+     * @param string $path
      * @return string
      */
-    public static function image(string $imagePath): string
+    public static function image(string $path): string
     {
-        $publishedImage = public_path('vendor/hyro/images/' . $imagePath);
+        $publishedImage = public_path('vendor/hyro/images/' . $path);
         
         if (File::exists($publishedImage)) {
-            return asset('vendor/hyro/images/' . $imagePath);
+            return asset('vendor/hyro/images/' . $path);
         }
 
         // Fallback to package images
-        return asset('vendor/hyro/images/' . $imagePath);
+        return asset('vendor/hyro/images/' . $path);
     }
 }
 

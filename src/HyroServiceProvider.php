@@ -257,6 +257,10 @@ class HyroServiceProvider extends ServiceProvider
             return "<?php echo \\Marufsharia\\Hyro\\Core\\Helpers\\HyroAsset::js(); ?>";
         });
 
+        \Blade::directive('hyroImage', function ($expression) {
+            return "<?php echo \\Marufsharia\\Hyro\\Core\\Helpers\\HyroAsset::image({$expression}); ?>";
+        });
+
         // Register Blade components
         \Blade::component('hyro::components.card', 'hyro-card');
         \Blade::component('hyro::components.button', 'hyro-button');

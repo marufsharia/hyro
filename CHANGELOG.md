@@ -5,6 +5,23 @@ All notable changes to the Hyro package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7] - 2026-02-23
+
+### Added
+- Added `@hyroImage` Blade directive for loading package images
+- Automatic asset publishing on package installation (no manual `php artisan hyro:publish-assets` required)
+- Auto-publish checks if assets exist before copying to avoid unnecessary operations
+
+### Changed
+- Simplified HyroAsset helper class for better performance
+- Assets now automatically published when package is installed via Composer
+- Updated AdminPanelServiceProvider with `autoPublishAssets()` method
+
+### Improved
+- Zero-configuration asset management - works out of the box
+- Better fallback path resolution in HyroAsset helper
+- Cleaner implementation following Laravel package best practices
+
 ## [1.0.6] - 2026-02-23
 
 ### Fixed

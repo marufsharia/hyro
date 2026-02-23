@@ -26,6 +26,9 @@ class AdminPanelServiceProvider extends ServiceProvider
             $this->registerCommands();
         }
 
+        // Auto-publish assets on package installation/update
+        $this->autoPublishAssets();
+
         // Load views
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'hyro');
 
@@ -115,5 +118,59 @@ class AdminPanelServiceProvider extends ServiceProvider
     private function registerBladeDirectives(): void
     {
         // Blade directives will be registered here
+    }
+
+    /**
+     * Auto-publish assets if they don't exist.
+     * This ensures assets are available without manual publishing.
+     */
+    private function autoPublishAssets(): void
+    {
+        // Check if assets are already published
+        if (\Illuminate\Support\Facades\File::exists(public_path('vendor/hyro/manifest.json'))) {
+            return;
+        }
+
+        // Only auto-publish in non-console or during specific commands
+        if ($this->app->runningInConsole()) {
+            // Auto-publish during composer install/update
+            $this->publishAssetsAutomatically();
+        }
+    }
+
+    /**
+     * Publish assets automatically.
+     */
+    private function publishAssetsAutomatically(): void
+    {
+        try {
+            $buildSource = __DIR__ . '/../../public/build';
+            $buildDest = public_path('vendor/hyro');
+
+            if (\Illuminate\Support\Facades\File::exists($buildSource)) {
+                // Create destination directory
+                if (!\Illuminate\Support\Facades\File::exists($buildDest)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($buildDest, 0755, true);
+                }
+
+                // Copy built assets
+                \Illuminate\Support\Facades\File::copyDirectory($buildSource, $buildDest);
+
+                // Also copy raw assets as fallback
+                $cssSource = __DIR__ . '/../resources/css';
+                $cssDest = public_path('vendor/hyro/css');
+                if (\Illuminate\Support\Facades\File::exists($cssSource)) {
+                    \Illuminate\Support\Facades\File::copyDirectory($cssSource, $cssDest);
+                }
+
+                $jsSource = __DIR__ . '/../resources/js';
+                $jsDest = public_path('vendor/hyro/js');
+                if (\Illuminate\Support\Facades\File::exists($jsSource)) {
+                    \Illuminate\Support\Facades\File::copyDirectory($jsSource, $jsDest);
+                }
+            }
+        } catch (\Exception $e) {
+            // Silently fail - assets can be published manually
+        }
     }
 }
