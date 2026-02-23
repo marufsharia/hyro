@@ -121,21 +121,48 @@ class AdminPanelServiceProvider extends ServiceProvider
     }
 
     /**
-     * Auto-publish assets if they don't exist.
-     * This ensures assets are available without manual publishing.
+     * Auto-publish assets if they don't exist or are outdated.
+     * This ensures assets are available and up-to-date without manual publishing.
      */
     private function autoPublishAssets(): void
     {
-        // Check if assets are already published
-        if (\Illuminate\Support\Facades\File::exists(public_path('vendor/hyro/manifest.json'))) {
+        // Only auto-publish during console commands (composer install/update)
+        if (!$this->app->runningInConsole()) {
             return;
         }
 
-        // Only auto-publish in non-console or during specific commands
-        if ($this->app->runningInConsole()) {
-            // Auto-publish during composer install/update
+        // Check if assets need publishing
+        if ($this->shouldPublishAssets()) {
             $this->publishAssetsAutomatically();
         }
+    }
+
+    /**
+     * Determine if assets should be published.
+     * 
+     * @return bool
+     */
+    private function shouldPublishAssets(): bool
+    {
+        $manifestPath = public_path('vendor/hyro/manifest.json');
+        
+        // If manifest doesn't exist, definitely publish
+        if (!\Illuminate\Support\Facades\File::exists($manifestPath)) {
+            return true;
+        }
+
+        // Check if package manifest is newer than published manifest
+        $packageManifest = __DIR__ . '/../../public/build/manifest.json';
+        if (!\Illuminate\Support\Facades\File::exists($packageManifest)) {
+            return false; // No package manifest, nothing to publish
+        }
+
+        // Compare modification times
+        $publishedTime = filemtime($manifestPath);
+        $packageTime = filemtime($packageManifest);
+
+        // If package manifest is newer, republish
+        return $packageTime > $publishedTime;
     }
 
     /**
