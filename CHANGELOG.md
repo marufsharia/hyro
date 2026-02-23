@@ -5,6 +5,28 @@ All notable changes to the Hyro package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-02-23
+
+### Fixed
+- Fixed `HyroAsset` helper to check `.vite/manifest.json` path first for proper asset loading
+- Fixed CSS/JS not loading due to incorrect manifest path resolution
+- Removed duplicate Alpine.js loading in login view
+
+### Changed
+- Updated login view to use `@hyroAssets` directive instead of separate `@hyroCss` and `@hyroJs`
+- Updated all auth views to use modern `@hyroAssets` directive
+- Improved manifest path resolution with multiple fallback locations
+
+### Added
+- Added `ASSET_PATH_FIX.md` documentation with troubleshooting guide
+- Added backward compatibility for old manifest location (`public/vendor/hyro/manifest.json`)
+- Added development support with package manifest fallback
+
+### Improved
+- Better asset path resolution order: `.vite/manifest.json` → `manifest.json` → package assets → CDN
+- Simplified auth views with single directive
+- Enhanced error handling for missing manifests
+
 ## [2.0.0] - 2026-02-23
 
 ### 🎉 Major Release: Filament-Style Asset Architecture
