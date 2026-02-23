@@ -13,14 +13,20 @@ class HyroAsset
      */
     protected static function getManifestPath(): ?string
     {
-        // Check published assets first
-        $publishedManifest = public_path('vendor/hyro/manifest.json');
+        // Check published assets first (new v2.0 location)
+        $publishedManifest = public_path('vendor/hyro/.vite/manifest.json');
         if (File::exists($publishedManifest)) {
             return $publishedManifest;
         }
 
+        // Fallback to root manifest (for backward compatibility)
+        $rootManifest = public_path('vendor/hyro/manifest.json');
+        if (File::exists($rootManifest)) {
+            return $rootManifest;
+        }
+
         // Fallback to package assets (for development)
-        $packageManifest = base_path('vendor/marufsharia/hyro/public/build/manifest.json');
+        $packageManifest = base_path('vendor/marufsharia/hyro/dist/.vite/manifest.json');
         if (File::exists($packageManifest)) {
             return $packageManifest;
         }

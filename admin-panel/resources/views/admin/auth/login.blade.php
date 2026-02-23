@@ -14,11 +14,9 @@
     <!-- Dynamic Styles & Favicon -->
     @include('hyro::admin.auth.partials.dynamic-styles')
 
-    <!-- Styles -->
-    @hyroCss
-    
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Hyro Assets (CSS & JS) -->
+    @hyroAssets
+    @livewireStyles
 </head>
 <body class="h-full bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
     <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -207,6 +205,7 @@
             </p>
         </div>
     </div>
-    @hyroJs
+    
+    @livewireScripts
 </body>
 </html>
