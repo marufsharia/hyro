@@ -1,0 +1,41 @@
+{
+    "name": "hyro",
+    "version": "1.0.0",
+    "description": "Enterprise-grade Authentication, Authorization, Role & Privilege Management System for Laravel 12+",
+    "main": "tailwind.config.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/marufsharia/hyro.git"
+    },
+    "keywords": [
+        "laravel",
+        "authentication",
+        "authorization",
+        "rbac",
+        "livewire"
+    ],
+    "author": "Maruf Sharia",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/marufsharia/hyro/issues"
+    },
+    "homepage": "https://github.com/marufsharia/hyro#readme",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@alpinejs/collapse": "^3.15.5",
+        "@alpinejs/focus": "^3.15.5",
+        "@alpinejs/intersect": "^3.15.5",
+        "@tailwindcss/vite": "^4.1.18",
+        "alpinejs": "^3.15.5",
+        "axios": "^1.11.0",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^2.0.0",
+        "tailwindcss": "^4.1.18",
+        "vite": "^7.0.7"
+    }
+}

@@ -1,0 +1,89 @@
+<?php
+
+namespace {{ namespace }};
+
+use Marufsharia\Hyro\Livewire\BaseCrudComponent;
+use {{ modelClass }};
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+
+class {{ componentName }} extends BaseCrudComponent
+{
+{{ properties }}
+
+{{ layoutMethod }}
+
+    /**
+     * Get the model class for CRUD operations
+     */
+    protected function getModel(): string
+    {
+        return \{{ modelClass }}::class;
+    }
+
+    /**
+     * Get the model fields for form generation
+     */
+    protected function getFields(): array
+    {
+        return [
+{{ fields }}
+        ];
+    }
+
+    /**
+     * Get searchable fields
+     */
+    protected function getSearchableFields(): array
+    {
+        return [{{ searchableFields }}];
+    }
+
+    /**
+     * Get table columns to display
+     */
+    protected function getTableColumns(): array
+    {
+        return [{{ tableColumns }}];
+    }
+
+{{ relations }}
+
+{{ filters }}
+
+    /**
+     * Check if user can update record
+     */
+    protected function canUpdate($record): bool
+    {
+        // Simple authentication check - customize as needed
+        return auth()->check();
+        
+        // For ownership-based permissions, uncomment and add user_id column:
+        // return auth()->check() && auth()->id() === $record->user_id;
+        
+        // For Hyro privilege system, uncomment:
+        // return auth()->user()->hasPrivilege('{{ permission }}.update');
+    }
+
+    /**
+     * Check if user can delete record
+     */
+    protected function canDelete($record): bool
+    {
+        // Simple authentication check - customize as needed
+        return auth()->check();
+        
+        // For ownership-based permissions, uncomment and add user_id column:
+        // return auth()->check() && auth()->id() === $record->user_id;
+        
+        // For Hyro privilege system, uncomment:
+        // return auth()->user()->hasPrivilege('{{ permission }}.delete');
+    }
+
+{{ exportMethods }}
+
+{{ importMethods }}
+
+{{ customMethods }}
+}

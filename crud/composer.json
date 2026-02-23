@@ -1,0 +1,33 @@
+{
+    "name": "marufsharia/hyro-crud",
+    "description": "Hyro CRUD - CRUD Generator and Auto-scaffolding",
+    "version": "1.0.0",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maruf Sharia",
+            "email": "marufsharia@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "marufsharia/hyro-core": "^1.0",
+        "marufsharia/hyro-admin-panel": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Marufsharia\\Hyro\\Crud\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Marufsharia\\Hyro\\Crud\\CrudServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

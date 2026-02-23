@@ -1,0 +1,111 @@
+{
+    "name": "marufsharia/hyro",
+    "description": "Hyro is a modular Laravel RBAC ecosystem featuring advanced role-permission management, admin panel, CRUD generator, plugin system, and API layer — built for scalable SaaS and enterprise applications",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "admin",
+        "rbac",
+        "acl",
+        "roles",
+        "permissions",
+        "authorization",
+        "authentication",
+        "crud",
+        "plugin",
+        "hyro",
+        "livewire",
+        "admin-panel",
+        "api",
+        "sanctum"
+    ],
+    "homepage": "https://github.com/marufsharia/hyro",
+    "support": {
+        "issues": "https://github.com/marufsharia/hyro/issues",
+        "source": "https://github.com/marufsharia/hyro"
+    },
+    "authors": [
+        {
+            "name": "Maruf Sharia",
+            "email": "marufsharia@gmail.com",
+            "homepage": "https://github.com/marufsharia",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^11.0|^12.0",
+        "illuminate/support": "^11.0|^12.0",
+        "jantinnerezo/livewire-alert": "^3.0",
+        "laravel/framework": "^11.0|^12.0",
+        "laravel/prompts": "^0.3.13",
+        "laravel/sanctum": "^4.0",
+        "livewire/livewire": "^3.7",
+        "pragmarx/google2fa": "^8.0",
+        "ramsey/uuid": "^4.0",
+        "wire-elements/modal": "^2.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.0",
+        "orchestra/testbench": "^9.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Marufsharia\\Hyro\\": "src/",
+            "Marufsharia\\Hyro\\Core\\": "core/src/",
+            "Marufsharia\\Hyro\\Auth\\": "auth/src/",
+            "Marufsharia\\Hyro\\Api\\": "api/src/",
+            "Marufsharia\\Hyro\\AdminPanel\\": "admin-panel/src/",
+            "Marufsharia\\Hyro\\Crud\\": "crud/src/",
+            "Marufsharia\\Hyro\\Plugin\\": "plugin/src/"
+        },
+        "files": [
+            "core/src/Helpers/hyro_helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Marufsharia\\Hyro\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Marufsharia\\Hyro\\HyroServiceProvider",
+                "Marufsharia\\Hyro\\Core\\CoreServiceProvider",
+                "Marufsharia\\Hyro\\Auth\\AuthServiceProvider",
+                "Marufsharia\\Hyro\\Api\\ApiServiceProvider",
+                "Marufsharia\\Hyro\\AdminPanel\\AdminPanelServiceProvider",
+                "Marufsharia\\Hyro\\Crud\\CrudServiceProvider",
+                "Marufsharia\\Hyro\\Plugin\\PluginServiceProvider"
+            ],
+            "aliases": {
+                "Hyro": "Marufsharia\\Hyro\\Core\\Facades\\Hyro",
+                "HyroPlugin": "Marufsharia\\Hyro\\Plugin\\Facades\\Plugin"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php -r \"file_exists('vendor/bin/testbench') && @unlink('vendor/bin/testbench');\""
+        ],
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
+        "format": "vendor/bin/pint",
+        "analyse": "vendor/bin/phpstan analyse"
+    }
+}

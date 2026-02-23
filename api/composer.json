@@ -1,0 +1,34 @@
+{
+    "name": "marufsharia/hyro-api",
+    "description": "Hyro API - RESTful API layer",
+    "version": "1.0.0",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maruf Sharia",
+            "email": "marufsharia@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.0",
+        "marufsharia/hyro-core": "^1.0",
+        "marufsharia/hyro-auth": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Marufsharia\\Hyro\\Api\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Marufsharia\\Hyro\\Api\\ApiServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

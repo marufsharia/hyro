@@ -1,0 +1,400 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | General Toggles
+    |--------------------------------------------------------------------------
+    */
+    'enabled' => env('HYRO_ENABLED', true),
+  
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Configuration
+    |--------------------------------------------------------------------------
+    */
+    'api' => [
+        'enabled' => env('HYRO_API_ENABLED', false),
+        'prefix' => env('HYRO_API_PREFIX', 'api/hyro'),
+        'middleware' => ['api', 'auth:sanctum'],
+        'rate_limit' => [
+            'enabled' => env('HYRO_API_RATE_LIMIT', true),
+            'max_attempts' => env('HYRO_API_MAX_ATTEMPTS', 60),
+            'decay_minutes' => env('HYRO_API_DECAY_MINUTES', 1),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Panel
+    |--------------------------------------------------------------------------
+    */
+    'admin' => [
+        'enabled' => env('HYRO_ADMIN_ENABLED', true),
+        'redirects' => [
+            'authenticated' => 'dashboard',
+        ],
+        'route' => [
+            'prefix' => env('HYRO_ADMIN_PREFIX', 'admin/hyro'),
+            'middleware' => ['web', 'hyro.auth'],
+        ],
+        'layout' => env('HYRO_ADMIN_LAYOUT', 'hyro::admin.layouts.app'),
+        'pagination' => [
+            'per_page' => 20,
+        ],
+        'features' => [
+            'user_management' => true,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Appearance & Branding
+    |--------------------------------------------------------------------------
+    */
+    'appearance' => [
+        'app_name' => env('HYRO_APP_NAME', env('APP_NAME', 'Hyro Admin')),
+        'app_logo' => env('HYRO_APP_LOGO', ''),
+        'app_favicon' => env('HYRO_APP_FAVICON', ''),
+        'primary_color' => env('HYRO_PRIMARY_COLOR', '#3B82F6'),
+        'sidebar_position' => env('HYRO_SIDEBAR_POSITION', 'left'),
+        'sidebar_collapsed' => env('HYRO_SIDEBAR_COLLAPSED', false),
+        'theme_mode' => env('HYRO_THEME_MODE', 'system'), // light, dark, system
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication
+    |--------------------------------------------------------------------------
+    */
+    'auth' => [
+        'enabled' => env('HYRO_AUTH_ENABLED', true),
+        'routes' => [
+            'login' => 'login',
+            'logout' => 'logout',
+            'register' => 'register',
+            'password' => [
+                'request' => 'password.request',
+                'email' => 'password.email',
+                'reset' => 'password.reset',
+                'update' => 'password.update',
+            ],
+            'verification' => [
+                'notice' => 'verification.notice',
+                'verify' => 'verification.verify',
+                'resend' => 'verification.resend',
+            ],
+        ],
+        'redirects' => [
+            'login' => '/dashboard',
+            'register' => '/dashboard',
+            'logout' => '/',
+            'password_reset' => '/dashboard',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | CLI
+    |--------------------------------------------------------------------------
+    */
+    'cli' => [
+        'enabled' => env('HYRO_CLI_ENABLED', true),
+        'danger_confirmations' => env('HYRO_CLI_DANGER_CONFIRM', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Livewire CRUD System
+    |--------------------------------------------------------------------------
+    */
+    'livewire' => [
+        'enabled' => env('HYRO_LIVEWIRE_ENABLED', true),
+        'theme' => env('HYRO_LIVEWIRE_THEME', 'default'),
+        'layout' => env('HYRO_LIVEWIRE_LAYOUT', 'hyro::admin.layouts.app'),
+        'pagination' => [
+            'per_page' => env('HYRO_LIVEWIRE_PER_PAGE', 15),
+            'theme' => env('HYRO_LIVEWIRE_PAGINATION_THEME', 'tailwind'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | CRUD Generator
+    |--------------------------------------------------------------------------
+    */
+    'crud' => [
+        'generate_api' => env('HYRO_CRUD_GENERATE_API', true),
+        'soft_delete' => env('HYRO_CRUD_SOFT_DELETE', true),
+        'auto_permission' => env('HYRO_CRUD_AUTO_PERMISSION', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | RBAC System
+    |--------------------------------------------------------------------------
+    */
+    'rbac' => [
+        'enabled' => env('HYRO_RBAC_ENABLED', true),
+        'default_role' => env('HYRO_RBAC_DEFAULT_ROLE', 'user'),
+        'super_admin_role' => env('HYRO_RBAC_SUPER_ADMIN_ROLE', 'super-admin'),
+        'cache_permissions' => env('HYRO_RBAC_CACHE_PERMISSIONS', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Plugin System
+    |--------------------------------------------------------------------------
+    */
+    'plugins' => [
+        'enabled' => env('HYRO_PLUGINS_ENABLED', true),
+        'path' => env('HYRO_PLUGINS_PATH', base_path('hyro-plugins')),
+        'autoload' => env('HYRO_PLUGINS_AUTOLOAD', true),
+        'remote_cache_ttl' => 1800,
+        'cache' => [
+            'enabled' => env('HYRO_PLUGINS_CACHE_ENABLED', true),
+            'ttl' => env('HYRO_PLUGINS_CACHE_TTL', 3600),
+        ],
+        // Remote sources configuration
+        'marketplace' => [
+            'enabled' => true,
+            'url' => env('HYRO_MARKETPLACE_URL', 'https://marketplace.hyro.io/api/v1'),
+            'api_key' => env('HYRO_MARKETPLACE_API_KEY'),
+        ],
+        'github' => [
+            'enabled' => true,
+        ],
+        'gitlab' => [
+            'enabled' => true,
+            'url' => env('HYRO_GITLAB_URL', 'https://gitlab.com/api/v4'),
+        ],
+        'packagist' => [
+            'enabled' => true,
+        ],
+    ],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Assets
+    |--------------------------------------------------------------------------
+    */
+    'assets' => [
+        'css' => '/vendor/hyro/css/hyro.css',
+        'js' => '/vendor/hyro/js/hyro.js',
+        'versioned' => env('HYRO_ASSETS_VERSIONED', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Database
+    |--------------------------------------------------------------------------
+    */
+    'database' => [
+        'connection' => env('HYRO_DB_CONNECTION'),
+        'migrations' => [
+            'autoload' => true,
+            'publish' => false,
+        ],
+        'tables' => [
+            'roles' => 'hyro_roles',
+            'privileges' => 'hyro_privileges',
+            'role_user' => 'hyro_role_user',
+            'privilege_role' => 'hyro_privilege_role',
+            'user_suspensions' => 'hyro_user_suspensions',
+            'audit_logs' => 'hyro_audit_logs',
+        ],
+        'models' => [
+            'users' => \App\Models\User::class,
+            'role' => \Marufsharia\Hyro\Models\Role::class,
+            'privilege' => \Marufsharia\Hyro\Models\Privilege::class,
+            'user_suspension' => \Marufsharia\Hyro\Models\UserSuspension::class,
+            'audit_log' => \Marufsharia\Hyro\Models\AuditLog::class,
+        ],
+        'backup' => [
+            'enabled' => env('HYRO_DB_BACKUP_ENABLED', true),
+            'disk' => env('HYRO_DB_BACKUP_DISK', 'local'),
+            'compress' => env('HYRO_DB_BACKUP_COMPRESS', true),
+            'encrypt' => env('HYRO_DB_BACKUP_ENCRYPT', false),
+            'encryption_key' => env('HYRO_DB_BACKUP_KEY'),
+            'retention_days' => env('HYRO_DB_BACKUP_RETENTION', 30),
+            'schedule' => [
+                'enabled' => env('HYRO_DB_BACKUP_SCHEDULE', false),
+                'frequency' => env('HYRO_DB_BACKUP_FREQUENCY', 'daily'),
+                'time' => env('HYRO_DB_BACKUP_TIME', '02:00'),
+            ],
+        ],
+        'optimization' => [
+            'enabled' => env('HYRO_DB_OPTIMIZE_ENABLED', true),
+            'schedule' => [
+                'enabled' => env('HYRO_DB_OPTIMIZE_SCHEDULE', false),
+                'frequency' => env('HYRO_DB_OPTIMIZE_FREQUENCY', 'weekly'),
+            ],
+        ],
+        'monitoring' => [
+            'enabled' => env('HYRO_DB_MONITORING_ENABLED', true),
+            'slow_query_threshold' => env('HYRO_DB_SLOW_QUERY_THRESHOLD', 1000),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authorization & Privileges
+    |--------------------------------------------------------------------------
+    */
+    'authorization' => [
+        'resolution_order' => [
+            'token_ability',
+            'direct_privilege',
+            'wildcard_privilege',
+            'role_fallback',
+            'laravel_gate',
+        ],
+        'override_gate' => false,
+        'wildcards' => [
+            'enabled' => true,
+            'character' => '*',
+            'patterns' => [
+                'users.*',
+                'admin.*',
+                '*.view',
+                '*.create',
+                '*.update',
+                '*.delete',
+            ],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tokens
+    |--------------------------------------------------------------------------
+    */
+    'tokens' => [
+        'sync' => [
+            'enabled' => true,
+            'revoke_on_suspension' => true,
+            'revoke_on_privilege_change' => true,
+            'batch_size' => 100,
+            'delay' => 0,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Security
+    |--------------------------------------------------------------------------
+    */
+    'security' => [
+        'fail_closed' => true,
+        'protected_roles' => [
+            'super-admin',
+            'administrator',
+        ],
+        'password_policy' => [
+            'enabled' => false,
+            'min_length' => 12,
+            'mixed_case' => true,
+            'numbers' => true,
+            'symbols' => true,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auditing
+    |--------------------------------------------------------------------------
+    */
+    'auditing' => [
+        'enabled' => true,
+        'retention_days' => 365,
+        'log' => [
+            'ip' => true,
+            'user_agent' => true,
+            'request' => false,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache
+    |--------------------------------------------------------------------------
+    */
+    'cache' => [
+        'enabled' => true,
+        'prefix' => 'hyro:',
+        'ttl' => [
+            'roles' => 3600,
+            'privileges' => 3600,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications
+    |--------------------------------------------------------------------------
+    */
+    'notifications' => [
+        'enabled' => env('HYRO_NOTIFICATIONS_ENABLED', true),
+        'channels' => ['database', 'mail'],
+        
+        // Notification preferences per event type
+        'role_assigned' => [
+            'enabled' => env('HYRO_NOTIFY_ROLE_ASSIGNED', true),
+            'channels' => ['database', 'mail'],
+        ],
+        'role_revoked' => [
+            'enabled' => env('HYRO_NOTIFY_ROLE_REVOKED', true),
+            'channels' => ['database', 'mail'],
+        ],
+        'privilege_granted' => [
+            'enabled' => env('HYRO_NOTIFY_PRIVILEGE_GRANTED', true),
+            'channels' => ['database'], // Email only for important privileges
+        ],
+        'privilege_revoked' => [
+            'enabled' => env('HYRO_NOTIFY_PRIVILEGE_REVOKED', true),
+            'channels' => ['database'],
+        ],
+        'user_suspended' => [
+            'enabled' => env('HYRO_NOTIFY_USER_SUSPENDED', true),
+            'channels' => ['database', 'mail'],
+        ],
+        'user_unsuspended' => [
+            'enabled' => env('HYRO_NOTIFY_USER_UNSUSPENDED', true),
+            'channels' => ['database', 'mail'],
+        ],
+        'admin_user_suspended' => [
+            'enabled' => env('HYRO_NOTIFY_ADMIN_USER_SUSPENDED', true),
+            'channels' => ['database', 'mail'],
+        ],
+        
+        // Queue configuration
+        'queue' => [
+            'enabled' => env('HYRO_NOTIFICATIONS_QUEUE', true),
+            'connection' => env('HYRO_NOTIFICATIONS_QUEUE_CONNECTION', 'default'),
+            'queue' => env('HYRO_NOTIFICATIONS_QUEUE_NAME', 'notifications'),
+        ],
+        
+        // Real-time notifications (requires broadcasting)
+        'real_time' => [
+            'enabled' => env('HYRO_NOTIFICATIONS_REALTIME', false),
+            'driver' => env('BROADCAST_DRIVER', 'pusher'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Events
+    |--------------------------------------------------------------------------
+    */
+    'events' => [
+        'broadcast' => [
+            'enabled' => false,
+            'driver' => 'pusher',
+            'channel_prefix' => 'hyro.',
+        ],
+    ],
+
+];

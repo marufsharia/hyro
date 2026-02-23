@@ -1,0 +1,57 @@
+<?php
+
+namespace Marufsharia\Hyro\Core\Events;
+
+use Illuminate\Contracts\Auth\Authenticatable;
+use Marufsharia\Hyro\Core\Models\Role;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class RoleAssigned
+{
+    use Dispatchable, SerializesModels;
+
+    /**
+     * The user instance.
+     */
+    public Authenticatable $user;
+
+    /**
+     * The role instance.
+     */
+    public Role $role;
+
+    /**
+     * The user who performed the assignment.
+     */
+    public ?Authenticatable $assigner;
+
+    /**
+     * Additional metadata.
+     */
+    public array $metadata;
+
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(Authenticatable $user, Role $role, ?Authenticatable $assigner = null, array $metadata = [])
+    {
+        $this->user = $user;
+        $this->role = $role;
+        $this->assigner = $assigner;
+        $this->metadata = array_merge([
+            'assigned_at' => now(),
+            'via' => 'manual',
+            'reason' => null,
+        ], $metadata);
+    }
+
+    /**
+     * Get the event's broadcast channel name.
+     */
+    public function broadcastOn(): string
+    {
+        return 'users.' . $this->user->id;
+    }
+}
+

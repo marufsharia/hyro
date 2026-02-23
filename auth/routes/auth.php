@@ -1,0 +1,92 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Marufsharia\Hyro\AdminPanel\Http\Controllers\Admin\Auth\AuthController;
+use Marufsharia\Hyro\AdminPanel\Http\Controllers\Admin\Auth\RegisterController;
+use Marufsharia\Hyro\AdminPanel\Http\Controllers\Admin\Auth\ForgotPasswordController;
+use Marufsharia\Hyro\AdminPanel\Http\Controllers\Admin\Auth\ResetPasswordController;
+use Marufsharia\Hyro\AdminPanel\Http\Controllers\Admin\Auth\TwoFactorController;
+
+Route::prefix(hyro_config('admin.route.prefix', config('hyro.admin.route.prefix')))
+    ->middleware('web')
+    ->name('hyro.')
+    ->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Guest Routes (login, register, password reset)
+        |--------------------------------------------------------------------------
+        */
+        Route::middleware('hyro.guest')->group(function () {
+            Route::get('/', [AuthController::class, 'showLoginForm'])
+                ->name('login');
+
+            Route::get('/login', function () {
+                return redirect()->route('hyro.login');
+            });
+
+            // Login page or redirect to dashboard if already logged in
+//            Route::get('/dashboard', function () {
+//                if (auth()->check()) {
+//                    return redirect()->route('hyro.admin.dashboard');
+//                }
+//                return app(AuthController::class)->showLoginForm();
+//            })->name('login');
+
+
+
+            // Login submission
+            Route::post('login', [AuthController::class, 'login'])
+                ->name('login.submit');
+            
+            // Two-Factor Authentication
+            Route::get('2fa/verify', [TwoFactorController::class, 'show'])
+                ->name('2fa.verify')
+                ->withoutMiddleware('hyro.guest');
+            
+            Route::post('2fa/verify', [TwoFactorController::class, 'verify'])
+                ->name('2fa.verify.submit')
+                ->withoutMiddleware('hyro.guest');
+            
+            Route::get('2fa/recovery', [TwoFactorController::class, 'showRecovery'])
+                ->name('2fa.recovery')
+                ->withoutMiddleware('hyro.guest');
+
+            // Registration page
+            Route::get('register', [RegisterController::class, 'showRegistrationForm'])
+                ->name('register');
+
+            // Registration submission
+            Route::post('register', [RegisterController::class, 'register'])
+                ->name('register.submit');
+
+            // Password reset request form
+            Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])
+                ->name('password.request');
+
+            // Send password reset link
+            Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])
+                ->name('password.email');
+
+            // Password reset form (with token)
+            Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])
+                ->name('password.reset');
+
+            // Password reset submission
+            Route::post('password/reset', [ResetPasswordController::class, 'reset'])
+                ->name('password.update');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Authenticated Routes (logout)
+        |--------------------------------------------------------------------------
+        */
+        Route::middleware('auth')->group(function () {
+
+            // Logout
+            Route::post('logout', [AuthController::class, 'logout'])
+                ->name('logout');
+        });
+
+    });

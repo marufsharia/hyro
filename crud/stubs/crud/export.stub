@@ -1,0 +1,115 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ modelClass }};
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+class {{ exportName }} implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
+{
+    protected $query;
+    protected $format;
+
+    public function __construct($query = null, string $format = 'xlsx')
+    {
+        $this->query = $query;
+        $this->format = $format;
+    }
+
+    /**
+     * Get the collection to export
+     */
+    public function collection()
+    {
+        if ($this->query) {
+            return $this->query->get();
+        }
+
+        return {{ modelClass }}::all();
+    }
+
+    /**
+     * Define column headings
+     */
+    public function headings(): array
+    {
+        return [
+{{ headings }}
+        ];
+    }
+
+    /**
+     * Map each row
+     */
+    public function map($item): array
+    {
+        return [
+{{ mappings }}
+        ];
+    }
+
+    /**
+     * Apply styles to the worksheet
+     */
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1 => [
+                'font' => [
+                    'bold' => true,
+                    'size' => 12,
+                    'color' => ['rgb' => 'FFFFFF'],
+                ],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => '4F46E5'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Export to CSV
+     */
+    public static function toCsv($query = null): string
+    {
+        $exporter = new static($query, 'csv');
+        $filename = '{{ resourceName }}_' . now()->format('Y-m-d_His') . '.csv';
+        
+        return \Maatwebsite\Excel\Facades\Excel::download($exporter, $filename)->getFile()->getPathname();
+    }
+
+    /**
+     * Export to Excel
+     */
+    public static function toExcel($query = null): string
+    {
+        $exporter = new static($query, 'xlsx');
+        $filename = '{{ resourceName }}_' . now()->format('Y-m-d_His') . '.xlsx';
+        
+        return \Maatwebsite\Excel\Facades\Excel::download($exporter, $filename)->getFile()->getPathname();
+    }
+
+    /**
+     * Export to PDF
+     */
+    public static function toPdf($query = null): string
+    {
+        $items = $query ? $query->get() : {{ modelClass }}::all();
+        
+        $pdf = Pdf::loadView('exports.{{ resourceNameKebab }}', [
+            'items' => $items,
+            'date' => now()->format('Y-m-d H:i:s'),
+        ]);
+
+        $filename = '{{ resourceName }}_' . now()->format('Y-m-d_His') . '.pdf';
+        
+        return $pdf->download($filename)->getFile()->getPathname();
+    }
+}
