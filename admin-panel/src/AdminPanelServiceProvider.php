@@ -23,6 +23,7 @@ class AdminPanelServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishResources();
+            $this->registerCommands();
         }
 
         // Load views
@@ -43,26 +44,37 @@ class AdminPanelServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register console commands.
+     */
+    private function registerCommands(): void
+    {
+        $this->commands([
+            \Marufsharia\Hyro\AdminPanel\Console\Commands\PublishAssetsCommand::class,
+        ]);
+    }
+
+    /**
      * Publish package resources.
      */
     private function publishResources(): void
     {
         // Views
         $this->publishes([
-            __DIR__ . '/../resources/views' => resource_path('views/vendor/hyro-admin'),
-        ], 'hyro-admin-views');
+            __DIR__ . '/../resources/views' => resource_path('views/vendor/hyro'),
+        ], 'hyro-views');
 
-        // Assets
+        // Assets - publish to vendor/hyro (not vendor/hyro-admin)
         $this->publishes([
-            __DIR__ . '/../resources/css' => public_path('vendor/hyro-admin/css'),
-            __DIR__ . '/../resources/js' => public_path('vendor/hyro-admin/js'),
-        ], 'hyro-admin-assets');
+            __DIR__ . '/../resources/css' => public_path('vendor/hyro/css'),
+            __DIR__ . '/../resources/js' => public_path('vendor/hyro/js'),
+        ], 'hyro-assets');
 
         // Routes
         $this->publishes([
             __DIR__ . '/../routes/admin.php' => base_path('routes/hyro/admin.php'),
             __DIR__ . '/../routes/notifications.php' => base_path('routes/hyro/notifications.php'),
-        ], 'hyro-admin-routes');
+            __DIR__ . '/../routes/profile.php' => base_path('routes/hyro/profile.php'),
+        ], 'hyro-routes');
     }
 
     /**
