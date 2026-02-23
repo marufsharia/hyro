@@ -5,6 +5,22 @@ All notable changes to the Hyro package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2026-02-23
+
+### Removed
+- Removed duplicate CSS/JS files from `admin-panel/resources/css/` and `admin-panel/resources/js/`
+- Removed duplicate views from root `resources/views/`
+- Cleaned up package structure to eliminate confusion
+
+### Changed
+- Package now has clear separation: `resources/` for build source, `admin-panel/resources/views/` for admin views
+- Reduced package size by ~50% by removing duplicates
+
+### Improved
+- Clearer package structure following Laravel conventions
+- Easier to maintain with single source of truth for assets
+- Better documentation of package architecture
+
 ## [1.0.7] - 2026-02-23
 
 ### Added
