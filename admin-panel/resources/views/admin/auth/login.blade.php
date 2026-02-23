@@ -15,8 +15,9 @@
     @include('hyro::admin.auth.partials.dynamic-styles')
 
     <!-- Hyro Assets (CSS & JS) -->
-    @hyroAssets
+    @hyroCss
     @livewireStyles
+    @stack('styles')
 </head>
 <body class="h-full bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
     <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -205,7 +206,8 @@
             </p>
         </div>
     </div>
-    
+    @hyroJs
     @livewireScripts
+    @stack('scripts')
 </body>
 </html>

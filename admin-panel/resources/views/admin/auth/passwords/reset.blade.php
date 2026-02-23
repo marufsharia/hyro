@@ -15,7 +15,9 @@
     @include('hyro::admin.auth.partials.dynamic-styles')
     
     <!-- Styles -->
-    @hyroCss
+      @hyroCss
+    @livewireStyles
+    @stack('styles')
     
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -175,6 +177,8 @@
             </p>
         </div>
     </div>
-    @hyroJs
+   @hyroJs
+    @livewireScripts
+    @stack('scripts')
 </body>
 </html>
