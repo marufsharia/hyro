@@ -63,11 +63,16 @@ class AdminPanelServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/views' => resource_path('views/vendor/hyro'),
         ], 'hyro-views');
 
-        // Assets - publish to vendor/hyro (not vendor/hyro-admin)
+        // Built assets from Vite - publish the entire build directory
+        $this->publishes([
+            __DIR__ . '/../../public/build' => public_path('vendor/hyro'),
+        ], 'hyro-assets');
+
+        // Also publish raw CSS/JS for fallback
         $this->publishes([
             __DIR__ . '/../resources/css' => public_path('vendor/hyro/css'),
             __DIR__ . '/../resources/js' => public_path('vendor/hyro/js'),
-        ], 'hyro-assets');
+        ], 'hyro-assets-raw');
 
         // Routes
         $this->publishes([

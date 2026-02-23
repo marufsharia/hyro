@@ -5,6 +5,18 @@ All notable changes to the Hyro package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2026-02-23
+
+### Fixed
+- Fixed asset publishing to include Vite-built assets (manifest.json and compiled CSS/JS from public/build/)
+- Updated AdminPanelServiceProvider to publish built assets instead of source files
+- Updated PublishAssetsCommand to copy the entire build directory with manifest
+- Assets now properly published with versioned filenames (e.g., hyro-D-y3am57.js)
+
+### Changed
+- Asset publishing now includes both built assets (primary) and raw assets (fallback)
+- Added `hyro-assets-raw` tag for publishing uncompiled CSS/JS files
+
 ## [1.0.5] - 2026-02-23
 
 ### Fixed

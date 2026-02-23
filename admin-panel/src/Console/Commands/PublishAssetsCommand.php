@@ -18,7 +18,18 @@ class PublishAssetsCommand extends Command
 
         $force = $this->option('force');
 
-        // Define source and destination paths
+        // First, publish the built assets (manifest.json and compiled assets)
+        $buildSource = __DIR__ . '/../../../public/build';
+        $buildDestination = public_path('vendor/hyro');
+        
+        if (File::exists($buildSource)) {
+            $this->info('Publishing built assets (Vite compiled)...');
+            $this->publishDirectory($buildSource, $buildDestination, 'built', $force, true);
+        } else {
+            $this->warn('⚠ Built assets not found. Run "npm run build" in the package directory first.');
+        }
+
+        // Then publish raw CSS/JS as fallback
         $sources = [
             'css' => [
                 'source' => __DIR__ . '/../../../resources/css',
@@ -30,6 +41,8 @@ class PublishAssetsCommand extends Command
             ],
         ];
 
+        $this->newLine();
+        $this->info('Publishing raw assets (fallback)...');
         foreach ($sources as $type => $paths) {
             $this->publishDirectory($paths['source'], $paths['destination'], $type, $force);
         }
@@ -38,13 +51,15 @@ class PublishAssetsCommand extends Command
         $this->info('✓ Assets published successfully!');
         $this->newLine();
         $this->info('Assets published to:');
-        $this->line('  • public/vendor/hyro/css');
-        $this->line('  • public/vendor/hyro/js');
+        $this->line('  • public/vendor/hyro/manifest.json (Vite manifest)');
+        $this->line('  • public/vendor/hyro/assets/ (compiled CSS/JS)');
+        $this->line('  • public/vendor/hyro/css/ (raw CSS fallback)');
+        $this->line('  • public/vendor/hyro/js/ (raw JS fallback)');
 
         return 0;
     }
 
-    private function publishDirectory($source, $destination, $type, $force)
+    private function publishDirectory($source, $destination, $type, $force, $recursive = false)
     {
         if (!File::exists($source)) {
             $this->warn("⚠ Source directory not found: {$source}");
@@ -56,7 +71,18 @@ class PublishAssetsCommand extends Command
             File::makeDirectory($destination, 0755, true);
         }
 
-        // Copy files
+        if ($recursive) {
+            // Copy entire directory recursively (for build folder)
+            if ($force || !File::exists($destination . '/manifest.json')) {
+                File::copyDirectory($source, $destination);
+                $this->line("✓ Copied {$type} directory recursively");
+            } else {
+                $this->line("  Skipped {$type} directory (use --force to overwrite)");
+            }
+            return;
+        }
+
+        // Copy files (non-recursive)
         $files = File::files($source);
         $copied = 0;
         $skipped = 0;
